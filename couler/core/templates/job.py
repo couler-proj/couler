@@ -1,0 +1,69 @@
+from collections import OrderedDict
+
+from couler.core import pyfunc
+from couler.core.templates.template import Template
+
+
+class Job(Template):
+    def __init__(
+        self,
+        name,
+        args,
+        action,
+        manifest,
+        set_owner_reference,
+        success_condition,
+        failure_condition,
+        timeout=None,
+        retry=None,
+        pool=None,
+    ):
+        Template.__init__(
+            self, name=name, timeout=timeout, retry=retry, pool=pool
+        )
+        self.args = args
+        self.action = action
+        self.manifest = manifest
+        self.set_owner_reference = "true" if set_owner_reference else "false"
+        self.success_condition = success_condition
+        self.failure_condition = failure_condition
+
+    def to_dict(self):
+        template = Template.to_dict(self)
+        if pyfunc.non_empty(self.args):
+            template["inputs"] = {"parameters": self.args}
+        template["resource"] = self.resource_dict()
+
+        # Append outputs to this template
+        # return the resource job name, job ID, and job object by default
+        job_outputs = [
+            OrderedDict(
+                {
+                    "name": "job-name",
+                    "valueFrom": {"jsonPath": '"{.metadata.name}"'},
+                }
+            ),
+            OrderedDict(
+                {
+                    "name": "job-id",
+                    "valueFrom": {"jsonPath": '"{.metadata.uid}"'},
+                }
+            ),
+            OrderedDict({"name": "job-obj", "valueFrom": {"jqFilter": '"."'}}),
+        ]
+        template["outputs"] = {"parameters": job_outputs}
+        return template
+
+    def resource_dict(self):
+        resource = OrderedDict(
+            {
+                "action": self.action,
+                "setOwnerReference": self.set_owner_reference,
+                "manifest": self.manifest,
+            }
+        )
+        if self.success_condition:
+            resource["successCondition"] = self.success_condition
+        if self.failure_condition:
+            resource["failureCondition"] = self.failure_condition
+        return resource
