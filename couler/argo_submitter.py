@@ -1,0 +1,83 @@
+import logging
+import re
+
+from kubernetes import client as k8s_client
+from kubernetes import config
+
+from couler.core.constants import CronWorkflowCRD, WorkflowCRD
+
+
+# TODO: some k8s common parts can move to another file later.
+class ArgoSubmitter(object):
+    """A submitter which submits a workflow to Argo"""
+
+    def __init__(
+        self,
+        namespace="default",
+        config_file=None,
+        context=None,
+        client_configuration=None,
+        persist_config=True,
+    ):
+        try:
+            config.load_kube_config(
+                config_file, context, client_configuration, persist_config
+            )
+            logging.info(
+                "Found local kubernetes config. Initialized with kube_config."
+            )
+        except Exception:
+            logging.info(
+                "Cannot find local k8s config. Trying in-cluster config."
+            )
+            config.load_incluster_config()
+            logging.info("Initialized with in-cluster config.")
+
+        self._custom_object_api_client = k8s_client.CustomObjectsApi()
+        self.namespace = namespace
+
+    @staticmethod
+    def check_name(name):
+        """Check the name is valid or not"""
+        if len(name) > WorkflowCRD.NAME_MAX_LENGTH:
+            raise ValueError(
+                "Name is too long. Max length: {}, now: {}"
+                "".format(WorkflowCRD.NAME_MAX_LENGTH, len(name))
+            )
+        if "." in name:
+            raise ValueError("Name cannot include dot.")
+        if "_" in name:
+            raise ValueError("Name cannot include underscore.")
+
+        match_obj = re.match(WorkflowCRD.NAME_PATTERN, name)
+        if not match_obj:
+            raise ValueError(
+                "Name is invalid. Regex used for validation is %s"
+                % WorkflowCRD.NAME_PATTERN
+            )
+
+    def get_custom_object_api_client(self):
+        return self._custom_object_api_client
+
+    def submit(self, workflow_yaml):
+        self.check_name(
+            workflow_yaml["metadata"]["name"]
+            if "name" in workflow_yaml["metadata"]
+            else workflow_yaml["metadata"]["generateName"]
+        )
+
+        # TODO: dump the yaml for comma format issue
+        import pyaml
+        import yaml
+
+        yaml_str = pyaml.dump(workflow_yaml)
+        workflow_yaml = yaml.safe_load(yaml_str)
+        return self._custom_object_api_client.create_namespaced_custom_object(  # noqa: E501
+            WorkflowCRD.GROUP,
+            WorkflowCRD.VERSION,
+            self.namespace,
+            WorkflowCRD.PLURAL
+            if workflow_yaml["kind"] == WorkflowCRD.KIND
+            else CronWorkflowCRD.PLURAL,
+            workflow_yaml,
+        )
