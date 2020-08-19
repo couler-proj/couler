@@ -91,7 +91,6 @@ class Workflow(object):
             entrypoint = self.generate_name
         if self.user_id is not None:
             d["metadata"]["labels"] = {
-                "kubemaker_job_user": self.user_id,
                 "couler_job_user": self.user_id,
             }
 
