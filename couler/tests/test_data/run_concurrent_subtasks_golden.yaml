@@ -1,0 +1,68 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: pytest-
+spec:
+  entrypoint: pytest
+  templates:
+    - name: pytest
+      steps:
+        - - name: whalesay-106
+            template: whalesay
+            arguments:
+              parameters:
+                - name: para-whalesay-0
+                  value: 'workflow start'
+        - - name: concurrent-task-1-615-1
+            template: concurrent-task-1
+          - name: concurrent-task-2-615-2
+            template: concurrent-task-2
+        - - name: whalesay-108
+            template: whalesay
+            arguments:
+              parameters:
+                - name: para-whalesay-0
+                  value: 'workflow finish'
+    - name: whalesay
+      inputs:
+        parameters:
+          - name: para-whalesay-0
+      container:
+        image: docker/whalesay
+        command:
+          - cowsay
+        args:
+          - "{{inputs.parameters.para-whalesay-0}}"
+        env:
+          - name: "NVIDIA_VISIBLE_DEVICES"
+            value: null
+          - name: "NVIDIA_DRIVER_CAPABILITIES"
+            value: null
+    - name: concurrent-task-1
+      steps:
+        - - name: whalesay-99
+            template: whalesay
+            arguments:
+              parameters:
+                - name: para-whalesay-0
+                  value: 'workflow one'
+        - - name: whalesay-100
+            template: whalesay
+            arguments:
+              parameters:
+                - name: para-whalesay-0
+                  value: t1
+        - - name: whalesay-101
+            template: whalesay
+            arguments:
+              parameters:
+                - name: para-whalesay-0
+                  value: t2
+    - name: concurrent-task-2
+      steps:
+        - - name: whalesay-104
+            template: whalesay
+            arguments:
+              parameters:
+                - name: para-whalesay-0
+                  value: 'workflow two'

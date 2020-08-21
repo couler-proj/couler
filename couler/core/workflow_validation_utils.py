@@ -14,16 +14,22 @@
 import copy
 import json
 
-from argo.workflows import client
-from argo.workflows.client.models import (
-    V1alpha1DAGTemplate,
-    V1alpha1ResourceTemplate,
-    V1alpha1ScriptTemplate,
-    V1alpha1WorkflowStep,
-)
+try:
+    from argo.workflows import client
+    from argo.workflows.client.models import (
+        V1alpha1DAGTemplate,
+        V1alpha1ResourceTemplate,
+        V1alpha1ScriptTemplate,
+        V1alpha1WorkflowStep,
+    )
+    _ARGO_INSTALLED = True
+except ImportError:
+    _ARGO_INSTALLED = False
 
 
 def validate_workflow_yaml(original_wf):
+    if not _ARGO_INSTALLED:
+        return
     wf = copy.deepcopy(original_wf)
     if (
         "spec" not in wf
