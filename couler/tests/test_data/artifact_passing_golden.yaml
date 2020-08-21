@@ -1,0 +1,86 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: pytest-
+spec:
+  entrypoint: pytest
+  templates:
+    - name: pytest
+      dag:
+        tasks:
+          - name: A
+            template: A
+            arguments:
+              parameters:
+                - name: para-A-0
+                  value: 'echo -n hello world > /tmp/t1.txt'
+          - name: B
+            dependencies:
+              - A
+            template: B
+            arguments:
+              artifacts:
+                - from: "{{steps.A.outputs.artifacts.output-oss-1c392c25}}"
+                  name: para-B-1
+              parameters:
+                - name: para-B-0
+                  value: '--test 1'
+    - name: A
+      inputs:
+        parameters:
+          - name: para-A-0
+      container:
+        image: docker/whalesay:latest
+        command:
+          - bash
+          - -c
+        args:
+          - "{{inputs.parameters.para-A-0}}"
+        env:
+          - name: NVIDIA_VISIBLE_DEVICES
+            value: null
+          - name: NVIDIA_DRIVER_CAPABILITIES
+            value: null
+      outputs:
+        artifacts:
+          - name: output-oss-1c392c25
+            path: /tmp/t1.txt
+            oss:
+              endpoint: xyz.com
+              bucket: anttest/
+              key: osspath/t1
+              accessKeySecret:
+                key: accessKey
+                name: couler-fd7fe83868ddaf22ddda8bca5f3d83d1
+              secretKeySecret:
+                key: secretKey
+                name: couler-fd7fe83868ddaf22ddda8bca5f3d83d1
+    - name: B
+      inputs:
+        parameters:
+          - name: para-B-0
+        artifacts:
+          - name: output-oss-1c392c25
+            path: /tmp/t1.txt
+            oss:
+              endpoint: xyz.com
+              bucket: anttest/
+              key: osspath/t1
+              accessKeySecret:
+                key: accessKey
+                name: couler-fd7fe83868ddaf22ddda8bca5f3d83d1
+              secretKeySecret:
+                key: secretKey
+                name: couler-fd7fe83868ddaf22ddda8bca5f3d83d1
+      container:
+        image: docker/whalesay:latest
+        command:
+          - 'cat /tmp/t1.txt'
+        args:
+          - "{{inputs.parameters.para-B-0}}"
+          - "{{inputs.artifacts.output-oss-1c392c25}}"
+        env:
+          - name: NVIDIA_VISIBLE_DEVICES
+            value: null
+          - name: NVIDIA_DRIVER_CAPABILITIES
+            value: null

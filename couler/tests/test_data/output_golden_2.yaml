@@ -1,0 +1,65 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: pytest-
+spec:
+  entrypoint: pytest
+  templates:
+    - name: pytest
+      steps:
+        - - name: producer-two-48
+            template: producer-two
+            arguments:
+              parameters:
+                - name: para-producer-two-0
+                  value: 'echo -n output one > /tmp/place_one.txt && echo -n output
+                    tw0 > /tmp/place_two.txt'
+        - - name: consume-two-49
+            template: consume-two
+            arguments:
+              parameters:
+                - name: para-consume-two-0
+                  value: "{{steps.producer-two-48.outputs.parameters.output-id-29}}"
+                - name: para-consume-two-1
+                  value: "{{steps.producer-two-48.outputs.parameters.output-id-30}}"
+    - name: producer-two
+      inputs:
+        parameters:
+          - name: para-producer-two-0
+      container:
+        image: docker/whalesay:latest
+        command:
+          - bash
+          - -c
+        args:
+          - "{{inputs.parameters.para-producer-two-0}}"
+        env:
+          - name: "NVIDIA_VISIBLE_DEVICES"
+            value: null
+          - name: "NVIDIA_DRIVER_CAPABILITIES"
+            value: null
+      outputs:
+        parameters:
+          - name: output-id-29
+            valueFrom:
+              path: /tmp/place_one.txt
+          - name: output-id-30
+            valueFrom:
+              path: /tmp/place_two.txt
+    - name: consume-two
+      inputs:
+        parameters:
+          - name: para-consume-two-0
+          - name: para-consume-two-1
+      container:
+        image: docker/whalesay:latest
+        command:
+          - cowsay
+        args:
+          - "{{inputs.parameters.para-consume-two-0}}"
+          - "{{inputs.parameters.para-consume-two-1}}"
+        env:
+          - name: "NVIDIA_VISIBLE_DEVICES"
+            value: null
+          - name: "NVIDIA_DRIVER_CAPABILITIES"
+            value: null

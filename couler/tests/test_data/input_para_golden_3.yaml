@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: pytest-
+spec:
+  entrypoint: pytest
+  templates:
+    - name: pytest
+      steps:
+        - - name: whalesay-97
+            template: whalesay
+            arguments:
+              parameters:
+                - name: para-whalesay-0
+                  value: "test"
+        - - name: generate-number-98
+            template: generate-number
+        - - name: whalesay-99
+            template: whalesay
+            arguments:
+              parameters:
+                - name: para-whalesay-0
+                  value: "{{steps.generate-number-98.outputs.result}}"
+    - name: whalesay
+      inputs:
+        parameters:
+          - name: para-whalesay-0
+      container:
+        image: docker/whalesay
+        command:
+          - cowsay
+        args:
+          - "{{inputs.parameters.para-whalesay-0}}"
+        env:
+          - name: "NVIDIA_VISIBLE_DEVICES"
+            value: null
+          - name: "NVIDIA_DRIVER_CAPABILITIES"
+            value: null
+    - name: generate-number
+      script:
+        image: python:3.6
+        command:
+          - python
+        source: '
+
+              import random
+
+
+              result = random.randint(0, 1)
+
+              print(result)
+
+          '
+        env:
+          - name: "NVIDIA_VISIBLE_DEVICES"
+            value: null
+          - name: "NVIDIA_DRIVER_CAPABILITIES"
+            value: null
