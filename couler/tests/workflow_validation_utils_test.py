@@ -32,17 +32,6 @@ def run_multiple_pods(num_pods):
     couler.map(lambda x: start_pod(x), para)
 
 
-# TODO: Provide new test case without `tf.train`.
-# def run_multiple_jobs(num_jobs):
-#     para = []
-#     i = 0
-#     while i < num_jobs:
-#         message = "couler-tf-job-%s" % i
-#         para.append(message)
-#         i = i + 1
-#     couler.map(lambda x: train_tensorflow_km(x), para)
-
-
 class WorkflowValidationUtilsTest(ArgoYamlTest):
     # TODO: Need to test this with Argo as a dependency
     # def test_validate_workflow_multiple_pods(self):
