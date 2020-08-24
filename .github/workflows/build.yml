@@ -32,4 +32,4 @@ jobs:
     - name: Unit tests
       run: |
         python setup.py install
-        pytest
+        python -m pytest
