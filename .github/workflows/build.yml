@@ -31,4 +31,5 @@ jobs:
         pre-commit run --all
     - name: Unit tests
       run: |
+        python setup.py install
         pytest
