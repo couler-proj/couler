@@ -22,6 +22,7 @@ try:
         V1alpha1ScriptTemplate,
         V1alpha1WorkflowStep,
     )
+
     _ARGO_INSTALLED = True
 except ImportError:
     _ARGO_INSTALLED = False

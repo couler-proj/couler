@@ -18,15 +18,17 @@ class PyfuncTest(unittest.TestCase):
         # A real function
         code = """
 func_name = pyfunc.workflow_filename()
-# Here we assume using pytest to trigger the unit tests
-self.assertTrue("pytest" in func_name)
+# Here we assume that we are using `pytest` or `python -m pytest`
+# to trigger the unit tests.
+self.assertTrue(func_name in ["pytest", "runpy"])
 """
         self.assertEqual(code, pyfunc.body(self.test_get_root_caller_filename))
 
     def test_get_root_caller_filename(self):
         func_name = pyfunc.workflow_filename()
-        # Here we assume using pytest to trigger the unit tests
-        self.assertTrue("pytest" in func_name)
+        # Here we assume that we are using `pytest` or `python -m pytest`
+        # to trigger the unit tests.
+        self.assertTrue(func_name in ["pytest", "runpy"])
 
     def test_invocation_location(self):
         def inner_func():

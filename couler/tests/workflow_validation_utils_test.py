@@ -1,7 +1,7 @@
-import copy
-
 import couler.argo as couler
-from couler.core.workflow_validation_utils import validate_workflow_yaml
+from couler.core.workflow_validation_utils import (  # noqa: F401
+    validate_workflow_yaml,
+)
 from couler.tests.argo_yaml_test import ArgoYamlTest
 
 

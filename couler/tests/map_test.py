@@ -42,7 +42,7 @@ class MapTest(unittest.TestCase):
 
         # Check the steps template
         steps_template = templates[0]
-        self.assertTrue("pytest" in steps_template["name"])
+        self.assertTrue(steps_template["name"] in ["pytest", "runpy"])
         self.assertEqual(len(steps_template["steps"]), 1)
         self.assertEqual(len(steps_template["steps"][0]), 1)
         map_step = steps_template["steps"][0][0]

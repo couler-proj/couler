@@ -103,9 +103,7 @@ class Workflow(object):
             d["metadata"]["generateName"] = "%s-" % self.generate_name
             entrypoint = self.generate_name
         if self.user_id is not None:
-            d["metadata"]["labels"] = {
-                "couler_job_user": self.user_id,
-            }
+            d["metadata"]["labels"] = {"couler_job_user": self.user_id}
 
         workflow_spec = {"entrypoint": entrypoint}
         if self.volumes:
