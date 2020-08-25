@@ -120,6 +120,11 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  name: default
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
   name: argo-server
 ---
 apiVersion: v1
