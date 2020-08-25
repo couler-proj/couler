@@ -33,3 +33,15 @@ jobs:
       run: |
         python setup.py install
         python -m pytest
+    - uses: opsgang/ga-setup-minikube@v0.1.1
+      with:
+          minikube-version: 1.11.0
+          k8s-version: 1.18.3
+    - name: Integration tests
+      run: |
+        minikube config set vm-driver docker
+        minikube config set kubernetes-version 1.18.3
+        minikube start
+        minikube update-context
+        kubectl cluster-info
+        kubectl get pods -n kube-system
