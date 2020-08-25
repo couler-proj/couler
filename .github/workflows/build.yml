@@ -39,7 +39,7 @@ jobs:
           k8s-version: 1.18.3
     - name: Integration tests
       run: |
-        minikube config set vm-driver kvm2
+        minikube config set vm-driver none
         minikube config set kubernetes-version 1.18.3
         minikube start
         minikube update-context
