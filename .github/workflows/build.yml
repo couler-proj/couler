@@ -32,7 +32,7 @@ jobs:
     - name: Unit tests
       run: |
         python setup.py install
-        # python -m pytest
+        python -m pytest
     - uses: opsgang/ga-setup-minikube@v0.1.1
       with:
           minikube-version: 1.11.0
@@ -48,3 +48,4 @@ jobs:
         kubectl create ns argo
         kubectl apply -n argo -f manifests/quick-start-minimal-argo-v2.10.0.yaml
         python -m integration_tests.dag_example
+        kubectl get wf

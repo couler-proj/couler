@@ -204,7 +204,7 @@ class WorkflowBasicTest(ArgoYamlTest):
         wf = couler.workflow_yaml()
         expected_meta = {
             "name": "test-workflow",
-            "labels": {"couler_job_user": "88888888"},
+            # "labels": {"couler_job_user": "88888888"},
         }
         self.assertEqual(wf["metadata"], expected_meta)
 

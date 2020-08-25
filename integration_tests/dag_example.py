@@ -91,8 +91,8 @@ if __name__ == "__main__":
     wf_name = wf["metadata"]["name"]
     print("Workflow %s has been submitted" % wf_name)
 
-    time.sleep(5)
-
-    print("Deleting workflow %s" % wf_name)
-    couler.delete(wf_name, grace_period_seconds=10)
-    print("Workflow %s has been deleted" % wf_name)
+    time.sleep(10)
+    #
+    # print("Deleting workflow %s" % wf_name)
+    # couler.delete(wf_name, grace_period_seconds=10)
+    # print("Workflow %s has been deleted" % wf_name)
