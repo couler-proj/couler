@@ -45,7 +45,7 @@ def workflow_yaml():
     return states.workflow.to_dict()
 
 
-def run(cluster=None, submitter=ArgoSubmitter, enable_wait=True, bizdate=None):
+def run(submitter=ArgoSubmitter):
     """To submit the workflow using user-provided submitter implementation.
        Note that, the provided submitter must have a submit function which
        takes the workflow YAML as input.
