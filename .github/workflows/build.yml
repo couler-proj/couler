@@ -40,7 +40,7 @@ jobs:
     - name: Integration tests
       run: |
         minikube config set vm-driver kvm2
-        minikube config set kubernetes-version=1.18.3
+        minikube config set kubernetes-version 1.18.3
         minikube start
         minikube update-context
         kubectl cluster-info
