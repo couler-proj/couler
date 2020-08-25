@@ -56,10 +56,10 @@ def run(submitter=ArgoSubmitter):
         raise ValueError("The input submitter is None")
     wf = workflow_yaml()
     validate_workflow_yaml(wf)
-    if issubclass(submitter, ArgoSubmitter):
-        submitter = ArgoSubmitter()
+    if isinstance(submitter, ArgoSubmitter):
         return submitter.submit(wf)
-    elif isinstance(submitter, ArgoSubmitter):
+    elif issubclass(submitter, ArgoSubmitter):
+        submitter = ArgoSubmitter()
         return submitter.submit(wf)
     else:
         raise ValueError("Only ArgoSubmitter is supported currently.")
