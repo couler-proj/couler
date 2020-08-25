@@ -45,3 +45,6 @@ jobs:
         minikube update-context
         kubectl cluster-info
         kubectl get pods -n kube-system
+        kubectl create ns argo
+        kubectl apply -n argo -f https://raw.githubusercontent.com/argoproj/argo/stable/manifests/quick-start-postgres.yaml
+        python integration_tests/dag_example.py

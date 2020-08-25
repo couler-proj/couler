@@ -59,6 +59,8 @@ def run(submitter=ArgoSubmitter):
     if issubclass(submitter, ArgoSubmitter):
         submitter = ArgoSubmitter()
         return submitter.submit(wf)
+    elif isinstance(submitter, ArgoSubmitter):
+        return submitter.submit(wf)
     else:
         raise ValueError("Only ArgoSubmitter is supported currently.")
 
