@@ -47,4 +47,5 @@ jobs:
         kubectl get pods -n kube-system
         kubectl create ns argo
         kubectl apply -n argo -f manifests/quick-start-minimal-argo-v2.10.0.yaml
+        python setup.py install
         python integration_tests/dag_example.py
