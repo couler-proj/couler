@@ -50,3 +50,4 @@ jobs:
         python -m integration_tests.dag_example
         python -m integration_tests.flip_coin_example
         kubectl -n argo get workflows
+        # TODO(terrytangyuan): Validate workflow status

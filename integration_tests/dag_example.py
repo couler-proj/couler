@@ -91,6 +91,7 @@ if __name__ == "__main__":
 
     time.sleep(10)
 
+    # TODO(terrytangyuan): Validate status before deleting
     # print("Deleting workflow %s" % wf_name)
     # couler.delete(wf_name, namespace="argo", grace_period_seconds=10)
     # print("Workflow %s has been deleted" % wf_name)
