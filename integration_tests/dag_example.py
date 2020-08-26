@@ -81,9 +81,7 @@ def diamond():
 
 
 if __name__ == "__main__":
-    couler.config_workflow(
-        name=None, user_id="123456", timeout=3600, time_to_clean=3600 * 1.5
-    )
+    couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
 
     diamond()
     submitter = ArgoSubmitter(namespace="argo")
@@ -93,6 +91,6 @@ if __name__ == "__main__":
 
     time.sleep(10)
 
-    print("Deleting workflow %s" % wf_name)
-    couler.delete(wf_name, namespace="argo", grace_period_seconds=10)
-    print("Workflow %s has been deleted" % wf_name)
+    # print("Deleting workflow %s" % wf_name)
+    # couler.delete(wf_name, namespace="argo", grace_period_seconds=10)
+    # print("Workflow %s has been deleted" % wf_name)
