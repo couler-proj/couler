@@ -250,3 +250,7 @@ linear()
 submitter = ArgoSubmitter(namespace="argo")
 couler.run(submitter=submitter)
 ```
+
+Note that the current version only works with Argo Workflows but we are actively working on the design of the unified
+interface that is extensible to additional workflow engines. Please stay tuned for more updates and we welcome
+any feedback and contributions from the community.
