@@ -39,6 +39,7 @@ if __name__ == "__main__":
     wf_name = wf["metadata"]["name"]
     print("Workflow %s has been submitted" % wf_name)
 
+    print(couler.workflow_yaml())
     time.sleep(10)
 
     # TODO(terrytangyuan): Validate status before deleting
