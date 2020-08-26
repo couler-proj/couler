@@ -102,7 +102,8 @@ class Workflow(object):
         else:
             d["metadata"]["generateName"] = "%s-" % self.generate_name
             entrypoint = self.generate_name
-        # TODO: There is an issue when working with ArgoSubmitter.
+        # TODO (terrytangyuan): There is an issue when working
+        #  with ArgoSubmitter.
         # if self.user_id is not None:
         #     d["metadata"]["labels"] = {"couler_job_user": self.user_id}
 
