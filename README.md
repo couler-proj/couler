@@ -153,13 +153,13 @@ def flip_coin():
 
 def heads():
     return couler.run_container(
-        image="alpine:3.6", command=["bash", "-c", 'echo "it was heads"']
+        image="alpine:3.6", command=["sh", "-c", 'echo "it was heads"']
     )
 
 
 def tails():
     return couler.run_container(
-        image="alpine:3.6", command=["bash", "-c", 'echo "it was tails"']
+        image="alpine:3.6", command=["sh", "-c", 'echo "it was tails"']
     )
 
 
