@@ -48,4 +48,4 @@ jobs:
         kubectl create ns argo
         kubectl apply -n argo -f manifests/quick-start-minimal-argo-v2.10.0.yaml
         python -m integration_tests.dag_example
-        kubectl -n argo get wf
+        kubectl -n argo get workflows

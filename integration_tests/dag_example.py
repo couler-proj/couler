@@ -92,7 +92,7 @@ if __name__ == "__main__":
     print("Workflow %s has been submitted" % wf_name)
 
     time.sleep(10)
-    #
-    # print("Deleting workflow %s" % wf_name)
-    # couler.delete(wf_name, grace_period_seconds=10)
-    # print("Workflow %s has been deleted" % wf_name)
+
+    print("Deleting workflow %s" % wf_name)
+    couler.delete(wf_name, namespace="argo", grace_period_seconds=10)
+    print("Workflow %s has been deleted" % wf_name)
