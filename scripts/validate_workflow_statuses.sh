@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # We intentionally `set +e` here since we want to allow certain kinds of known failures that can be ignored.
-# For example, workflows may not have been created yet so neither `kubectl get workflows` nor `kubectl delete workflow` would
-# be successful at earlier stages of this script.
+# For example, workflows may not have been created yet so neither `kubectl get workflows` nor
+# `kubectl delete workflow` would be successful at earlier stages of this script.
 set +e
 
 WF_NAME=$1

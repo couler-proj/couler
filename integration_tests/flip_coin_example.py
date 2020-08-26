@@ -1,5 +1,3 @@
-import time
-
 import couler.argo as couler
 from couler.argo_submitter import ArgoSubmitter
 
@@ -37,11 +35,4 @@ if __name__ == "__main__":
     submitter = ArgoSubmitter(namespace="argo")
     wf = couler.run(submitter=submitter)
     wf_name = wf["metadata"]["name"]
-    print("Workflow %s has been submitted" % wf_name)
-
-    time.sleep(10)
-
-    # TODO(terrytangyuan): Validate status before deleting
-    # print("Deleting workflow %s" % wf_name)
-    # couler.delete(wf_name, namespace="argo", grace_period_seconds=10)
-    # print("Workflow %s has been deleted" % wf_name)
+    print("Workflow %s has been submitted for flip coin example" % wf_name)
