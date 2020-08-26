@@ -249,7 +249,7 @@ def diamond():
 
 
 couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
-diamond()
+linear()
 submitter = ArgoSubmitter(namespace="argo")
 couler.run(submitter=submitter)
 ```
