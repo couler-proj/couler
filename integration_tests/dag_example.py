@@ -1,5 +1,3 @@
-import time
-
 import couler.argo as couler
 from couler.argo_submitter import ArgoSubmitter
 
@@ -45,18 +43,7 @@ def job_d(message):
 # B  C
 # /
 # D
-def linear_option1():
-    couler.dag(
-        [
-            [lambda: job_a(message="A")],
-            [lambda: job_a(message="A"), lambda: job_b(message="B")],  # A -> B
-            [lambda: job_a(message="A"), lambda: job_c(message="C")],  # A -> C
-            [lambda: job_b(message="B"), lambda: job_d(message="D")],  # B -> D
-        ]
-    )
-
-
-def linear_option2():
+def linear():
     couler.set_dependencies(lambda: job_a(message="A"), dependencies=None)
     couler.set_dependencies(lambda: job_b(message="B"), dependencies=["A"])
     couler.set_dependencies(lambda: job_c(message="C"), dependencies=["A"])
@@ -83,15 +70,8 @@ def diamond():
 if __name__ == "__main__":
     couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
 
-    diamond()
+    linear()
     submitter = ArgoSubmitter(namespace="argo")
     wf = couler.run(submitter=submitter)
     wf_name = wf["metadata"]["name"]
-    print("Workflow %s has been submitted" % wf_name)
-
-    time.sleep(10)
-
-    # TODO(terrytangyuan): Validate status before deleting
-    # print("Deleting workflow %s" % wf_name)
-    # couler.delete(wf_name, namespace="argo", grace_period_seconds=10)
-    # print("Workflow %s has been deleted" % wf_name)
+    print("Workflow %s has been submitted for DAG example" % wf_name)
