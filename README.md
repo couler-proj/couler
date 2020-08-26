@@ -4,7 +4,7 @@
 
 ## What is Couler?
 
-Couler is a project that aims to provide a unified interface for constructing and managing workflows on
+Couler aims to provide a unified interface for constructing and managing workflows on
 different workflow engines, such as [Argo Workflows](https://github.com/argoproj/argo) and [Apache Airflow](https://airflow.apache.org/).
 
 ## Why use Couler?
@@ -123,33 +123,133 @@ python setup.py install
 
 ## Examples
 
-An example workflow defined via Couler is shown below:
+### Coin Flip
+
+This example combines the use of a Python function result, along with conditionals,
+to take a dynamic path in the workflow. In this example, depending on the result
+of the first step defined in `flip_coin()`, the template will either run the
+`heads()` step or the `tails()` step.
+
+Steps can be defined via either `couler.run_script()`
+for Python functions or `couler.run_container()` for containers. In addition,
+the conditional logic to decide whether to flip the coin in this example
+is defined via the combined use of `couler.when()` and couler.equal()`.
 
 ```python
+import couler.argo as couler
+from couler.argo_submitter import ArgoSubmitter
+
+
 def random_code():
-    result = "heads" if random.randint(0, 1) == 0 else "tails"
-    print(result)
+    import random
+
+    res = "heads" if random.randint(0, 1) == 0 else "tails"
+    print(res)
+
 
 def flip_coin():
-    return couler.run_step(
-        image="couler/python:3.6",
-        source=random_code,
-    )
+    return couler.run_script(image="python:alpine3.6", source=random_code)
+
 
 def heads():
-    return couler.run_step(
-        image="couler/python:3.6",
-        command=["bash", "-c", 'echo "it was heads"'],
+    return couler.run_container(
+        image="alpine:3.6", command=["bash", "-c", 'echo "it was heads"']
     )
 
+
 def tails():
-    return couler.run_step(
-        image="couler/python:3.6",
-        command=["bash", "-c", 'echo "it was tails"'],
+    return couler.run_container(
+        image="alpine:3.6", command=["bash", "-c", 'echo "it was tails"']
     )
+
+
+couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
 
 result = flip_coin()
 couler.when(couler.equal(result, "heads"), lambda: heads())
 couler.when(couler.equal(result, "tails"), lambda: tails())
+
+submitter = ArgoSubmitter(namespace="argo")
+couler.run(submitter=submitter)
 ```
 
+### DAG
+
+This example demonstrates different ways to define the workflow as a directed-acyclic graph (DAG) by specifying the
+dependencies of each task via `couler.set_dependencies()` and `couler.dag()`. Please see the code comments for the
+specific shape of DAG that we've defined in `linear()` and `diamond()`.
+
+```python
+import couler.argo as couler
+from couler.argo_submitter import ArgoSubmitter
+
+
+def job_a(message):
+    couler.run_container(
+        image="docker/whalesay:latest",
+        command=["cowsay"],
+        args=[message],
+        step_name="A",
+    )
+
+
+def job_b(message):
+    couler.run_container(
+        image="docker/whalesay:latest",
+        command=["cowsay"],
+        args=[message],
+        step_name="B",
+    )
+
+
+def job_c(message):
+    couler.run_container(
+        image="docker/whalesay:latest",
+        command=["cowsay"],
+        args=[message],
+        step_name="C",
+    )
+
+
+def job_d(message):
+    couler.run_container(
+        image="docker/whalesay:latest",
+        command=["cowsay"],
+        args=[message],
+        step_name="D",
+    )
+
+#  A
+# / \
+# B  C
+# /
+# D
+def linear():
+    couler.set_dependencies(lambda: job_a(message="A"), dependencies=None)
+    couler.set_dependencies(lambda: job_b(message="B"), dependencies=["A"])
+    couler.set_dependencies(lambda: job_c(message="C"), dependencies=["A"])
+    couler.set_dependencies(lambda: job_d(message="D"), dependencies=["B"])
+
+
+#  A
+# / \
+# B  C
+# \  /
+#  D
+def diamond():
+    couler.dag(
+        [
+            [lambda: job_a(message="A")],
+            [lambda: job_a(message="A"), lambda: job_b(message="B")],  # A -> B
+            [lambda: job_a(message="A"), lambda: job_c(message="C")],  # A -> C
+            [lambda: job_b(message="B"), lambda: job_d(message="D")],  # B -> D
+            [lambda: job_b(message="C"), lambda: job_d(message="D")],  # C -> D
+        ]
+    )
+
+
+couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
+diamond()
+submitter = ArgoSubmitter(namespace="argo")
+couler.run(submitter=submitter)
+```
