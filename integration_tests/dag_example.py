@@ -83,14 +83,14 @@ def diamond():
 if __name__ == "__main__":
     couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
 
-    diamond()
+    linear_option2()
     submitter = ArgoSubmitter(namespace="argo")
     wf = couler.run(submitter=submitter)
     wf_name = wf["metadata"]["name"]
     print("Workflow %s has been submitted" % wf_name)
 
     print(couler.workflow_yaml())
-    couler._dump_yaml()
+    print(couler._dump_yaml())
     time.sleep(10)
 
     # TODO(terrytangyuan): Validate status before deleting
