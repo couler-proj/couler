@@ -38,7 +38,9 @@ from couler.core.states import (  # noqa: F401
 )
 from couler.core.syntax import *  # noqa: F401, F403
 from couler.core.templates import Artifact, OssArtifact, Secret  # noqa: F401
-from couler.core.workflow_validation_utils import validate_workflow_yaml
+from couler.core.workflow_validation_utils import (  # noqa: F401
+    validate_workflow_yaml,
+)
 
 
 def workflow_yaml():
@@ -55,8 +57,11 @@ def run(submitter=ArgoSubmitter):
     if submitter is None:
         raise ValueError("The input submitter is None")
     wf = workflow_yaml()
-    validate_workflow_yaml(wf)
-    if issubclass(submitter, ArgoSubmitter):
+    # TODO (terrytangyuan): Decouple with Argo and then uncomment this
+    # validate_workflow_yaml(wf)
+    if isinstance(submitter, ArgoSubmitter):
+        return submitter.submit(wf)
+    elif issubclass(submitter, ArgoSubmitter):
         submitter = ArgoSubmitter()
         return submitter.submit(wf)
     else:
@@ -99,6 +104,8 @@ def delete(
             name,
             body=delete_body,
         )
+    # TODO (terrytangyuan): `ApiException` seems unavailable in
+    #  some versions of k8s client.
     except k8s_client.api_client.ApiException as e:
         raise Exception("Exception when deleting the workflow: %s\n" % e)
 
