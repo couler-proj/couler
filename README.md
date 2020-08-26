@@ -5,14 +5,14 @@
 ## What is Couler?
 
 Couler aims to provide a unified interface for constructing and managing workflows on
-different workflow engines, such as [Argo Workflows](https://github.com/argoproj/argo) and [Apache Airflow](https://airflow.apache.org/).
+different workflow engines, such as [Argo Workflows](https://github.com/argoproj/argo), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/).
 
 ## Why use Couler?
 
-Many workflow engines exist nowadays, e.g. [Apache Airflow](https://airflow.apache.org/), [Kubeflow Pipelines](https://github.com/kubeflow/pipelines), and [Argo Workflows](https://github.com/argoproj/argo).
+Many workflow engines exist nowadays, e.g. [Argo Workflows](https://github.com/argoproj/argo), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/).
 However, their programming experience varies and they have different level of abstractions
 that are often obscure and complex. The code snippets below are some examples for constructing workflows
-using Apache Airflow and Kubeflow Pipelines. 
+using Apache Airflow and [Kubeflow Pipelines](https://github.com/kubeflow/pipelines/).
 
 <table>
 <tr><th>Apache Airflow</th><th>Kubeflow Pipelines</th></tr>
@@ -133,7 +133,7 @@ of the first step defined in `flip_coin()`, the template will either run the
 Steps can be defined via either `couler.run_script()`
 for Python functions or `couler.run_container()` for containers. In addition,
 the conditional logic to decide whether to flip the coin in this example
-is defined via the combined use of `couler.when()` and couler.equal()`.
+is defined via the combined use of `couler.when()` and `couler.equal()`.
 
 ```python
 import couler.argo as couler
@@ -162,8 +162,6 @@ def tails():
         image="alpine:3.6", command=["sh", "-c", 'echo "it was tails"']
     )
 
-
-couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
 
 result = flip_coin()
 couler.when(couler.equal(result, "heads"), lambda: heads())
@@ -248,7 +246,6 @@ def diamond():
     )
 
 
-couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
 linear()
 submitter = ArgoSubmitter(namespace="argo")
 couler.run(submitter=submitter)
