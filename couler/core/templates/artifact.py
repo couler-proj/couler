@@ -13,14 +13,14 @@
 
 from collections import OrderedDict
 
-import couler.core.utils as pyfunc
+from couler.core import utils
 
 
 class Artifact(object):
     def __init__(self, path, type=None, is_global=False):
         # TODO (terrytangyuan): This seems hacky.
         #   If line number changes, we need to update tests as well.
-        _, caller_line = pyfunc.invocation_location()
+        _, caller_line = utils.invocation_location()
         self.id = "output-id-%s" % caller_line
         self.path = path
         # TODO (terrytangyuan): this is not used for now and we currently
@@ -53,7 +53,7 @@ class OssArtifact(Artifact):
         endpoint="http://oss-cn-hangzhou-zmf.aliyuncs.com",
         is_global=False,
     ):
-        self.id = "output-oss-%s" % pyfunc._get_uuid()
+        self.id = "output-oss-%s" % utils._get_uuid()
         # path is used for local path
         self.path = path
         self.type = "OSS"
