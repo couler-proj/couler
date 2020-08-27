@@ -13,6 +13,7 @@
 
 from collections import OrderedDict
 
+import couler.core.templates.output
 from couler.core import pyfunc, states
 from couler.core.templates import OutputArtifact, Step
 
@@ -181,7 +182,7 @@ def _get_params_and_artifacts_from_args(args, input_param_name, prefix):
         args = [args]
     i = 0
     for values in args:
-        values = pyfunc.parse_argo_output(values, prefix)
+        values = couler.core.templates.output.parse_argo_output(values, prefix)
         if isinstance(values, list):
             for value in values:
                 parameters.append(

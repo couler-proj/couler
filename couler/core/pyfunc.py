@@ -18,6 +18,7 @@ import re
 import textwrap
 
 from couler.core.constants import ImagePullPolicy
+from couler.core.templates.output import parse_argo_output
 
 
 def argo_safe_name(name):
@@ -92,38 +93,6 @@ def input_parameter_name(name, var_pos):
     return "para-%s-%s" % (name, var_pos)
 
 
-def extract_step_return(step_output):
-    """Extract information for run container or script output.
-    step_output is a list with multiple outputs
-    """
-    from couler.core.templates import Output
-
-    ret = {}
-    if isinstance(step_output, list):
-        # The first element of outputs is used for control flow operation
-        step_output = step_output[0]
-        # In case user input a normal variable
-        if not isinstance(step_output, Output):
-            ret["value"] = step_output
-            return ret
-        else:
-            tmp = step_output.value.split(".")
-            if len(tmp) < 4:
-                raise ValueError("Incorrect step return representation")
-            step_name = tmp[1]
-            template_name = tmp[2]
-            # To avoid duplicate map function
-            output = tmp[3]
-            for item in tmp[4:]:
-                output = output + "." + item
-
-            ret = {"name": template_name, "id": step_name, "output": output}
-            return ret
-    else:
-        ret["value"] = step_output
-        return ret
-
-
 def invocation_name(function_name, caller_line):
     """Argo YAML requires that each step, which is an invocation to a
     template, has a name.  For example, hello1, hello2a, and hello2b
@@ -133,54 +102,6 @@ def invocation_name(function_name, caller_line):
     called.
     """
     return "%s-%s" % (function_name, caller_line)
-
-
-def _parse_single_argo_output(output, prefix):
-    from couler.core.templates import Output
-
-    if isinstance(output, Output):
-        tmp = output.value.split(".")
-        if len(tmp) < 4:
-            raise ValueError("Incorrect step return representation")
-        step_name = tmp[1]
-        output_id = tmp[3]
-        for item in tmp[4:]:
-            output_id = output_id + "." + item
-        if output.is_global:
-            return '"{{workflow.outputs.%s}}"' % output_id
-        else:
-            return '"{{%s.%s.%s}}"' % (prefix, step_name, output_id)
-    else:
-        # enforce int, float and bool types to string
-        if (
-            isinstance(output, int)
-            or isinstance(output, float)
-            or isinstance(output, bool)
-        ):
-            output = "'%s'" % output
-
-        return output
-
-
-def parse_argo_output(output, prefix):
-    from couler.core.templates import Output, OutputJob
-
-    if isinstance(output, OutputJob):
-        return [
-            _parse_single_argo_output(
-                Output(value=output.job_id, is_global=output.is_global), prefix
-            ),
-            _parse_single_argo_output(
-                Output(value=output.job_name, is_global=output.is_global),
-                prefix,
-            ),
-            _parse_single_argo_output(
-                Output(value=output.job_obj, is_global=output.is_global),
-                prefix,
-            ),
-        ]
-    else:
-        return _parse_single_argo_output(output, prefix)
 
 
 def load_cluster_config():

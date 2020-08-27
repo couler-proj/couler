@@ -15,7 +15,7 @@ import types
 from collections import OrderedDict
 
 from couler.core import pyfunc, states
-from couler.core.templates import Step, Steps
+from couler.core.templates import Step, Steps, output
 
 
 def exec_while(condition, inner_while):
@@ -35,7 +35,7 @@ def exec_while(condition, inner_while):
     else:
         raise TypeError("condition to run would be a function")
 
-    branch_dict = pyfunc.extract_step_return(branch)
+    branch_dict = output.extract_step_return(branch)
     recursive_name = "exec-while-" + branch_dict["name"]
     recursive_id = "exec-while-" + branch_dict["id"]
     if states.workflow.get_template(recursive_name) is None:
@@ -46,7 +46,7 @@ def exec_while(condition, inner_while):
     # Generate leaving point for recursive
     step_out_name = "%s-%s" % (recursive_name, "exit")
     pre = condition["pre"]
-    pre_dict = pyfunc.extract_step_return(pre)
+    pre_dict = output.extract_step_return(pre)
     condition_suffix = condition["condition"]
 
     # Generate the recursive go to step

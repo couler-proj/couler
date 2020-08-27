@@ -13,7 +13,8 @@
 
 import types
 
-from couler.core import pyfunc, states
+import couler.core.templates.output
+from couler.core import states
 from couler.core.templates import Step
 
 
@@ -29,8 +30,8 @@ def when(condition, function):
 
     condition_suffix = condition["condition"]
 
-    pre_dict = pyfunc.extract_step_return(pre)
-    post_dict = pyfunc.extract_step_return(post)
+    pre_dict = couler.core.templates.output.extract_step_return(pre)
+    post_dict = couler.core.templates.output.extract_step_return(post)
 
     if "name" in pre_dict:
         left_function_id = pre_dict["id"]
