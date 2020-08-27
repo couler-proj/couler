@@ -15,7 +15,7 @@ import hashlib
 import json
 from collections import OrderedDict
 
-from couler.core import pyfunc
+from couler.core import utils
 
 
 class Secret(object):
@@ -33,7 +33,7 @@ class Secret(object):
         ).hexdigest()
         self.name = "couler-%s" % cypher_md5
 
-        self.data = {k: pyfunc.encode_base64(v) for k, v in data.items()}
+        self.data = {k: utils.encode_base64(v) for k, v in data.items()}
 
     def to_yaml(self):
         """Covert the secret to a secret CRD specification."""

@@ -13,7 +13,7 @@
 
 from collections import OrderedDict
 
-from couler.core import pyfunc
+from couler.core import utils
 
 
 class Template(object):
@@ -44,7 +44,5 @@ class Template(object):
         if self.timeout is not None:
             template["activeDeadlineSeconds"] = self.timeout
         if self.retry is not None:
-            template["retryStrategy"] = pyfunc.config_retry_strategy(
-                self.retry
-            )
+            template["retryStrategy"] = utils.config_retry_strategy(self.retry)
         return template

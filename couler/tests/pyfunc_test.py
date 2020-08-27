@@ -1,7 +1,7 @@
 import base64
 import unittest
 
-import couler.core.pyfunc as pyfunc
+import couler.core.utils as pyfunc
 
 
 class PyfuncTest(unittest.TestCase):

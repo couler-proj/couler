@@ -13,7 +13,7 @@
 
 import types
 
-import couler.core.pyfunc as pyfunc
+import couler.core.utils as pyfunc
 from couler.core import states
 from couler.core.templates import OutputArtifact, OutputJob, OutputParameter
 

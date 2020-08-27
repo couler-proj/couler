@@ -13,7 +13,7 @@
 
 from collections import OrderedDict
 
-from couler.core import pyfunc, states
+from couler.core import states, utils
 
 
 def config_workflow(
@@ -50,7 +50,7 @@ def config_workflow(
         import os
 
         os.environ["couler_cluster_config"] = cluster_config_file
-        states.workflow.cluster_config = pyfunc.load_cluster_config()
+        states.workflow.cluster_config = utils.load_cluster_config()
 
     if cron_config is not None:
         if isinstance(cron_config, OrderedDict):

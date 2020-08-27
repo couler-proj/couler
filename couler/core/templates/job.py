@@ -13,7 +13,7 @@
 
 from collections import OrderedDict
 
-from couler.core import pyfunc
+from couler.core import utils
 from couler.core.templates.template import Template
 
 
@@ -43,7 +43,7 @@ class Job(Template):
 
     def to_dict(self):
         template = Template.to_dict(self)
-        if pyfunc.non_empty(self.args):
+        if utils.non_empty(self.args):
             template["inputs"] = {"parameters": self.args}
         template["resource"] = self.resource_dict()
 

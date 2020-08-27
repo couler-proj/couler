@@ -14,7 +14,7 @@
 import types
 from collections import OrderedDict
 
-from couler.core import pyfunc, states
+from couler.core import states, utils
 from couler.core.step_update_utils import _update_steps
 from couler.core.templates import Steps
 
@@ -28,7 +28,7 @@ def concurrent(function_list, subtasks=False):
     if not isinstance(function_list, list):
         raise SyntaxError("require input functions as list")
 
-    _, con_caller_line = pyfunc.invocation_location()
+    _, con_caller_line = utils.invocation_location()
 
     states._concurrent_func_line = con_caller_line
     states._run_concurrent_lock = True

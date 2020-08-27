@@ -14,7 +14,7 @@
 import copy
 from collections import OrderedDict
 
-from couler.core import pyfunc
+from couler.core import utils
 from couler.core.constants import OVERWRITE_GPU_ENVS
 from couler.core.templates.secret import Secret
 from couler.core.templates.template import Template
@@ -54,7 +54,7 @@ class Script(Template):
 
     def to_dict(self):
         template = Template.to_dict(self)
-        if not pyfunc.gpu_requested(self.resources):
+        if not utils.gpu_requested(self.resources):
             if self.env is None:
                 self.env = {}
             self.env.update(OVERWRITE_GPU_ENVS)
@@ -64,12 +64,12 @@ class Script(Template):
     def script_dict(self):
         script = OrderedDict({"image": self.image, "command": [self.command]})
         script["source"] = (
-            pyfunc.body(self.source)
+            utils.body(self.source)
             if self.command.lower() == "python"
             else self.source
         )
-        if pyfunc.non_empty(self.env):
-            script["env"] = pyfunc.convert_dict_to_env_list(self.env)
+        if utils.non_empty(self.env):
+            script["env"] = utils.convert_dict_to_env_list(self.env)
 
         if self.secret is not None:
             if not isinstance(self.secret, Secret):
@@ -88,7 +88,7 @@ class Script(Template):
                 "limits": copy.deepcopy(self.resources),
             }
         if self.image_pull_policy is not None:
-            script["imagePullPolicy"] = pyfunc.config_image_pull_policy(
+            script["imagePullPolicy"] = utils.config_image_pull_policy(
                 self.image_pull_policy
             )
         return script

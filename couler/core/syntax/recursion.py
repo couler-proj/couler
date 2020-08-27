@@ -14,7 +14,7 @@
 import types
 from collections import OrderedDict
 
-from couler.core import pyfunc, states
+from couler.core import states, utils
 from couler.core.templates import Step, Steps, output
 
 
@@ -63,7 +63,7 @@ def exec_while(condition, inner_while):
             "when": when_prefix,
         }
     )
-    step_out_id = pyfunc.invocation_name(step_out_name, recursive_id)
+    step_out_id = utils.invocation_name(step_out_name, recursive_id)
     states._while_steps[step_out_id] = [step_out_template]
 
     # Add steps inside the recursive logic to recursive template

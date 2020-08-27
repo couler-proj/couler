@@ -3,7 +3,7 @@ import unittest
 import yaml
 
 import couler.argo as couler
-from couler.core import pyfunc
+from couler.core import utils
 from couler.core.templates.volume import Volume, VolumeMount
 
 
@@ -356,7 +356,7 @@ class ArgoTest(unittest.TestCase):
         self, script_to_check, image, command, source, env
     ):
         if env is None:
-            env = pyfunc.convert_dict_to_env_list(
+            env = utils.convert_dict_to_env_list(
                 {
                     "NVIDIA_VISIBLE_DEVICES": "",
                     "NVIDIA_DRIVER_CAPABILITIES": "",
@@ -364,7 +364,7 @@ class ArgoTest(unittest.TestCase):
             )
         else:
             env.append(
-                pyfunc.convert_dict_to_env_list(
+                utils.convert_dict_to_env_list(
                     {
                         "NVIDIA_VISIBLE_DEVICES": "",
                         "NVIDIA_DRIVER_CAPABILITIES": "",

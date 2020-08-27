@@ -13,7 +13,7 @@
 
 from collections import OrderedDict
 
-import couler.core.pyfunc as pyfunc
+import couler.core.utils as pyfunc
 
 
 class Artifact(object):
