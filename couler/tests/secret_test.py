@@ -1,5 +1,5 @@
 import couler.argo as couler
-import couler.pyfunc as pyfunc
+from couler.core import pyfunc
 from couler.tests.argo_yaml_test import ArgoYamlTest
 
 _test_data_dir = "test_data"

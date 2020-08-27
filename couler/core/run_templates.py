@@ -73,7 +73,7 @@ def run_script(
     step_name = step_update_utils.update_step(
         func_name, args=None, step_name=step_name, caller_line=caller_line
     )
-    rets = pyfunc.script_output(step_name, func_name)
+    rets = _script_output(step_name, func_name)
     states._steps_outputs[step_name] = rets
     return rets
 
@@ -185,7 +185,7 @@ def run_container(
         states.workflow.get_template(func_name).to_dict().get("outputs", None)
     )
 
-    rets = pyfunc.container_output(step_name, func_name, _output)
+    rets = _container_output(step_name, func_name, _output)
     states._steps_outputs[step_name] = rets
     return rets
 
@@ -266,6 +266,118 @@ def run_job(
     step_update_utils.update_step(func_name, args, step_name, caller_line)
 
     # return job name and job uid for reference
-    rets = pyfunc.job_output(step_name, func_name)
+    rets = _job_output(step_name, func_name)
     states._steps_outputs[step_name] = rets
     return rets
+
+
+def _container_output(step_name, template_name, output):
+    """Generate output name from an Argo container template.  For example,
+    "{{steps.generate-parameter.outputs.parameters.hello-param}}" used in
+    https://github.com/argoproj/argo/tree/master/examples#output-parameters.
+    Each element of return for run_container is contacted by:
+    couler.step_name.template_name.output.parameters.output_id
+    """
+    from couler.core.templates import (
+        OutputParameter,
+        OutputArtifact,
+        OutputEmpty,
+    )
+
+    rets = []
+    if output is None:
+        ret = "couler.%s.%s.outputs.parameters.%s" % (
+            step_name,
+            template_name,
+            "1",
+        )
+        rets.append(OutputEmpty(value=ret))
+        return rets
+
+    output_is_parameter = True
+    if "parameters" in output:
+        _outputs = output["parameters"]
+    elif "artifacts" in output:
+        _outputs = output["artifacts"]
+        output_is_parameter = False
+
+    if isinstance(_outputs, str):
+        _outputs = [_outputs]
+
+    if isinstance(_outputs, list):
+        for o in _outputs:
+            output_id = o["name"]
+            is_global = "globalName" in o
+            if output_is_parameter:
+                if is_global:
+                    ret = "couler.workflow.outputs.parameters.%s" % output_id
+                else:
+                    ret = "couler.%s.%s.outputs.parameters.%s" % (
+                        step_name,
+                        template_name,
+                        output_id,
+                    )
+                rets.append(OutputParameter(value=ret, is_global=is_global))
+            else:
+                if is_global:
+                    ret = "couler.workflow.outputs.artifacts.%s" % output_id
+                else:
+                    ret = "couler.%s.%s.outputs.artifacts.%s" % (
+                        step_name,
+                        template_name,
+                        output_id,
+                    )
+                rets.append(
+                    OutputArtifact(
+                        value=ret,
+                        path=o["path"],
+                        artifact=o,
+                        is_global=is_global,
+                    )
+                )
+    else:
+        raise SyntaxError("Container output must be a list")
+
+    return rets
+
+
+def _script_output(step_name, template_name):
+    """Generate output name from an Argo script template.  For example,
+    "{{steps.generate.outputs.result}}" in
+    https://github.com/argoproj/argo/tree/master/examples#scripts--results
+    Return of run_script is contacted by:
+    couler.step_name.template_name.outputs.result
+    """
+    from couler.core.templates import OutputScript
+
+    value = "couler.%s.%s.outputs.result" % (step_name, template_name)
+    return [OutputScript(value=value)]
+
+
+def _job_output(step_name, template_name):
+    """
+    :param step_name:
+    :param template_name:
+    https://github.com/argoproj/argo/blob/master/examples/k8s-jobs.yaml#L44
+    Return the job name and job id for running a job
+    """
+    job_name = "couler.%s.%s.outputs.parameters.job-name" % (
+        step_name,
+        template_name,
+    )
+    job_id = "couler.%s.%s.outputs.parameters.job-id" % (
+        step_name,
+        template_name,
+    )
+    job_obj = "couler.%s.%s.outputs.parameters.job-obj" % (
+        step_name,
+        template_name,
+    )
+
+    from couler.core.templates import OutputJob
+
+    return [
+        OutputJob(
+            value=job_name, job_name=job_name, job_obj=job_obj, job_id=job_id
+        )
+    ]

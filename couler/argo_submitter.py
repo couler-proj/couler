@@ -14,6 +14,8 @@
 import logging
 import re
 
+import pyaml
+import yaml
 from kubernetes import client as k8s_client
 from kubernetes import config
 
@@ -78,11 +80,6 @@ class ArgoSubmitter(object):
             if "name" in workflow_yaml["metadata"]
             else workflow_yaml["metadata"]["generateName"]
         )
-
-        # TODO: dump the yaml for comma format issue
-        import pyaml
-        import yaml
-
         yaml_str = pyaml.dump(workflow_yaml)
         workflow_yaml = yaml.safe_load(yaml_str)
         return self._custom_object_api_client.create_namespaced_custom_object(  # noqa: E501

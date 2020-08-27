@@ -15,7 +15,7 @@ import hashlib
 import json
 from collections import OrderedDict
 
-from couler import pyfunc
+from couler.core import pyfunc
 
 
 class Secret(object):

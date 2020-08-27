@@ -16,8 +16,8 @@ import types
 import pyaml
 import yaml
 
-from couler.argo_workflow import Step
 from couler.core import pyfunc, states
+from couler.core.templates import Step
 
 
 def map(function, input_list):

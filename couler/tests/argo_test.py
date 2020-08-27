@@ -3,7 +3,7 @@ import unittest
 import yaml
 
 import couler.argo as couler
-import couler.pyfunc as pyfunc
+from couler.core import pyfunc
 from couler.core.templates.volume import Volume, VolumeMount
 
 
