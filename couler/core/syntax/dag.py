@@ -53,7 +53,7 @@ def set_dependencies(step_function, dependencies):
     if dependencies is not None and not isinstance(dependencies, list):
         raise SyntaxError("require input as list")
 
-    if not isinstance(step_function, types.FunctionType):
+    if not callable(step_function):
         raise SyntaxError("require step_function to a function")
 
     states.workflow.enable_dag_mode()

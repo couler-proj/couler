@@ -75,7 +75,26 @@ class DAGTest(ArgoYamlTest):
         couler.set_dependencies(lambda: job_d(message="D"), dependencies=["B"])
 
         self.check_argo_yaml("dag_golden_1.yaml")
-        couler._cleanup()
+
+    def test_method_dependencies(self):
+        class A:
+            def a(self):
+                return job_a(message="A")
+
+            @staticmethod
+            def b():
+                return job_b(message="B")
+
+            @classmethod
+            def c(cls):
+                return job_c(message="C")
+
+        instance = A()
+        couler.set_dependencies(instance.a, dependencies=None)
+        couler.set_dependencies(instance.b, dependencies=["A"])
+        couler.set_dependencies(A.c, dependencies=["A"])
+        couler.set_dependencies(lambda: job_d(message="D"), dependencies=["B"])
+        self.check_argo_yaml("dag_golden_1.yaml")
 
     def test_set_dependencies_with_passing_parameter_artifact_implicitly(self):
         def producer_two(step_name):
@@ -108,7 +127,6 @@ class DAGTest(ArgoYamlTest):
         )
 
         self.check_argo_yaml("parameter_passing_golden.yaml")
-        couler._cleanup()
 
     # TODO: Provide new test case without `tf.train`.
     # def test_set_dependencies_for_job(self):
