@@ -217,10 +217,10 @@ def job_d(message):
         step_name="D",
     )
 
-#  A
-# / \
-# B  C
-# /
+#     A
+#    / \
+#   B   C
+#  /
 # D
 def linear():
     couler.set_dependencies(lambda: job_a(message="A"), dependencies=None)
@@ -229,11 +229,11 @@ def linear():
     couler.set_dependencies(lambda: job_d(message="D"), dependencies=["B"])
 
 
-#  A
-# / \
-# B  C
-# \  /
-#  D
+#   A
+#  / \
+# B   C
+#  \ /
+#   D
 def diamond():
     couler.dag(
         [
