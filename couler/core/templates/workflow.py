@@ -13,7 +13,7 @@
 
 from collections import OrderedDict
 
-from couler.core import pyfunc
+from couler.core import utils
 from couler.core.templates import Container, Job, Script, Step, Template
 from couler.core.templates.volume import Volume
 
@@ -32,7 +32,7 @@ class Workflow(object):
         self.clean_ttl = None
         self.dag_mode = False
         self.user_id = None
-        self.cluster_config = pyfunc.load_cluster_config()
+        self.cluster_config = utils.load_cluster_config()
         self.cron_config = None
         self.volumes = []
 

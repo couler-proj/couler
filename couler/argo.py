@@ -16,7 +16,6 @@ import logging
 
 import pyaml
 import yaml
-from deprecated import deprecated
 from kubernetes import client as k8s_client
 from kubernetes import config
 
@@ -142,11 +141,6 @@ def _dump_yaml():
         print(yaml_str)
 
 
-@deprecated(version="0.1.1", reason="Use create_parameter_artifact instead")
-def artifact(path, is_global=False):
-    return Artifact(path=path, type="parameters", is_global=is_global)
-
-
 def create_parameter_artifact(path, is_global=False):
     return Artifact(path=path, type="parameters", is_global=is_global)
 
@@ -193,10 +187,6 @@ def create_secret(secret_data={}, namespace="default"):
         states._secrets[secret.name] = secret
 
     return secret.name
-
-
-def get_cluster_config_name():
-    return states.workflow.get_cluster_config_name()
 
 
 # Dump the YAML when exiting

@@ -13,7 +13,7 @@
 
 from collections import OrderedDict
 
-from couler.core import pyfunc
+from couler.core import utils
 from couler.core.templates.template import Template
 
 
@@ -33,9 +33,9 @@ class Step(object):
             d.update({"template": self.template})
         if self.when is not None:
             d.update({"when": self.when})
-        if pyfunc.non_empty(self.arguments):
+        if utils.non_empty(self.arguments):
             d.update({"arguments": self.arguments})
-        if pyfunc.non_empty(self.with_items):
+        if utils.non_empty(self.with_items):
             d.update({"withItems": self.with_items})
         return d
 

@@ -13,7 +13,8 @@
 
 from collections import OrderedDict
 
-from couler.core import pyfunc, states
+import couler.core.templates.output
+from couler.core import states, utils
 from couler.core.templates import OutputArtifact, Step
 
 
@@ -54,7 +55,7 @@ def _update_dag_tasks(
     Here we insert a single task into the global tasks.
     """
     if step_name is None:
-        function_id = pyfunc.invocation_name(function_name, caller_line)
+        function_id = utils.invocation_name(function_name, caller_line)
     else:
         function_id = step_name
 
@@ -108,13 +109,13 @@ def _update_steps(function_name, caller_line, args=None, template_name=None):
     A step in Argo YAML contains name, related template and parameters.
     Here we insert a single step into the global steps.
     """
-    function_id = pyfunc.invocation_name(function_name, caller_line)
+    function_id = utils.invocation_name(function_name, caller_line)
 
     # Update `steps` only if needed
     if states._update_steps_lock:
         name = function_id
         if states._run_concurrent_lock:
-            _id = pyfunc.invocation_name(template_name, caller_line)
+            _id = utils.invocation_name(template_name, caller_line)
             name = "%s-%s" % (_id, states._concurrent_func_id)
             if states._sub_steps is not None:
                 states._concurrent_func_id = states._concurrent_func_id + 1
@@ -181,12 +182,12 @@ def _get_params_and_artifacts_from_args(args, input_param_name, prefix):
         args = [args]
     i = 0
     for values in args:
-        values = pyfunc.parse_argo_output(values, prefix)
+        values = couler.core.templates.output.parse_argo_output(values, prefix)
         if isinstance(values, list):
             for value in values:
                 parameters.append(
                     {
-                        "name": pyfunc.input_parameter_name(
+                        "name": utils.input_parameter_name(
                             input_param_name, i
                         ),
                         "value": value,
@@ -197,7 +198,7 @@ def _get_params_and_artifacts_from_args(args, input_param_name, prefix):
             if isinstance(values, OutputArtifact):
                 artifacts.append(
                     {
-                        "name": pyfunc.input_parameter_name(
+                        "name": utils.input_parameter_name(
                             input_param_name, i
                         ),
                         "from": values,
@@ -206,7 +207,7 @@ def _get_params_and_artifacts_from_args(args, input_param_name, prefix):
             else:
                 parameters.append(
                     {
-                        "name": pyfunc.input_parameter_name(
+                        "name": utils.input_parameter_name(
                             input_param_name, i
                         ),
                         "value": values,

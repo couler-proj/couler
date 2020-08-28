@@ -1,5 +1,5 @@
 import couler.argo as couler
-import couler.pyfunc as pyfunc
+from couler.core import utils
 from couler.tests.argo_yaml_test import ArgoYamlTest
 
 _test_data_dir = "test_data"
@@ -32,27 +32,27 @@ class SecretTest(ArgoYamlTest):
         self.assertEqual(secret1_yaml["metadata"]["namespace"], "default")
         self.assertEqual(len(secret1_yaml["data"]), 2)
         self.assertEqual(
-            secret1_yaml["data"]["uname"], pyfunc.encode_base64("abc")
+            secret1_yaml["data"]["uname"], utils.encode_base64("abc")
         )
         self.assertEqual(
-            secret1_yaml["data"]["passwd"], pyfunc.encode_base64("def")
+            secret1_yaml["data"]["passwd"], utils.encode_base64("def")
         )
 
         self.assertEqual(secret2_yaml["metadata"]["namespace"], "test")
         self.assertEqual(len(secret2_yaml["data"]), 2)
         self.assertEqual(
-            secret2_yaml["data"]["access_key"], pyfunc.encode_base64("key1234")
+            secret2_yaml["data"]["access_key"], utils.encode_base64("key1234")
         )
         self.assertEqual(
             secret2_yaml["data"]["access_value"],
-            pyfunc.encode_base64("value5678"),
+            utils.encode_base64("value5678"),
         )
 
     def _verify_script_body(
         self, script_to_check, image, command, source, env
     ):
         if env is None:
-            env = pyfunc.convert_dict_to_env_list(
+            env = utils.convert_dict_to_env_list(
                 {
                     "NVIDIA_VISIBLE_DEVICES": "",
                     "NVIDIA_DRIVER_CAPABILITIES": "",
@@ -60,7 +60,7 @@ class SecretTest(ArgoYamlTest):
             )
         else:
             env.append(
-                pyfunc.convert_dict_to_env_list(
+                utils.convert_dict_to_env_list(
                     {
                         "NVIDIA_VISIBLE_DEVICES": "",
                         "NVIDIA_DRIVER_CAPABILITIES": "",

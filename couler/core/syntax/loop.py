@@ -16,8 +16,8 @@ import types
 import pyaml
 import yaml
 
-from couler.argo_workflow import Step
-from couler.core import pyfunc, states
+from couler.core import states
+from couler.core.templates import Step, output
 
 
 def map(function, input_list):
@@ -36,7 +36,7 @@ def map(function, input_list):
     else:
         raise TypeError("require loop over a function to run")
 
-    inner_dict = pyfunc.extract_step_return(inner)
+    inner_dict = output.extract_step_return(inner)
     template_name = inner_dict["name"]
     inner_step = Step(name=inner_dict["id"], template=template_name)
 

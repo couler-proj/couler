@@ -13,7 +13,7 @@
 
 from collections import OrderedDict
 
-from couler.core import pyfunc
+from couler.core import utils
 from couler.core.templates import Workflow
 
 _sub_steps = None
@@ -25,7 +25,7 @@ _concurrent_func_line = -1
 _concurrent_func_id = 0
 # We need to fetch the name before triggering atexit, as the atexit handlers
 # cannot get the original Python filename.
-workflow_filename = pyfunc.workflow_filename()
+workflow_filename = utils.workflow_filename()
 workflow = Workflow(workflow_filename=workflow_filename)
 # '_when_prefix' represents 'when' prefix in Argo YAML. For example,
 # https://github.com/argoproj/argo/blob/master/examples/README.md#conditionals

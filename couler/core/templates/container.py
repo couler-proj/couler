@@ -14,7 +14,7 @@
 import copy
 from collections import OrderedDict
 
-from couler.core import pyfunc
+from couler.core import utils
 from couler.core.constants import OVERWRITE_GPU_ENVS
 from couler.core.templates.artifact import OssArtifact
 from couler.core.templates.output import OutputArtifact, OutputJob
@@ -45,8 +45,8 @@ class Container(Template):
         Template.__init__(
             self,
             name=name,
-            output=pyfunc.make_list_if_not(output),
-            input=pyfunc.make_list_if_not(input),
+            output=utils.make_list_if_not(output),
+            input=utils.make_list_if_not(input),
             timeout=timeout,
             retry=retry,
             pool=pool,
@@ -54,7 +54,7 @@ class Container(Template):
             daemon=daemon,
         )
         self.image = image
-        self.command = pyfunc.make_list_if_not(command)
+        self.command = utils.make_list_if_not(command)
         self.args = args
         self.env = env
         self.secret = secret
@@ -74,14 +74,14 @@ class Container(Template):
                         for _ in range(3):
                             parameters.append(
                                 {
-                                    "name": pyfunc.input_parameter_name(
+                                    "name": utils.input_parameter_name(
                                         self.name, i
                                     )
                                 }
                             )
                             i += 1
                     else:
-                        para_name = pyfunc.input_parameter_name(self.name, i)
+                        para_name = utils.input_parameter_name(self.name, i)
                         parameters.append({"name": para_name})
                         i += 1
 
@@ -107,7 +107,7 @@ class Container(Template):
                 template["inputs"]["artifacts"] = _input_list
 
         # Container
-        if not pyfunc.gpu_requested(self.resources):
+        if not utils.gpu_requested(self.resources):
             if self.env is None:
                 self.env = {}
             self.env.update(OVERWRITE_GPU_ENVS)
@@ -130,12 +130,12 @@ class Container(Template):
     def container_dict(self):
         # Container part
         container = OrderedDict({"image": self.image, "command": self.command})
-        if pyfunc.non_empty(self.args):
+        if utils.non_empty(self.args):
             container["args"] = self._convert_args_to_input_parameters(
                 self.args
             )
-        if pyfunc.non_empty(self.env):
-            container["env"] = pyfunc.convert_dict_to_env_list(self.env)
+        if utils.non_empty(self.env):
+            container["env"] = utils.convert_dict_to_env_list(self.env)
         if self.secret is not None:
             if not isinstance(self.secret, Secret):
                 raise ValueError(
@@ -152,7 +152,7 @@ class Container(Template):
                 "limits": copy.deepcopy(self.resources),
             }
         if self.image_pull_policy is not None:
-            container["imagePullPolicy"] = pyfunc.config_image_pull_policy(
+            container["imagePullPolicy"] = utils.config_image_pull_policy(
                 self.image_pull_policy
             )
         if self.volume_mounts is not None:
@@ -170,7 +170,7 @@ class Container(Template):
                     para_name = o.artifact["name"]
                     parameters.append('"{{inputs.artifacts.%s}}"' % para_name)
                 else:
-                    para_name = pyfunc.input_parameter_name(self.name, i)
+                    para_name = utils.input_parameter_name(self.name, i)
                     parameters.append('"{{inputs.parameters.%s}}"' % para_name)
 
         return parameters

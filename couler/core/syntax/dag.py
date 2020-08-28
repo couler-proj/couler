@@ -13,8 +13,7 @@
 
 import types
 
-import couler.core.pyfunc as pyfunc
-from couler.core import states
+from couler.core import states, utils
 from couler.core.templates import OutputArtifact, OutputJob, OutputParameter
 
 
@@ -29,7 +28,7 @@ def dag(dependency_graph):
 
     states.workflow.enable_dag_mode()
 
-    _, call_line = pyfunc.invocation_location()
+    _, call_line = utils.invocation_location()
 
     states._dag_caller_line = call_line
 

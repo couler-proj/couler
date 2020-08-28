@@ -14,7 +14,7 @@
 import pyaml
 import yaml
 
-from couler.core import pyfunc, states, step_update_utils
+from couler.core import states, step_update_utils, utils
 from couler.core.templates import (
     Container,
     Job,
@@ -22,6 +22,11 @@ from couler.core.templates import (
     OutputArtifact,
     OutputJob,
     Script,
+)
+from couler.core.templates.output import (
+    _container_output,
+    _job_output,
+    _script_output,
 )
 
 
@@ -43,11 +48,9 @@ def run_script(
     https://github.com/argoproj/argo/tree/master/examples#scripts--results.
     Step_name is only used for annotating step while developing step zoo.
     """
-    func_name, caller_line = pyfunc.invocation_location()
+    func_name, caller_line = utils.invocation_location()
     func_name = (
-        pyfunc.argo_safe_name(step_name)
-        if step_name is not None
-        else func_name
+        utils.argo_safe_name(step_name) if step_name is not None else func_name
     )
 
     if states.workflow.get_template(func_name) is None:
@@ -73,7 +76,7 @@ def run_script(
     step_name = step_update_utils.update_step(
         func_name, args=None, step_name=step_name, caller_line=caller_line
     )
-    rets = pyfunc.script_output(step_name, func_name)
+    rets = _script_output(step_name, func_name)
     states._steps_outputs[step_name] = rets
     return rets
 
@@ -116,11 +119,9 @@ def run_container(
     :param daemon:
     :return:
     """
-    func_name, caller_line = pyfunc.invocation_location()
+    func_name, caller_line = utils.invocation_location()
     func_name = (
-        pyfunc.argo_safe_name(step_name)
-        if step_name is not None
-        else func_name
+        utils.argo_safe_name(step_name) if step_name is not None else func_name
     )
 
     if states.workflow.get_template(func_name) is None:
@@ -185,7 +186,7 @@ def run_container(
         states.workflow.get_template(func_name).to_dict().get("outputs", None)
     )
 
-    rets = pyfunc.container_output(step_name, func_name, _output)
+    rets = _container_output(step_name, func_name, _output)
     states._steps_outputs[step_name] = rets
     return rets
 
@@ -217,11 +218,9 @@ def run_job(
     if manifest is None:
         raise ValueError("Input manifest can not be null")
 
-    func_name, caller_line = pyfunc.invocation_location()
+    func_name, caller_line = utils.invocation_location()
     func_name = (
-        pyfunc.argo_safe_name(step_name)
-        if step_name is not None
-        else func_name
+        utils.argo_safe_name(step_name) if step_name is not None else func_name
     )
 
     args = []
@@ -230,7 +229,7 @@ def run_job(
             env["inferred_outputs"] = states._outputs_tmp
 
         # Generate the inputs for the manifest template
-        envs, parameters, args = pyfunc.generate_parameters_run_job(env)
+        envs, parameters, args = utils.generate_parameters_run_job(env)
 
         # update the env
         if env is not None:
@@ -266,6 +265,6 @@ def run_job(
     step_update_utils.update_step(func_name, args, step_name, caller_line)
 
     # return job name and job uid for reference
-    rets = pyfunc.job_output(step_name, func_name)
+    rets = _job_output(step_name, func_name)
     states._steps_outputs[step_name] = rets
     return rets
