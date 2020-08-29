@@ -167,7 +167,7 @@ result = flip_coin()
 couler.when(couler.equal(result, "heads"), lambda: heads())
 couler.when(couler.equal(result, "tails"), lambda: tails())
 
-submitter = ArgoSubmitter(namespace="argo")
+submitter = ArgoSubmitter()
 couler.run(submitter=submitter)
 ```
 
@@ -247,7 +247,7 @@ def diamond():
 
 
 linear()
-submitter = ArgoSubmitter(namespace="argo")
+submitter = ArgoSubmitter()
 couler.run(submitter=submitter)
 ```
 
