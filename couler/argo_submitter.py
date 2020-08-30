@@ -34,6 +34,7 @@ class ArgoSubmitter(object):
         client_configuration=None,
         persist_config=True,
     ):
+        logging.basicConfig(level=logging.INFO)
         try:
             config.load_kube_config(
                 config_file, context, client_configuration, persist_config
@@ -75,19 +76,32 @@ class ArgoSubmitter(object):
         return self._custom_object_api_client
 
     def submit(self, workflow_yaml):
-        self.check_name(
+        wf_name = (
             workflow_yaml["metadata"]["name"]
             if "name" in workflow_yaml["metadata"]
             else workflow_yaml["metadata"]["generateName"]
         )
+        logging.info("Checking workflow name/generatedName %s" % wf_name)
+        self.check_name(wf_name)
         yaml_str = pyaml.dump(workflow_yaml)
         workflow_yaml = yaml.safe_load(yaml_str)
-        return self._custom_object_api_client.create_namespaced_custom_object(  # noqa: E501
-            WorkflowCRD.GROUP,
-            WorkflowCRD.VERSION,
-            self.namespace,
-            WorkflowCRD.PLURAL
-            if workflow_yaml["kind"] == WorkflowCRD.KIND
-            else CronWorkflowCRD.PLURAL,
-            workflow_yaml,
-        )
+
+        logging.info("Submitting workflow to Argo")
+        try:
+            response = self._custom_object_api_client.create_namespaced_custom_object(  # noqa: E501
+                WorkflowCRD.GROUP,
+                WorkflowCRD.VERSION,
+                self.namespace,
+                WorkflowCRD.PLURAL
+                if workflow_yaml["kind"] == WorkflowCRD.KIND
+                else CronWorkflowCRD.PLURAL,
+                workflow_yaml,
+            )
+            logging.info(
+                "Workflow %s has been submitted!"
+                % response.get("metadata", {}).get("name")
+            )
+            return response
+        except Exception as e:
+            logging.error("Failed to submit workflow")
+            raise e
