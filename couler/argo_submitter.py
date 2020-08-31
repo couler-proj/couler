@@ -50,6 +50,7 @@ class ArgoSubmitter(object):
             logging.info("Initialized with in-cluster config.")
 
         self._custom_object_api_client = k8s_client.CustomObjectsApi()
+        self._core_api_client = k8s_client.CoreV1Api()
         self.namespace = namespace
 
     @staticmethod
@@ -75,7 +76,14 @@ class ArgoSubmitter(object):
     def get_custom_object_api_client(self):
         return self._custom_object_api_client
 
-    def submit(self, workflow_yaml):
+    def get_core_api_client(self):
+        return self._core_api_client
+
+    def submit(self, workflow_yaml, secrets=None):
+        if secrets:
+            for secret in secrets:
+                self._create_secret(secret.to_yaml())
+
         wf_name = (
             workflow_yaml["metadata"]["name"]
             if "name" in workflow_yaml["metadata"]
@@ -83,9 +91,11 @@ class ArgoSubmitter(object):
         )
         logging.info("Checking workflow name/generatedName %s" % wf_name)
         self.check_name(wf_name)
+        return self._create_workflow(workflow_yaml)
+
+    def _create_workflow(self, workflow_yaml):
         yaml_str = pyaml.dump(workflow_yaml)
         workflow_yaml = yaml.safe_load(yaml_str)
-
         logging.info("Submitting workflow to Argo")
         try:
             response = self._custom_object_api_client.create_namespaced_custom_object(  # noqa: E501
@@ -105,3 +115,10 @@ class ArgoSubmitter(object):
         except Exception as e:
             logging.error("Failed to submit workflow")
             raise e
+
+    def _create_secret(self, secret_yaml):
+        yaml_str = pyaml.dump(secret_yaml)
+        secret_yaml = yaml.safe_load(yaml_str)
+        return self._core_api_client.create_namespaced_secret(  # noqa: E501
+            self.namespace, secret_yaml
+        )

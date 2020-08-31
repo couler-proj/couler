@@ -56,13 +56,14 @@ def run(submitter=ArgoSubmitter):
     if submitter is None:
         raise ValueError("The input submitter is None")
     wf = workflow_yaml()
+    secrets = states._secrets.values()
     # TODO (terrytangyuan): Decouple with Argo and then uncomment this
     # validate_workflow_yaml(wf)
     if isinstance(submitter, ArgoSubmitter):
-        return submitter.submit(wf)
+        return submitter.submit(wf, secrets=secrets)
     elif issubclass(submitter, ArgoSubmitter):
         submitter = ArgoSubmitter()
-        return submitter.submit(wf)
+        return submitter.submit(wf, secrets=secrets)
     else:
         raise ValueError("Only ArgoSubmitter is supported currently.")
 
