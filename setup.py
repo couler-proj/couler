@@ -29,13 +29,13 @@ with io.open(os.path.join("couler", "_version.py")) as fp:
 
 setup(
     name="couler",
-    description="Couler Python SDK/CLI",
-    long_description="Couler Python SDK/CLI",
+    description="Unified Interface for Constructing and Managing Workflows",
+    long_description="Unified Interface for Constructing and Managing Workflows",
     version=version["__version__"],
     include_package_data=True,
     install_requires=required_deps,
     extras_require=extras,
     python_requires=">=3.6",
-    packages=find_packages(exclude=["*test*", "step_zoo"]),
+    packages=find_packages(exclude=["*test*"]),
     package_data={"": ["requirements.txt"]},
 )
