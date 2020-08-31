@@ -30,7 +30,8 @@ with io.open(os.path.join("couler", "_version.py")) as fp:
 setup(
     name="couler",
     description="Unified Interface for Constructing and Managing Workflows",
-    long_description="Unified Interface for Constructing and Managing Workflows",
+    long_description="Unified Interface for"
+    " Constructing and Managing Workflows",
     version=version["__version__"],
     include_package_data=True,
     install_requires=required_deps,
