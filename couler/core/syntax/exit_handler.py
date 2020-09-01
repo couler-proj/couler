@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import types
 
 from couler.core import states
 from couler.core.constants import WFStatus
@@ -24,7 +23,7 @@ def set_exit_handler(status, exit_handler):
     Each status invokes one exi_handler function.
     https://github.com/argoproj/argo/blob/master/examples/exit-handlers.yaml
     """
-    if not isinstance(exit_handler, types.FunctionType):
+    if not callable(exit_handler):
         raise SyntaxError("require exit handler is a function")
 
     if not isinstance(status, WFStatus):  # noqa: F405
@@ -37,12 +36,9 @@ def set_exit_handler(status, exit_handler):
     states._exit_handler_enable = True
     states._when_prefix = workflow_status
 
-    if isinstance(exit_handler, types.FunctionType):
-        branch = exit_handler()
-        if branch is None:
-            raise SyntaxError("require function return value")
-    else:
-        raise TypeError("condition to run would be a function")
+    branch = exit_handler()
+    if branch is None:
+        raise SyntaxError("require function return value")
 
     states._when_prefix = None
     states._exit_handler_enable = False

@@ -79,6 +79,23 @@ class WorkflowBasicTest(ArgoYamlTest):
 
         self.assertEqual(hope_steps, steps)
 
+    def test_when_callable(self):
+        couler.steps = OrderedDict()
+        couler.update_steps = True
+        cls = self.create_callable_cls(lambda: heads())
+        instance = cls()
+        func_names = ["a", "b", "c", "self"]
+        for func_name in func_names:
+            if func_name == "self":
+                couler.when(couler.equal(flip_coin(), "heads"), instance)
+            else:
+                couler.when(
+                    couler.equal(flip_coin(), "heads"),
+                    getattr(instance, func_name),
+                )
+            couler.when(couler.equal(flip_coin(), "tails"), lambda: tails())
+            couler._cleanup()
+
     def test_when_order_three(self):
         couler.steps = OrderedDict()
         couler.update_steps = True
@@ -94,54 +111,54 @@ class WorkflowBasicTest(ArgoYamlTest):
         hope_steps = [
             [
                 OrderedDict(
-                    [("name", "flip-coin-85"), ("template", "flip-coin")]
+                    [("name", "flip-coin-102"), ("template", "flip-coin")]
                 )
             ],
             [
                 OrderedDict(
                     [
-                        ("name", "heads-86"),
+                        ("name", "heads-103"),
                         ("template", "heads"),
                         (
                             "when",
-                            "{{steps.flip-coin-85.outputs.result}} == heads",
+                            "{{steps.flip-coin-102.outputs.result}} == heads",
                         ),
                     ]
                 ),
                 OrderedDict(
                     [
-                        ("name", "tails-89"),
+                        ("name", "tails-106"),
                         ("template", "tails"),
                         (
                             "when",
-                            "{{steps.flip-coin-85.outputs.result}} == tails",
+                            "{{steps.flip-coin-102.outputs.result}} == tails",
                         ),
                     ]
                 ),
             ],
             [
                 OrderedDict(
-                    [("name", "flip-coin-88"), ("template", "flip-coin")]
+                    [("name", "flip-coin-105"), ("template", "flip-coin")]
                 )
             ],
             [
                 OrderedDict(
                     [
-                        ("name", "heads-90"),
+                        ("name", "heads-107"),
                         ("template", "heads"),
                         (
                             "when",
-                            "{{steps.flip-coin-88.outputs.result}} == heads",
+                            "{{steps.flip-coin-105.outputs.result}} == heads",
                         ),
                     ]
                 ),
                 OrderedDict(
                     [
-                        ("name", "tails-91"),
+                        ("name", "tails-108"),
                         ("template", "tails"),
                         (
                             "when",
-                            "{{steps.flip-coin-88.outputs.result}} == tails",
+                            "{{steps.flip-coin-105.outputs.result}} == tails",
                         ),
                     ]
                 ),
@@ -166,17 +183,17 @@ class WorkflowBasicTest(ArgoYamlTest):
         expected = [
             [
                 OrderedDict(
-                    [("name", "flip-coin-160"), ("template", "flip-coin")]
+                    [("name", "flip-coin-177"), ("template", "flip-coin")]
                 )
             ],
             [
                 OrderedDict(
                     [
-                        ("name", "output-message-162"),
+                        ("name", "output-message-179"),
                         ("template", "output-message"),
                         (
                             "when",
-                            "{{steps.flip-coin-160.outputs.result}} > 0.2",
+                            "{{steps.flip-coin-177.outputs.result}} > 0.2",
                         ),
                         (
                             "arguments",
@@ -184,7 +201,7 @@ class WorkflowBasicTest(ArgoYamlTest):
                                 "parameters": [
                                     {
                                         "name": "para-output-message-0",
-                                        "value": '"{{steps.flip-coin-160.outputs.result}}"',  # noqa: E501
+                                        "value": '"{{steps.flip-coin-177.outputs.result}}"',  # noqa: E501
                                     }
                                 ]
                             },
@@ -209,8 +226,26 @@ class WorkflowBasicTest(ArgoYamlTest):
         self.assertEqual(wf["metadata"], expected_meta)
 
     def test_set_workflow_exit_handler(self):
+        couler._cleanup()
+
         flip_coin()
         couler.set_exit_handler(couler.WFStatus.Succeeded, heads)
         couler.set_exit_handler(couler.WFStatus.Failed, tails)
         self.check_argo_yaml("workflow_basic_golden.yaml")
         couler._cleanup()
+
+    def test_exit_callable(self):
+        cls = self.create_callable_cls(lambda: heads())
+        instance = cls()
+        func_names = ["a", "b", "c", "self"]
+        for func_name in func_names:
+            flip_coin()
+            if func_name == "self":
+                couler.set_exit_handler(couler.WFStatus.Succeeded, instance)
+            else:
+                couler.set_exit_handler(
+                    couler.WFStatus.Succeeded, getattr(instance, func_name)
+                )
+            couler.set_exit_handler(couler.WFStatus.Failed, tails)
+            self.check_argo_yaml("workflow_basic_golden.yaml")
+            couler._cleanup()

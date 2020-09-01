@@ -53,6 +53,19 @@ class ConcurrentTest(ArgoYamlTest):
         )
         self.verify_concurrent_step("run_concurrent_golden.yaml")
 
+    def test_run_concurrent_callable(self):
+        callable_cls = self.create_callable_cls(lambda: whalesay("hello1"))
+        func_names = ["a", "b", "c", "self"]
+        instance = callable_cls()
+        for func_name in func_names:
+            if func_name == "self":
+                func = instance
+            else:
+                func = getattr(instance, func_name)
+            couler.concurrent([func, lambda: heads(), lambda: tails()])
+            self.verify_concurrent_step("run_concurrent_golden.yaml")
+            couler._cleanup()
+
     def test_run_concurrent_same_name(self):
         couler.concurrent(
             [

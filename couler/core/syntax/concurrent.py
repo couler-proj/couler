@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import types
 from collections import OrderedDict
 
 from couler.core import states, utils
@@ -37,7 +36,7 @@ def concurrent(function_list, subtasks=False):
     for function in function_list:
         # In case different parallel steps use the same function name
         states._concurrent_func_id = states._concurrent_func_id + 1
-        if isinstance(function, types.FunctionType):
+        if callable(function):
             if subtasks is True:
                 # 1. generate the sub-steps template
                 # 2. for each step in F, update the sub_steps template

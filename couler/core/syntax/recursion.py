@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import types
 from collections import OrderedDict
 
 from couler.core import states, utils
@@ -28,7 +27,7 @@ def exec_while(condition, inner_while):
     states._while_lock = True
 
     # Enforce inner function of the while-loop to run
-    if isinstance(inner_while, types.FunctionType):
+    if callable(inner_while):
         branch = inner_while()
         if branch is None:
             raise SyntaxError("require function return value")

@@ -48,3 +48,21 @@ class ArgoYamlTest(unittest.TestCase):
 
         self.maxDiff = None
         self.assertEqual(output_j, expected_j)
+
+    def create_callable_cls(self, func):
+        class A:
+            def a(self, *args):
+                return func(*args)
+
+            @classmethod
+            def b(cls, *args):
+                return func(*args)
+
+            @staticmethod
+            def c(*args):
+                return func(*args)
+
+            def __call__(self, *args):
+                return func(*args)
+
+        return A
