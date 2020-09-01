@@ -46,10 +46,7 @@ def map(function, input_list):
     function_template = states.workflow.get_template(template_name)
     function_template_dict = function_template.to_dict()
 
-    if (
-        "resource" in function_template_dict
-        and "kind: Training" in function_template_dict["resource"]["manifest"]
-    ):
+    if "resource" in function_template_dict:
         # Update the template with the new dynamic `metadata.name`.
         manifest_dict = yaml.safe_load(
             function_template_dict["resource"]["manifest"]
