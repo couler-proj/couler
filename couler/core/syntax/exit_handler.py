@@ -21,7 +21,7 @@ def set_exit_handler(status, exit_handler):
     """
     Configure the workflow handler
     Status would be: Succeeded, Failed, or Error.
-    Each status invokes one exi_handler function.
+    Each status invokes one exit_handler function.
     https://github.com/argoproj/argo/blob/master/examples/exit-handlers.yaml
     """
     if not isinstance(exit_handler, types.FunctionType):

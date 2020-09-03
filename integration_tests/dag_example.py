@@ -51,6 +51,24 @@ def job_d(message):
     )
 
 
+def exit_handler_succeeded():
+    return couler.run_container(
+        image="docker/whalesay:latest",
+        command=["cowsay"],
+        args=["succeeded"],
+        step_name="success-exit",
+    )
+
+
+def exit_handler_failed():
+    return couler.run_container(
+        image="docker/whalesay:latest",
+        command=["cowsay"],
+        args=["failed"],
+        step_name="failure-exit",
+    )
+
+
 #  A
 # / \
 # B  C
@@ -84,6 +102,9 @@ if __name__ == "__main__":
     couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
 
     linear()
+    couler.set_exit_handler(couler.WFStatus.Succeeded, exit_handler_succeeded)
+    couler.set_exit_handler(couler.WFStatus.Failed, exit_handler_failed)
+
     submitter = ArgoSubmitter(namespace="argo")
     wf = couler.run(submitter=submitter)
     wf_name = wf["metadata"]["name"]
