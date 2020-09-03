@@ -1,4 +1,5 @@
 [![CI](https://github.com/couler-proj/couler/workflows/CI/badge.svg)](https://github.com/couler-proj/couler/actions?query=event%3Apush+branch%3Amaster)
+[![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://join.slack.com/t/couler/shared_invite/zt-h4hew4jm-LCZK1qr03bsMS5zZbCEc_g)
 
 # Couler
 
