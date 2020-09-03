@@ -53,16 +53,16 @@ def job_d(message):
 
 def exit_handler_succeeded():
     return couler.run_container(
-        image="docker/whalesay:latest",
-        command=["cowsay succeeded"],
+        image="alpine:3.6",
+        command=["sh", "-c", 'echo "succeeded"'],
         step_name="success-exit",
     )
 
 
 def exit_handler_failed():
     return couler.run_container(
-        image="docker/whalesay:latest",
-        command=["cowsay failed"],
+        image="alpine:3.6",
+        command=["sh", "-c", 'echo "failed"'],
         step_name="failure-exit",
     )
 
