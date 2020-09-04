@@ -1,4 +1,5 @@
 import unittest
+from collections import OrderedDict
 
 import yaml
 
@@ -135,16 +136,84 @@ class ArgoTest(unittest.TestCase):
         self.assertTrue(
             params["value"]
             in [
-                # Note that the "output-id-91" case is needed for
+                # Note that the "output-id-92" case is needed for
                 # Python 3.8.
-                '"{{workflow.outputs.parameters.output-id-91}}"',
                 '"{{workflow.outputs.parameters.output-id-92}}"',
+                '"{{workflow.outputs.parameters.output-id-93}}"',
             ]
         )
         # Check input parameters for step B
         template = wf["spec"]["templates"][2]
         self.assertEqual(
             template["inputs"]["parameters"], [{"name": "para-B-0"}]
+        )
+        couler._cleanup()
+
+    def test_set_dependencies_with_exit_handler(self):
+        def producer():
+            return couler.run_container(
+                image="docker/whalesay:latest",
+                args=["echo -n hello world"],
+                command=["bash", "-c"],
+                step_name="A",
+            )
+
+        def consumer():
+            return couler.run_container(
+                image="docker/whalesay:latest",
+                command=["cowsay"],
+                step_name="B",
+            )
+
+        def exit_handler_succeeded():
+            return couler.run_container(
+                image="docker/whalesay:latest",
+                command=["cowsay"],
+                step_name="success-exit",
+            )
+
+        def exit_handler_failed():
+            return couler.run_container(
+                image="docker/whalesay:latest",
+                command=["cowsay"],
+                step_name="failure-exit",
+            )
+
+        couler.set_dependencies(lambda: producer(), dependencies=None)
+        couler.set_dependencies(lambda: consumer(), dependencies=["A"])
+        couler.set_exit_handler(
+            couler.WFStatus.Succeeded, exit_handler_succeeded
+        )
+        couler.set_exit_handler(couler.WFStatus.Failed, exit_handler_failed)
+
+        wf = couler.workflow_yaml()
+        self.assertEqual(wf["spec"]["onExit"], "exit-handler")
+        expected_container_spec = (
+            "container",
+            OrderedDict(
+                [
+                    ("image", "docker/whalesay:latest"),
+                    ("command", ["cowsay"]),
+                    (
+                        "env",
+                        [
+                            {"name": "NVIDIA_VISIBLE_DEVICES", "value": ""},
+                            {
+                                "name": "NVIDIA_DRIVER_CAPABILITIES",
+                                "value": "",
+                            },
+                        ],
+                    ),
+                ]
+            ),
+        )
+        self.assertEqual(
+            wf["spec"]["templates"][3],
+            OrderedDict([("name", "success-exit"), expected_container_spec]),
+        )
+        self.assertEqual(
+            wf["spec"]["templates"][4],
+            OrderedDict([("name", "failure-exit"), expected_container_spec]),
         )
         couler._cleanup()
 
