@@ -2,8 +2,8 @@ from io import StringIO
 
 import yaml
 
+from couler.core import utils
 import couler.argo as couler
-import couler.pyfunc as pyfunc
 import couler.steps.tensorflow as tf
 from couler.tests.argo_yaml_test import ArgoYamlTest
 
@@ -26,10 +26,9 @@ class TensorflowTestCase(ArgoYamlTest):
             secret=secret,
         )
 
-        # secret_yaml = secrets.secret_yaml()[0]
         secret_yaml = list(couler.states._secrets.values())[0].to_yaml()
         self.assertEqual(
-            secret_yaml["data"]["access_key"], pyfunc.encode_base64("key1234")
+            secret_yaml["data"]["access_key"], utils.encode_base64("key1234")
         )
 
         wf = couler.workflow_yaml()

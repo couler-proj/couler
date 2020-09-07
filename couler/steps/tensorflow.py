@@ -4,7 +4,7 @@ import uuid
 import pyaml
 
 import couler.argo as couler
-import couler.pyfunc as pyfunc
+from couler.core import utils
 
 container_template = {"name": "tensorflow", "image": "", "command": ""}
 
@@ -175,7 +175,7 @@ def train(
 
         manifest["spec"]["tfReplicaSpecs"].update({"Worker": worker_pod})
 
-    step_name, _ = pyfunc.invocation_location()
+    step_name, _ = utils.invocation_location()
 
     couler.run_job(
         manifest=pyaml.dump(manifest),
