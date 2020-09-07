@@ -2,9 +2,9 @@ from io import StringIO
 
 import yaml
 
-from couler.core import utils
 import couler.argo as couler
 import couler.steps.tensorflow as tf
+from couler.core import utils
 from couler.tests.argo_yaml_test import ArgoYamlTest
 
 
