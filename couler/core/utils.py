@@ -255,3 +255,8 @@ def _get_uuid():
 
     """use uuid4 to gen ascii uuid, length=8"""
     return "".join(str(uuid.uuid4()).split("-"))[:8]
+def bool_to_str(b):
+    if b:
+        return 'true'
+    else:
+        return 'false'
