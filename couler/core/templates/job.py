@@ -37,7 +37,7 @@ class Job(Template):
         self.args = args
         self.action = action
         self.manifest = manifest
-        self.set_owner_reference = utils.bool_to_str(self.set_owner_reference)
+        self.set_owner_reference = utils.bool_to_str(set_owner_reference)
         self.success_condition = success_condition
         self.failure_condition = failure_condition
 
