@@ -261,4 +261,4 @@ def bool_to_str(bool_val):
     """convert boolean to strings for YAML configuration"""
     if not isinstance(bool_val,bool):
         raise TypeError("The bool_val is required to be boolean type")
-    return 'true' if bool_val else 'false'
+    return "true" if bool_val else "false"
