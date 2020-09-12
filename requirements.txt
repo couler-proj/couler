@@ -1,5 +1,0 @@
-argo-workflows==3.2.0
-pyaml
-kubernetes>=10.0.0, <=11.0.0
-docker==4.1.0
-Deprecated
