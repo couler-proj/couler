@@ -4,7 +4,6 @@ from couler.tests.argo_yaml_test import ArgoYamlTest
 import random
 
 
-
 _test_data_dir = "test_data"
 couler.config_workflow(name="pytest")
 

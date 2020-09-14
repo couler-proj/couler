@@ -5,8 +5,6 @@ import couler.argo as couler
 from couler.tests.argo_yaml_test import ArgoYamlTest
 
 
-
-
 couler.config_workflow(name="pytest")
 
 

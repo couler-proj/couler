@@ -3,9 +3,7 @@ from couler.tests.argo_yaml_test import ArgoYamlTest
 import random
 
 
-
 def random_code():
-
     result = "heads" if random.randint(0, 1) == 0 else "tails"
     print(result)
 

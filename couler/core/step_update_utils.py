@@ -1,8 +1,3 @@
-from collections import OrderedDict
-import couler.core.templates.output
-from couler.core import states, utils
-from couler.core.templates import OutputArtifact, Step
-
 # Copyright 2020 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +11,10 @@ from couler.core.templates import OutputArtifact, Step
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+from collections import OrderedDict
+import couler.core.templates.output
+from couler.core import states, utils
+from couler.core.templates import OutputArtifact, Step
 
 
 def update_step(func_name, args, step_name, caller_line):

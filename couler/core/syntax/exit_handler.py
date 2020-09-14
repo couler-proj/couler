@@ -1,7 +1,3 @@
-import types
-from couler.core import states
-from couler.core.constants import WFStatus
-
 # Copyright 2020 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +11,9 @@ from couler.core.constants import WFStatus
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import types
+from couler.core import states
+from couler.core.constants import WFStatus
 
 
 def set_exit_handler(status, exit_handler):

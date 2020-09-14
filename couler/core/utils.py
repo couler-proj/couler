@@ -1,14 +1,3 @@
-import base64
-import inspect
-import os
-import re
-import textwrap
-from couler.core.constants import ImagePullPolicy
-from couler.core.templates.output import parse_argo_output
-from importlib import util
-from couler.core.templates import Output
-import uuid
-
 # Copyright 2020 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +11,16 @@ import uuid
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import base64
+import inspect
+import os
+import re
+import textwrap
+from couler.core.constants import ImagePullPolicy
+from couler.core.templates.output import parse_argo_output
+from importlib import util
+from couler.core.templates import Output
+import uuid
 
 
 def argo_safe_name(name):

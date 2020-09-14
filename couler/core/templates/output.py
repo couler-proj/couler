@@ -1,10 +1,3 @@
-from couler.core.templates import Output
-from couler.core.templates import Output, OutputJob
-from couler.core.templates import (
-from couler.core.templates import OutputScript
-from couler.core.templates import OutputJob
-from couler.core.templates import Output
-
 # Copyright 2020 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +10,13 @@ from couler.core.templates import Output
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from couler.core.templates import Output
+from couler.core.templates import Output, OutputJob
+from couler.core.templates import (
+from couler.core.templates import OutputScript
+from couler.core.templates import OutputJob
+from couler.core.templates import Output
 
 
 class Output(object):

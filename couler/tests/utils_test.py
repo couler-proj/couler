@@ -3,8 +3,6 @@ import unittest
 from couler.core import utils
 
 
-
-
 class PyfuncTest(unittest.TestCase):
     def test_argo_safe_name(self):
         self.assertIsNone(utils.argo_safe_name(None))

@@ -5,9 +5,6 @@ import couler.argo as couler
 from couler.tests.argo_yaml_test import ArgoYamlTest
 
 
-
-
-
 class ResourceTest(ArgoYamlTest):
     def test_resource_setup(self):
         couler.run_container(

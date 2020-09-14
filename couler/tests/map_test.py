@@ -2,7 +2,6 @@ import unittest
 import couler.argo as couler
 
 
-
 couler.config_workflow(name="pytest")
 
 

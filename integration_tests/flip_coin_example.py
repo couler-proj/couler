@@ -1,7 +1,3 @@
-import couler.argo as couler
-from couler.argo_submitter import ArgoSubmitter
-import random
-
 # Copyright 2020 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,10 +11,12 @@ import random
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import couler.argo as couler
+from couler.argo_submitter import ArgoSubmitter
+import random
 
 
 def random_code():
-
     res = "heads" if random.randint(0, 1) == 0 else "tails"
     print(res)
 

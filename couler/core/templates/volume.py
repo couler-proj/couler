@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 # Copyright 2020 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +11,7 @@ from collections import OrderedDict
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+from collections import OrderedDict
 
 class Volume(object):
     def __init__(self, name, claim_name):

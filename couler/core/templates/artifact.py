@@ -1,8 +1,3 @@
-from collections import OrderedDict
-from couler.core import utils
-import couler.argo as couler
-
-
 # Copyright 2020 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +11,9 @@ import couler.argo as couler
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+from collections import OrderedDict
+from couler.core import utils
+import couler.argo as couler
 
 
 class Artifact(object):

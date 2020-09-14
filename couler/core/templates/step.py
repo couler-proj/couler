@@ -1,7 +1,3 @@
-from collections import OrderedDict
-from couler.core import utils
-from couler.core.templates.template import Template
-
 # Copyright 2020 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +11,9 @@ from couler.core.templates.template import Template
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+from collections import OrderedDict
+from couler.core import utils
+from couler.core.templates.template import Template
 
 
 class Step(object):

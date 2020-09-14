@@ -3,8 +3,6 @@ import unittest
 import couler.argo as couler
 
 
-
-
 class EnvUnitTest(unittest.TestCase):
     def setUp(self):
         couler._cleanup()

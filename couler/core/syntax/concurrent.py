@@ -1,9 +1,3 @@
-import types
-from collections import OrderedDict
-from couler.core import states, utils
-from couler.core.step_update_utils import _update_steps
-from couler.core.templates import Steps
-
 # Copyright 2020 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +11,11 @@ from couler.core.templates import Steps
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import types
+from collections import OrderedDict
+from couler.core import states, utils
+from couler.core.step_update_utils import _update_steps
+from couler.core.templates import Steps
 
 
 def concurrent(function_list, subtasks=False):

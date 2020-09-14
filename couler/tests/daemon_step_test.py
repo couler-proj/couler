@@ -2,8 +2,6 @@ import unittest
 import couler.argo as couler
 
 
-
-
 class DaemonStepTest(unittest.TestCase):
     def setUp(self) -> None:
         couler._cleanup()

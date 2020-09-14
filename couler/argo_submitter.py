@@ -1,11 +1,3 @@
-import logging
-import re
-import pyaml
-import yaml
-from kubernetes import client as k8s_client
-from kubernetes import config
-from couler.core.constants import CronWorkflowCRD, WorkflowCRD
-
 # Copyright 2020 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,8 +11,13 @@ from couler.core.constants import CronWorkflowCRD, WorkflowCRD
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
+import logging
+import re
+import pyaml
+import yaml
+from kubernetes import client as k8s_client
+from kubernetes import config
+from couler.core.constants import CronWorkflowCRD, WorkflowCRD
 
 
 # TODO: some k8s common parts can move to another file later.
