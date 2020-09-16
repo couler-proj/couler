@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import types
 
 from couler.core import states
 from couler.core.templates import Step, output
@@ -54,7 +53,7 @@ def when(condition, function):
     states._condition_id = "%s.%s" % (pre_dict["id"], pre_dict["output"])
 
     # Enforce the function to run and lock to add into step
-    if isinstance(function, types.FunctionType):
+    if callable(function):
         function()
     else:
         raise TypeError("condition to run would be a function")

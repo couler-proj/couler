@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import types
 
 from couler.core import states, utils
 from couler.core.templates import OutputArtifact, OutputJob, OutputParameter
@@ -36,7 +35,7 @@ def dag(dependency_graph):
         states._upstream_dag_task = None
         if isinstance(edges, list):
             for node in edges:
-                if isinstance(node, types.FunctionType):
+                if callable(node):
                     node()
                 else:
                     raise TypeError("require loop over a function to run")

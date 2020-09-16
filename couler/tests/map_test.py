@@ -1,6 +1,5 @@
-import unittest
-
 import couler.argo as couler
+from couler.tests.argo_yaml_test import ArgoYamlTest
 
 couler.config_workflow(name="pytest")
 
@@ -11,7 +10,7 @@ def consume(message):
     )
 
 
-class MapTest(unittest.TestCase):
+class MapTest(ArgoYamlTest):
     def test_map_function(self):
         test_paras = ["t1", "t2", "t3"]
         couler.map(lambda x: consume(x), test_paras)
@@ -63,6 +62,28 @@ class MapTest(unittest.TestCase):
         ]
         self.assertListEqual(map_step["withItems"], expected_with_items)
         couler._cleanup()
+
+    def test_map_function_callable(self):
+        test_paras = ["t1", "t2", "t3"]
+        callable_cls = self.create_callable_cls(lambda x: consume(x))
+        instance = callable_cls()
+        func_names = ["a", "b", "c", "self"]
+        for func_name in func_names:
+            if func_name == "self":
+                couler.map(instance, test_paras)
+            else:
+                couler.map(getattr(instance, func_name), test_paras)
+            expected_with_items = [
+                {"para-consume-0": "t1"},
+                {"para-consume-0": "t2"},
+                {"para-consume-0": "t3"},
+            ]
+            wf = couler.workflow_yaml()
+            templates = wf["spec"]["templates"]
+            steps_template = templates[0]
+            map_step = steps_template["steps"][0][0]
+            self.assertListEqual(map_step["withItems"], expected_with_items)
+            couler._cleanup()
 
     # TODO: Provide new test case without `tf.train`.
     # def test_map_function_with_run_job(self):

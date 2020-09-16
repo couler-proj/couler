@@ -11,19 +11,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import types
-
 
 def _predicate(pre, post, condition):
     """Generates an Argo predicate.
     """
     dict_config = {}
-    if isinstance(pre, types.FunctionType):
+    if callable(pre):
         dict_config["pre"] = pre()
     else:
         dict_config["pre"] = pre
 
-    if isinstance(post, types.FunctionType):
+    if callable(post):
         dict_config["post"] = post()
     else:
         dict_config["post"] = post

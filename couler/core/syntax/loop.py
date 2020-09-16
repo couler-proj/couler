@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import types
 
 import pyaml
 import yaml
@@ -25,7 +24,7 @@ def map(function, input_list):
     map operation of Couler
     """
     # Enforce the function to run and lock to add into step
-    if isinstance(function, types.FunctionType):
+    if callable(function):
         states._update_steps_lock = False
         # TODO (terrytangyuan): Support functions with multiple arguments.
         para = input_list[0]
