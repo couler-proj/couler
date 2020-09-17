@@ -256,3 +256,7 @@ couler.run(submitter=submitter)
 Note that the current version only works with Argo Workflows but we are actively working on the design of the unified
 interface that is extensible to additional workflow engines. Please stay tuned for more updates and we welcome
 any feedback and contributions from the community.
+
+## Community Blogs and Presentations
+
+* [Argo Workflows & Events Community Meeting, September 2020](https://docs.google.com/presentation/d/11KVEkKQGeV3R_-nHdqlzQV2uOrya94ra6Ilm_k6RwE4/edit?usp=sharing)
