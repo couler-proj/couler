@@ -18,7 +18,6 @@ import pyaml
 import yaml
 from kubernetes import client as k8s_client
 from kubernetes import config
-from kubernetes.client.rest import ApiException
 
 from couler.argo_submitter import ArgoSubmitter
 from couler.core import states  # noqa: F401
@@ -105,7 +104,7 @@ def delete(
             name,
             body=delete_body,
         )
-    except ApiException as e:
+    except k8s_client.api_client.rest.ApiException as e:
         raise Exception("Exception when deleting the workflow: %s\n" % e)
 
 
