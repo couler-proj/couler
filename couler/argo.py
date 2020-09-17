@@ -104,9 +104,7 @@ def delete(
             name,
             body=delete_body,
         )
-    # TODO (terrytangyuan): `ApiException` seems unavailable in
-    #  some versions of k8s client.
-    except k8s_client.api_client.ApiException as e:
+    except k8s_client.api_client.rest.ApiException as e:
         raise Exception("Exception when deleting the workflow: %s\n" % e)
 
 
