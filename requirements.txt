@@ -1,4 +1,4 @@
-argo-workflows==3.2.0
+argo-workflows==3.5.0
 pyaml
 kubernetes>=11.0.0
 docker==4.1.0
