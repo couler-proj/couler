@@ -1,0 +1,69 @@
+import unittest
+
+import couler.argo as couler
+import couler.steps.katib as katib
+
+xgb_cmd = """ \
+python /opt/katib/train_xgboost.py \
+  --train_dataset train.txt \
+  --validation_dataset validation.txt \
+  --booster gbtree \
+  --objective binary:logistic \
+"""
+
+xgboost_mainifest_template = """
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          name: {{{{.Trial}}}}
+          namespace: {{{{.NameSpace}}}}
+        spec:
+          template:
+            spec:
+              containers:
+              - name: {{{{.Trial}}}}
+                image: docker.io/katib/xgboost:v0.1
+                command:
+                - "{command}"
+                {{{{- with .HyperParameters}}}}
+                {{{{- range .}}}}
+                - "{{{{.Name}}}}={{{{.Value}}}}"
+                {{{{- end}}}}
+                {{{{- end}}}}
+              restartPolicy: Never
+""".format(
+    command=xgb_cmd
+)
+
+
+class KatibTest(unittest.TestCase):
+    def test_katib_with_xgboost_training(self):
+        katib.run(
+            tuning_params=[
+                {"name": "max_depth", "type": "int", "range": [2, 10]},
+                {"name": "num_round", "type": "int", "range": [50, 100]},
+            ],
+            objective={
+                "type": "maximize",
+                "goal": 1.01,
+                "metric_name": "accuracy",
+            },
+            success_condition="status.trialsSucceeded > 4",
+            failure_condition="status.trialsFailed > 3",
+            algorithm="random",
+            raw_template=xgboost_mainifest_template,
+            parallel_trial_count=4,
+            max_trial_count=16,
+            max_failed_trial_count=3,
+        )
+
+        wf = couler.workflow_yaml()
+
+        self.assertEqual(len(wf["spec"]["templates"]), 2)
+        # Check steps template
+        template0 = wf["spec"]["templates"][0]
+        self.assertEqual(len(template0["steps"]), 1)
+        self.assertEqual(len(template0["steps"][0]), 1)
+        # Check train template
+        template1 = wf["spec"]["templates"][1]
+        self.assertTrue(template1["name"] in ["run", "test-run-python-script"])
