@@ -37,12 +37,72 @@ class Artifact(object):
         return yaml_output
 
 
-class S3Artifact(Artifact):
+class TypedArtifact(Artifact):
     """
-    OssArtifact build the mapping from local path to remote oss bucekt,
-    user can read/write data from OSS as read/write local file
+    TypedArtifact builds the mapping from local path to a remote bucket.
+
+    A user can read/write data from a remote bucket in the same way they
+    write to a local file.
     """
 
+    def __init__(
+        self,
+        artifact_type,
+        path,
+        accesskey_id,
+        accesskey_secret,
+        bucket,
+        key=None,
+        endpoint="",
+        is_global=False,
+    ):
+        self.type = artifact_type
+        self.id = f"output-{self.type}-{utils._get_uuid()}"
+        # path is used for local path
+        self.path = path
+
+        self.is_global = is_global
+
+        if accesskey_secret is None or accesskey_id is None or bucket is None:
+            raise SyntaxError(
+                f"need to input the correct config for {self.type}"
+            )
+
+        self.bucket = bucket
+
+        if key is None:
+            # assume the local path is the same as the path of OSS
+            self.key = path
+        else:
+            self.key = key
+
+        self.endpoint = endpoint
+
+        import couler.argo as couler
+
+        secrets = {"accessKey": accesskey_id, "secretKey": accesskey_secret}
+        # TODO: check this secret exist or not
+        self.secret = couler.create_secret(secrets)
+
+    def to_yaml(self):
+        config = OrderedDict(
+            {
+                "endpoint": self.endpoint,
+                "bucket": self.bucket,
+                "key": self.key,
+                "accessKeySecret": {"name": self.secret, "key": "accessKey"},
+                "secretKeySecret": {"name": self.secret, "key": "secretKey"},
+            }
+        )
+        yaml_output = OrderedDict(
+            {"name": self.id, "path": self.path, self.type: config}
+        )
+        if self.is_global:
+            yaml_output["globalName"] = "global-" + self.id
+        return yaml_output
+
+
+class S3Artifact(TypedArtifact):
     def __init__(
         self,
         path,
@@ -53,55 +113,19 @@ class S3Artifact(Artifact):
         endpoint="s3.amazonaws.com",
         is_global=False,
     ):
-        self.id = "output-s3-%s" % utils._get_uuid()
-        # path is used for local path
-        self.path = path
-        self.type = "s3"
-        self.is_global = is_global
-
-        if accesskey_secret is None or accesskey_id is None or bucket is None:
-            raise SyntaxError("need to input the correct config for s3")
-
-        self.bucket = bucket
-
-        if key is None:
-            # assume the local path is the same as the path of OSS
-            self.key = path
-        else:
-            self.key = key
-
-        self.endpoint = endpoint
-
-        import couler.argo as couler
-
-        secrets = {"accessKey": accesskey_id, "secretKey": accesskey_secret}
-        # TODO: check this secret exist or not
-        self.secret = couler.create_secret(secrets)
-
-    def to_yaml(self):
-        s3_config = OrderedDict(
-            {
-                "endpoint": self.endpoint,
-                "bucket": self.bucket,
-                "key": self.key,
-                "accessKeySecret": {"name": self.secret, "key": "accessKey"},
-                "secretKeySecret": {"name": self.secret, "key": "secretKey"},
-            }
+        super().__init__(
+            "s3",
+            path,
+            accesskey_id,
+            accesskey_secret,
+            bucket,
+            key,
+            endpoint,
+            is_global,
         )
-        yaml_output = OrderedDict(
-            {"name": self.id, "path": self.path, "s3": s3_config}
-        )
-        if self.is_global:
-            yaml_output["globalName"] = "global-" + self.id
-        return yaml_output
 
 
-class OssArtifact(Artifact):
-    """
-    OssArtifact build the mapping from local path to remote oss bucekt,
-    user can read/write data from OSS as read/write local file
-    """
-
+class OssArtifact(TypedArtifact):
     def __init__(
         self,
         path,
@@ -112,44 +136,13 @@ class OssArtifact(Artifact):
         endpoint="http://oss-cn-hangzhou-zmf.aliyuncs.com",
         is_global=False,
     ):
-        self.id = "output-oss-%s" % utils._get_uuid()
-        # path is used for local path
-        self.path = path
-        self.type = "OSS"
-        self.is_global = is_global
-
-        if accesskey_secret is None or accesskey_id is None or bucket is None:
-            raise SyntaxError("need to input the correct config for oss")
-
-        self.bucket = bucket
-
-        if key is None:
-            # assume the local path is the same as the path of OSS
-            self.key = path
-        else:
-            self.key = key
-
-        self.endpoint = endpoint
-
-        import couler.argo as couler
-
-        secrets = {"accessKey": accesskey_id, "secretKey": accesskey_secret}
-        # TODO: check this secret exist or not
-        self.secret = couler.create_secret(secrets)
-
-    def to_yaml(self):
-        oss_config = OrderedDict(
-            {
-                "endpoint": self.endpoint,
-                "bucket": self.bucket,
-                "key": self.key,
-                "accessKeySecret": {"name": self.secret, "key": "accessKey"},
-                "secretKeySecret": {"name": self.secret, "key": "secretKey"},
-            }
+        super().__init__(
+            "oss",
+            path,
+            accesskey_id,
+            accesskey_secret,
+            bucket,
+            key,
+            endpoint,
+            is_global,
         )
-        yaml_output = OrderedDict(
-            {"name": self.id, "path": self.path, "oss": oss_config}
-        )
-        if self.is_global:
-            yaml_output["globalName"] = "global-" + self.id
-        return yaml_output
