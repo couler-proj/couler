@@ -28,37 +28,30 @@ spec:
 
 
 def run(
-    tuning_params=None,
-    objective=None,
+    raw_template,
+    tuning_params,
+    objective,
     success_condition=None,
     failure_condition=None,
-    raw_template=None,
     algorithm="random",
     parallel_trial_count=3,
     max_trial_count=12,
     max_failed_trial_count=3,
 ):
-    # Args:
-    #   tuning_params: [
-    #       {"name": "max_depth" , "type": "int", "range": [2, 10]},
-    #       ...,
-    #   ], to specify the hyperparameters will be tuned.
-    #   objective: {"type": "..." , "goal": "...", "metric_name": "..."},
-    #     to specify the objective of the model training,
-    #   success_condition: str, the condition which indicates
-    #     katib experiment succeeds,
-    #   failure_condition: str, the condition which indicates
-    #     katib experiment fails,
-    #   algorithm: str, the algorithm used in model training,
-    #   raw_template: str, the YAML string for particular training job,
-    #   parallel_trial_count: int, the number of katib training jobs
-    #     which execute in parallel,
-    #   max_trial_count: int, the total number of katib training jobs,
-    #   max_failed_trial_count: int, the number of failed katib training jobs,
-    #     which indicates katib experiment fails.
-
-    # Check required parameters
-    _validate_raw_template(raw_template)
+    """
+    Args:
+        tuning_params: A dictionary of hyperparameters to be tuned.
+        objective: The dictionary of objective for model training.
+        success_condition: The condition to indicate when a Katib
+            experiment succeeds.
+        failure_condition: The condition to indicate when a Katib
+            experiment fails.
+        algorithm: The algorithm used in model training.
+        raw_template: The YAML string for containing Katib trial manifest.
+        parallel_trial_count: The number of parallel Katib trials.
+        max_trial_count: The total number of Katib trials.
+        max_failed_trial_count: The total number of failed Katib trials.
+    """
     _validate_objective(objective)
     _validate_tuning_params(tuning_params)
 
@@ -97,11 +90,6 @@ def run(
     )
 
 
-def _validate_raw_template(raw_template):
-    if raw_template is None:
-        raise ValueError("Parameter raw_template should not be null.")
-
-
 def _validate_objective(objective):
     if (
         "type" not in objective
@@ -119,7 +107,7 @@ def _validate_tuning_params(tuning_params):
 
     for param in tuning_params:
         if not isinstance(param, dict):
-            raise TypeError("Each tunning parameter should be a dict.")
+            raise TypeError("Each tuning parameter should be a dict.")
 
         if (
             "name" not in param
