@@ -70,6 +70,64 @@ class ArtifactTest(ArgoYamlTest):
         self._oss_check_helper(artifact)
         couler._cleanup()
 
+    def _s3_check_helper(self, artifact):
+        self.assertIn("output-s3", artifact["name"])
+        self.assertEqual("/tmp/t1.txt", artifact["path"])
+        s3_config = artifact["s3"]
+        self.assertIsNotNone(s3_config)
+        self.assertEqual(s3_config["endpoint"], "xyz.com")
+        self.assertEqual(s3_config["bucket"], "anttest/")
+        self.assertEqual(s3_config["key"], "s3path/t1")
+        self.assertEqual(s3_config["accessKeySecret"]["key"], "accessKey")
+        self.assertEqual(s3_config["secretKeySecret"]["key"], "secretKey")
+
+    def test_output_s3_artifact(self):
+        # the content of local file would be uploaded to OSS
+        output_artifact = couler.create_s3_artifact(
+            path="/tmp/t1.txt",
+            bucket="anttest/",
+            accesskey_id="abcde",
+            accesskey_secret="abc12345",
+            key="s3path/t1",
+            endpoint="xyz.com",
+        )
+        couler.run_container(
+            image="docker/whalesay:latest",
+            args=["echo -n hello world > %s" % output_artifact.path],
+            command=["bash", "-c"],
+            output=output_artifact,
+        )
+
+        wf = couler.workflow_yaml()
+        template = wf["spec"]["templates"][1]
+        artifact = template["outputs"]["artifacts"][0]
+        self._s3_check_helper(artifact)
+        couler._cleanup()
+
+    def test_input_s3_artifact(self):
+        input_artifact = couler.create_s3_artifact(
+            path="/tmp/t1.txt",
+            bucket="anttest/",
+            accesskey_id="abcde",
+            accesskey_secret="abc12345",
+            key="s3path/t1",
+            endpoint="xyz.com",
+        )
+
+        # read the content from an S3 bucket
+        couler.run_container(
+            image="docker/whalesay:latest",
+            args=["cat %s" % input_artifact.path],
+            command=["bash", "-c"],
+            input=input_artifact,
+        )
+
+        wf = couler.workflow_yaml()
+        template = wf["spec"]["templates"][1]
+        artifact = template["inputs"]["artifacts"][0]
+        self._s3_check_helper(artifact)
+        couler._cleanup()
+
     def test_artifact_passing(self):
         def producer():
             output_artifact = couler.create_oss_artifact(
