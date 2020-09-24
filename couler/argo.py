@@ -36,7 +36,12 @@ from couler.core.states import (  # noqa: F401
     workflow,
 )
 from couler.core.syntax import *  # noqa: F401, F403
-from couler.core.templates import Artifact, OssArtifact, Secret  # noqa: F401
+from couler.core.templates import (  # noqa: F401
+    Artifact,
+    OssArtifact,
+    S3Artifact,
+    Secret,
+)
 from couler.core.workflow_validation_utils import (  # noqa: F401
     validate_workflow_yaml,
 )
@@ -165,6 +170,36 @@ def create_oss_artifact(
     :return:
     """
     return OssArtifact(
+        path,
+        accesskey_id,
+        accesskey_secret,
+        bucket,
+        key=key,
+        endpoint=endpoint,
+        is_global=is_global,
+    )
+
+
+def create_s3_artifact(
+    path,
+    bucket=None,
+    accesskey_id=None,
+    accesskey_secret=None,
+    key=None,
+    endpoint=None,
+    is_global=False,
+):
+    """
+    Configure the object as S3Artifact
+    :param path: the local path of container
+    :param bucket: s3 bucket
+    :param accesskey_id: s3 user id
+    :param accesskey_secret: s3 user key
+    :param key: key of s3 object
+    :param endpoint: end point of s3
+    :return:
+    """
+    return S3Artifact(
         path,
         accesskey_id,
         accesskey_secret,

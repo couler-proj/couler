@@ -11,7 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from couler.core.templates.artifact import Artifact, OssArtifact  # noqa: F401
+from couler.core.templates.artifact import (  # noqa: F401
+    Artifact,
+    OssArtifact,
+    S3Artifact,
+)
 from couler.core.templates.container import Container  # noqa: F401
 from couler.core.templates.job import Job  # noqa: F401
 from couler.core.templates.output import (  # noqa: F401

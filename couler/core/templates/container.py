@@ -16,7 +16,7 @@ from collections import OrderedDict
 
 from couler.core import utils
 from couler.core.constants import OVERWRITE_GPU_ENVS
-from couler.core.templates.artifact import OssArtifact
+from couler.core.templates.artifact import TypedArtifact
 from couler.core.templates.output import OutputArtifact, OutputJob
 from couler.core.templates.secret import Secret
 from couler.core.templates.template import Template
@@ -95,7 +95,7 @@ class Container(Template):
         if self.input is not None:
             _input_list = []
             for o in self.input:
-                if isinstance(o, OssArtifact):
+                if isinstance(o, TypedArtifact):
                     _input_list.append(o.to_yaml())
                 if isinstance(o, OutputArtifact):
                     _input_list.append(o.artifact)
@@ -119,7 +119,7 @@ class Container(Template):
             for o in self.output:
                 _output_list.append(o.to_yaml())
 
-            if isinstance(o, OssArtifact):
+            if isinstance(o, TypedArtifact):
                 # Require only one kind of output type
                 template["outputs"] = {"artifacts": _output_list}
             else:

@@ -37,30 +37,36 @@ class Artifact(object):
         return yaml_output
 
 
-class OssArtifact(Artifact):
+class TypedArtifact(Artifact):
     """
-    OssArtifact build the mapping from local path to remote oss bucekt,
-    user can read/write data from OSS as read/write local file
+    TypedArtifact builds the mapping from local path to a remote bucket.
+
+    A user can read/write data from a remote bucket in the same way they
+    write to a local file.
     """
 
     def __init__(
         self,
+        artifact_type,
         path,
         accesskey_id,
         accesskey_secret,
         bucket,
         key=None,
-        endpoint="http://oss-cn-hangzhou-zmf.aliyuncs.com",
+        endpoint="",
         is_global=False,
     ):
-        self.id = "output-oss-%s" % utils._get_uuid()
+        self.type = artifact_type
+        self.id = f"output-{self.type}-{utils._get_uuid()}"
         # path is used for local path
         self.path = path
-        self.type = "OSS"
+
         self.is_global = is_global
 
         if accesskey_secret is None or accesskey_id is None or bucket is None:
-            raise SyntaxError("need to input the correct config for oss")
+            raise SyntaxError(
+                f"need to input the correct config for {self.type}"
+            )
 
         self.bucket = bucket
 
@@ -79,7 +85,7 @@ class OssArtifact(Artifact):
         self.secret = couler.create_secret(secrets)
 
     def to_yaml(self):
-        oss_config = OrderedDict(
+        config = OrderedDict(
             {
                 "endpoint": self.endpoint,
                 "bucket": self.bucket,
@@ -89,8 +95,54 @@ class OssArtifact(Artifact):
             }
         )
         yaml_output = OrderedDict(
-            {"name": self.id, "path": self.path, "oss": oss_config}
+            {"name": self.id, "path": self.path, self.type: config}
         )
         if self.is_global:
             yaml_output["globalName"] = "global-" + self.id
         return yaml_output
+
+
+class S3Artifact(TypedArtifact):
+    def __init__(
+        self,
+        path,
+        accesskey_id,
+        accesskey_secret,
+        bucket,
+        key=None,
+        endpoint="s3.amazonaws.com",
+        is_global=False,
+    ):
+        super().__init__(
+            "s3",
+            path,
+            accesskey_id,
+            accesskey_secret,
+            bucket,
+            key,
+            endpoint,
+            is_global,
+        )
+
+
+class OssArtifact(TypedArtifact):
+    def __init__(
+        self,
+        path,
+        accesskey_id,
+        accesskey_secret,
+        bucket,
+        key=None,
+        endpoint="http://oss-cn-hangzhou-zmf.aliyuncs.com",
+        is_global=False,
+    ):
+        super().__init__(
+            "oss",
+            path,
+            accesskey_id,
+            accesskey_secret,
+            bucket,
+            key,
+            endpoint,
+            is_global,
+        )
