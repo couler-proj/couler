@@ -47,7 +47,7 @@ spec:
             path: /tmp/t1.txt
             oss:
               endpoint: xyz.com
-              bucket: anttest/
+              bucket: test-bucket/
               key: osspath/t1
               accessKeySecret:
                 key: accessKey
@@ -64,7 +64,7 @@ spec:
             path: /tmp/t1.txt
             oss:
               endpoint: xyz.com
-              bucket: anttest/
+              bucket: test-bucket/
               key: osspath/t1
               accessKeySecret:
                 key: accessKey
