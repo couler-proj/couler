@@ -49,7 +49,6 @@ class OutputJob(Output):
 
 
 def _parse_single_argo_output(output, prefix):
-    from couler.core.templates import Output
 
     if isinstance(output, Output):
         tmp = output.value.split(".")
@@ -76,7 +75,6 @@ def _parse_single_argo_output(output, prefix):
 
 
 def parse_argo_output(output, prefix):
-    from couler.core.templates import Output, OutputJob
 
     if isinstance(output, OutputJob):
         return [
@@ -103,11 +101,6 @@ def _container_output(step_name, template_name, output):
     Each element of return for run_container is contacted by:
     couler.step_name.template_name.output.parameters.output_id
     """
-    from couler.core.templates import (
-        OutputParameter,
-        OutputArtifact,
-        OutputEmpty,
-    )
 
     rets = []
     if output is None:
@@ -173,7 +166,6 @@ def _script_output(step_name, template_name):
     Return of run_script is contacted by:
     couler.step_name.template_name.outputs.result
     """
-    from couler.core.templates import OutputScript
 
     value = "couler.%s.%s.outputs.result" % (step_name, template_name)
     return [OutputScript(value=value)]
@@ -199,8 +191,6 @@ def _job_output(step_name, template_name):
         template_name,
     )
 
-    from couler.core.templates import OutputJob
-
     return [
         OutputJob(
             value=job_name, job_name=job_name, job_obj=job_obj, job_id=job_id
@@ -212,7 +202,6 @@ def extract_step_return(step_output):
     """Extract information for run container or script output.
     step_output is a list with multiple outputs
     """
-    from couler.core.templates import Output
 
     ret = {}
     if isinstance(step_output, list):
