@@ -16,8 +16,11 @@ import inspect
 import os
 import re
 import textwrap
+import uuid
+from importlib import util
 
 from couler.core.constants import ImagePullPolicy
+from couler.core.templates import Output
 from couler.core.templates.output import parse_argo_output
 
 
@@ -110,7 +113,6 @@ def load_cluster_config():
     module_file = os.getenv("couler_cluster_config")
     if module_file is None:
         return None
-    from importlib import util
 
     spec = util.spec_from_file_location(module_file, module_file)
     module = util.module_from_spec(spec)
@@ -134,7 +136,6 @@ def generate_parameters_run_job(env):
     """
     Generate the inputs parameter for running kubernetes resource
     """
-    from couler.core.templates import Output
 
     envs = []
     para_index = 0
@@ -251,8 +252,6 @@ def non_empty(d):
 
 
 def _get_uuid():
-    import uuid
-
     """use uuid4 to gen ascii uuid, length=8"""
     return "".join(str(uuid.uuid4()).split("-"))[:8]
 

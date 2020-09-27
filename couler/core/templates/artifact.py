@@ -13,6 +13,7 @@
 
 from collections import OrderedDict
 
+from couler import argo as couler
 from couler.core import utils
 
 
@@ -77,8 +78,6 @@ class TypedArtifact(Artifact):
             self.key = key
 
         self.endpoint = endpoint
-
-        import couler.argo as couler
 
         secrets = {"accessKey": accesskey_id, "secretKey": accesskey_secret}
         # TODO: check this secret exist or not
