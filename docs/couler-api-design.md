@@ -20,7 +20,7 @@ Core operations (`couler.ops`):
 * `run_step(step_def)` where `step_def` is the step definition that can be a container spec, Python function,
 or spec that's specific to the underlying workflow engine (e.g. k8s CRD if Argo Workflow is used). A "step"
 represents a node in the workflow graph, e.g. the "smallest" unit in some sense. For an analogy
-of a Couler "step" in different backends, please see the last section for a comparison table.
+of a Couler "step" in different backends, please see the last section for a table of various Couler concepts.
 
 Control flow (`couler.control_flows`):
 
@@ -89,7 +89,7 @@ while couler.get_status(name) == "Running":
         break
 ```
 
-## Concepts in Different Backends
+## Concepts Analogies in Different Backends
 
 To help visualize various concepts and their analogies in different Backends,
 below is an attempt to compare them in a table which will be updated over time as
@@ -98,7 +98,9 @@ support for new backends is proposed:
 | Concept\Framework| Couler        | Argo     | Tekton   | Airflow                                                             | Dagster         | Prefect |
 | ---------------- | -------------- | -------- | -------- | ------------------------------------------------------------------- | --------------- | ------- |
 | Step             | Step           | Step     | Step     | Task                                                                | Solid           | Task    |
-| Composite step   | Reusable step  | Template | Task     | SubDag or [TaskGroup](https://github.com/apache/airflow/pull/10153) | Composite Solid | TBA     |
+| Composite step   | Reusable step  | Template | Task     | SubDag or TaskGroup                                                 | Composite Solid | TBA     |
 | Worfklow         | Workflow       | Workflow | Pipeline | DAG                                                                 | Pipeline        | Flow    |
 
 Note that by "reusable step", we mean parameterized templates that can be used to define a Couler step where users only have to specify a few parameters.
+
+[Concepts Analogies in Different Backends]: #concepts-analogies
