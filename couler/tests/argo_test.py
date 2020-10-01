@@ -6,6 +6,7 @@ import yaml
 import couler.argo as couler
 from couler.core import utils
 from couler.core.templates.volume import Volume, VolumeMount
+from couler.core.templates.volume_claim import VolumeClaimTemplate
 
 
 class ArgoTest(unittest.TestCase):
@@ -85,6 +86,26 @@ class ArgoTest(unittest.TestCase):
         )
         couler._cleanup()
 
+    def test_run_container_with_workflow_volume(self):
+        pvc = VolumeClaimTemplate("workdir")
+        volume_mount = VolumeMount("workdir", "/mnt/vol")
+        couler.create_workflow_volume(pvc)
+        couler.run_container(
+            image="docker/whalesay:latest",
+            args=["echo -n hello world"],
+            command=["bash", "-c"],
+            step_name="A",
+            volume_mounts=[volume_mount],
+        )
+
+        wf = couler.workflow_yaml()
+        self.assertEqual(wf["spec"]["volumeClaimTemplates"][0], pvc.to_dict())
+        self.assertEqual(
+            wf["spec"]["templates"][1]["container"]["volumeMounts"][0],
+            volume_mount.to_dict(),
+        )
+        couler._cleanup()
+
     def test_run_container_with_dependency_implicit_params_passing(self):
         output_path = "/tmp/hello_world.txt"
 
@@ -138,8 +159,8 @@ class ArgoTest(unittest.TestCase):
             in [
                 # Note that the "output-id-92" case is needed for
                 # Python 3.8.
-                '"{{workflow.outputs.parameters.output-id-92}}"',
-                '"{{workflow.outputs.parameters.output-id-93}}"',
+                '"{{workflow.outputs.parameters.output-id-113}}"',
+                '"{{workflow.outputs.parameters.output-id-114}}"',
             ]
         )
         # Check input parameters for step B

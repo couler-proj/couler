@@ -18,4 +18,7 @@ from couler.core.syntax.exit_handler import set_exit_handler  # noqa: F401
 from couler.core.syntax.loop import map  # noqa: F401
 from couler.core.syntax.predicates import *  # noqa: F401, F403
 from couler.core.syntax.recursion import exec_while  # noqa: F401
-from couler.core.syntax.volume import add_volume  # noqa: F401
+from couler.core.syntax.volume import (  # noqa: F401
+    add_volume,
+    create_workflow_volume,
+)
