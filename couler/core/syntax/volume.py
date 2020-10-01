@@ -13,6 +13,7 @@
 
 from couler.core import states
 from couler.core.templates.volume import Volume
+from couler.core.templates.volume_claim import VolumeClaimTemplate
 
 
 def add_volume(volume: Volume):
@@ -23,3 +24,13 @@ def add_volume(volume: Volume):
     https://github.com/argoproj/argo/blob/master/examples/volumes-existing.yaml
     """
     states.workflow.add_volume(volume)
+
+
+def create_workflow_volume(volume_claim_template: VolumeClaimTemplate):
+    """
+    Create a transient volume for use in the workflow.
+
+    Reference:
+    https://github.com/argoproj/argo/blob/master/examples/volumes-pvc.yaml
+    """
+    states.workflow.add_pvc_template(volume_claim_template)

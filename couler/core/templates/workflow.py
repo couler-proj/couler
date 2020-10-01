@@ -16,6 +16,7 @@ from collections import OrderedDict
 from couler.core import utils
 from couler.core.templates import Container, Job, Script, Step, Template
 from couler.core.templates.volume import Volume
+from couler.core.templates.volume_claim import VolumeClaimTemplate
 
 
 class Workflow(object):
@@ -35,6 +36,7 @@ class Workflow(object):
         self.cluster_config = utils.load_cluster_config()
         self.cron_config = None
         self.volumes = []
+        self.pvcs = []
 
     def add_template(self, template: Template):
         self.templates.update({template.name: template})
@@ -46,6 +48,9 @@ class Workflow(object):
         if name not in self.steps:
             self.steps.update({name: []})
         self.steps.get(name).append(step)
+
+    def add_pvc_template(self, pvc: VolumeClaimTemplate):
+        self.pvcs.append(pvc.to_dict())
 
     def add_volume(self, volume: Volume):
         self.volumes.append(volume.to_dict())
@@ -110,6 +115,8 @@ class Workflow(object):
         workflow_spec = {"entrypoint": entrypoint}
         if self.volumes:
             workflow_spec.update({"volumes": self.volumes})
+        if self.pvcs:
+            workflow_spec.update({"volumeClaimTemplates": self.pvcs})
         if self.dag_mode_enabled():
             dag = {"tasks": list(self.dag_tasks.values())}
             ts = [OrderedDict({"name": entrypoint, "dag": dag})]
@@ -172,3 +179,4 @@ class Workflow(object):
         self.cluster_config = None
         self.cron_config = None
         self.volumes = []
+        self.pvcs = []
