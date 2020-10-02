@@ -19,7 +19,7 @@ def _validate_pod_params(
         raise ValueError("Parameter restart_policy should not be None.")
 
 
-def _generate_pod(
+def _generate_pod_spec(
     pod_template,
     container_template,
     allowed_pod_types,

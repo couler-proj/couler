@@ -5,7 +5,7 @@ import pyaml
 
 import couler.argo as couler
 from couler.core import utils
-from couler.steps.utils import _generate_pod
+from couler.steps.pod_utils import _generate_pod_spec
 
 pod_types = {"Master", "Worker"}
 
@@ -41,7 +41,7 @@ def train(
     clean_pod_policy="Running",
     timeout=None,
 ):
-    name = "tf-train-%s" % str(uuid.uuid4())
+    name = "pytorch-train-%s" % str(uuid.uuid4())
     success_condition = "status.pytorchReplicaStatuses.Worker.succeeded > 0"
     failure_condition = "status.pytorchReplicaStatuses.Worker.failed > 0"
 
@@ -52,7 +52,7 @@ def train(
     master_image = master_image if master_image else image
     master_command = master_command if master_command else command
 
-    chief_pod = _generate_pod(
+    chief_pod = _generate_pod_spec(
         pod_template,
         container_template,
         allowed_pod_types=pod_types,
@@ -71,7 +71,7 @@ def train(
         worker_image = worker_image if worker_image else image
         worker_command = worker_command if worker_command else command
 
-        worker_pod = _generate_pod(
+        worker_pod = _generate_pod_spec(
             pod_template,
             container_template,
             allowed_pod_types=pod_types,

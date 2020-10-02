@@ -5,7 +5,7 @@ import pyaml
 
 import couler.argo as couler
 from couler.core import utils
-from couler.steps.utils import _generate_pod
+from couler.steps.pod_utils import _generate_pod_spec
 
 container_template = {"name": "tensorflow", "image": "", "command": ""}
 
@@ -59,7 +59,7 @@ def train(
         chief_image = chief_image if chief_image else image
         chief_command = chief_command if chief_command else command
 
-        chief_pod = _generate_pod(
+        chief_pod = _generate_pod_spec(
             pod_template,
             container_template,
             allowed_pod_types=pod_types,
@@ -78,7 +78,7 @@ def train(
         ps_image = ps_image if ps_image else image
         ps_command = ps_command if ps_command else command
 
-        ps_pod = _generate_pod(
+        ps_pod = _generate_pod_spec(
             pod_template,
             container_template,
             allowed_pod_types=pod_types,
@@ -97,7 +97,7 @@ def train(
         worker_image = worker_image if worker_image else image
         worker_command = worker_command if worker_command else command
 
-        worker_pod = _generate_pod(
+        worker_pod = _generate_pod_spec(
             pod_template,
             container_template,
             allowed_pod_types=pod_types,
