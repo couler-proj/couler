@@ -22,17 +22,29 @@ python -m pytest
 
 ## Run Integration Tests
 
-The current integration test suite requires [Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) and [Argo Workflows](https://argoproj.github.io/argo).
-Please see instructions [here](https://kubernetes.io/docs/tasks/tools/install-minikube/) for setting up Minikube locally and instructions [here](https://argoproj.github.io/argo/quick-start/#install-argo-workflows) for installing Argo Workflows on your local Minikube cluster.
+The current integration test suite requires:
 
-Once these are installed, execute the integration test suite in [integration_tests](integration_tests) with Python, which will be
-submitting workflows to your local Minikube cluster. You can then validate workflow statuses via the following:
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+- [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
 
-```bash
-for WF_NAME in $(kubectl -n argo get workflows --no-headers -o custom-columns=":metadata.name")
-do
-    bash scripts/validate_workflow_statuses.sh ${WF_NAME}
-done
+Star a k8s cluster using minikube:
+
+```sh
+minikube config set vm-driver docker
+minikube config set kubernetes-version 1.18.3
+minikube start
+```
+
+Install Argo Workflows:
+
+```sh
+kubectl create ns argo
+kubectl apply -n argo -f https://raw.githubusercontent.com/argoproj/argo/v2.11.1/manifests/quick-start-minimal.yaml
+```
+
+Run the integration tests:
+```sh
+scripts/integration_tests.sh
 ```
 
 ## Run Sanity Checks
