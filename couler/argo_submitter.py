@@ -108,8 +108,8 @@ class ArgoSubmitter(object):
                 workflow_yaml,
             )
             logging.info(
-                "Workflow %s has been submitted!"
-                % response.get("metadata", {}).get("name")
+                'Workflow %s has been submitted in "%s" namespace!'
+                % (response.get("metadata", {}).get("name"), self.namespace)
             )
             return response
         except Exception as e:
