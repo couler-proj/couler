@@ -3,9 +3,7 @@ import copy
 import couler.argo as couler
 
 
-def _validate_pod_params(
-    pod_type, allowed_pod_types, image=None, replicas=0, restart_policy=None
-):
+def _validate_pod_params(pod_type, allowed_pod_types, image=None, replicas=0):
 
     if pod_type not in allowed_pod_types:
         raise ValueError("Invalid value %s for parameter pod_type." % pod_type)
@@ -13,10 +11,8 @@ def _validate_pod_params(
         raise ValueError("Parameter replicas value should be more than 0.")
     if image is None:
         raise ValueError("Parameter image should not be None.")
-    if pod_type == "Master" and replicas > 1:
-        raise ValueError("Master/Chief pod's replicas should be 1.")
-    if restart_policy is None:
-        raise ValueError("Parameter restart_policy should not be None.")
+    if pod_type in ["Master", "Chief", "Launcher"] and replicas > 1:
+        raise ValueError("Master/Chief/Launcher pod's replicas should be 1.")
 
 
 def _generate_pod_spec(
@@ -37,7 +33,6 @@ def _generate_pod_spec(
         allowed_pod_types=allowed_pod_types,
         image=image,
         replicas=replicas,
-        restart_policy=restart_policy,
     )
 
     container = copy.deepcopy(container_template)
@@ -74,7 +69,9 @@ def _generate_pod_spec(
             raise Exception("Unrecognized resource type %s" % resources)
 
     pod = copy.deepcopy(pod_template)
-    pod.update({"replicas": replicas, "restartPolicy": restart_policy})
+    pod.update({"replicas": replicas})
+    if restart_policy is not None:
+        pod.update({"restartPolicy": restart_policy})
     pod["template"]["spec"]["containers"].append(container)
 
     return pod
