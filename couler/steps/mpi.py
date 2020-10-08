@@ -7,21 +7,17 @@ import couler.argo as couler
 from couler.core import utils
 from couler.steps.pod_utils import _generate_pod_spec
 
-pod_types = {"Master", "Worker"}
+pod_types = {"Launcher", "Worker"}
 
-container_template = {"name": "pytorch", "image": "", "command": ""}
+container_template = {"name": "mpi", "image": "", "command": ""}
 
-pod_template = {
-    "replicas": 1,
-    "restartPolicy": "",
-    "template": {"spec": {"containers": []}},
-}
+pod_template = {"replicas": 1, "template": {"spec": {"containers": []}}}
 
 manifest_template = {
     "apiVersion": '"kubeflow.org/v1"',
-    "kind": '"PyTorchJob"',
+    "kind": '"MPIJob"',
     "metadata": {"name": ""},
-    "spec": {"cleanPodPolicy": "", "pytorchReplicaSpecs": {}},
+    "spec": {"cleanPodPolicy": "", "slotsPerWorker": 1, "mpiReplicaSpecs": {}},
 }
 
 
@@ -29,43 +25,40 @@ def train(
     image=None,
     command="",
     secret=None,
-    master_image=None,
-    master_resources=None,
-    master_restart_policy="Never",
-    master_command=None,
+    launcher_image=None,
+    launcher_resources=None,
+    launcher_command=None,
     num_workers=0,
     worker_image=None,
     worker_resources=None,
-    worker_restart_policy="Never",
     worker_command=None,
     clean_pod_policy="Running",
     timeout=None,
 ):
-    name = "pytorch-train-%s" % str(uuid.uuid4())
-    success_condition = "status.pytorchReplicaStatuses.Worker.succeeded > 0"
-    failure_condition = "status.pytorchReplicaStatuses.Worker.failed > 0"
+    name = "mpi-train-%s" % str(uuid.uuid4())
+    success_condition = "status.mpiReplicaStatuses.Worker.succeeded > 0"
+    failure_condition = "status.mpiReplicaStatuses.Worker.failed > 0"
 
     manifest = copy.deepcopy(manifest_template)
     manifest["metadata"].update({"name": name})
     manifest["spec"].update({"cleanPodPolicy": clean_pod_policy})
 
-    master_image = master_image if master_image else image
-    master_command = master_command if master_command else command
+    launcher_image = launcher_image if launcher_image else image
+    launcher_command = launcher_command if launcher_command else command
 
-    master_pod = _generate_pod_spec(
+    launcher_pod = _generate_pod_spec(
         pod_template,
         container_template,
         allowed_pod_types=pod_types,
-        pod_type="Master",
-        image=master_image,
+        pod_type="Launcher",
+        image=launcher_image,
         replicas=1,
         secret=secret,
-        command=master_command,
-        resources=master_resources,
-        restart_policy=master_restart_policy,
+        command=launcher_command,
+        resources=launcher_resources,
     )
 
-    manifest["spec"]["pytorchReplicaSpecs"].update({"Master": master_pod})
+    manifest["spec"]["mpiReplicaSpecs"].update({"Launcher": launcher_pod})
 
     if num_workers > 0:
         worker_image = worker_image if worker_image else image
@@ -81,10 +74,9 @@ def train(
             secret=secret,
             command=worker_command,
             resources=worker_resources,
-            restart_policy=worker_restart_policy,
         )
 
-        manifest["spec"]["pytorchReplicaSpecs"].update({"Worker": worker_pod})
+        manifest["spec"]["mpiReplicaSpecs"].update({"Worker": worker_pod})
 
     step_name, _ = utils.invocation_location()
 
