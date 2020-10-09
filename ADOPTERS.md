@@ -8,4 +8,5 @@ This page contains a list of organizations who are using Couler. If you'd like t
 | [Bytedance](https://www.bytedance.com/) | [Tianxin Dong](https://github.com/FogDong) |
 | [Determined](https://determined.ai/) | [David Hershey](https://github.com/davidhershey) and [Vishnu Mohan](https://github.com/vishnu2kmohan) |
 | [Kabam](https://kabam.com/) | [Yudi Xue](https://github.com/binarycrayon) |
+| [Onepanel](https://www.onepanel.io/) | [Inoh Monton](https://github.com/inohmonton99) |
 | [Pipekit](https://pipekit.io/) | [J.P. Zivalich](https://github.com/JPZ13) |
