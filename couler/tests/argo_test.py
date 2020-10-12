@@ -161,10 +161,8 @@ class ArgoTest(unittest.TestCase):
         self.assertTrue(
             params["value"]
             in [
-                # Note that the "output-id-92" case is needed for
-                # Python 3.8.
-                '"{{workflow.outputs.parameters.output-id-113}}"',
-                '"{{workflow.outputs.parameters.output-id-114}}"',
+                '"{{workflow.outputs.parameters.output-id-117}}"',
+                '"{{workflow.outputs.parameters.output-id-118}}"',
             ]
         )
         # Check input parameters for step B
