@@ -76,6 +76,7 @@ class ArgoTest(unittest.TestCase):
             command=["bash", "-c"],
             step_name="A",
             volume_mounts=[volume_mount],
+            working_dir="/mnt/src",
         )
 
         wf = couler.workflow_yaml()
@@ -83,6 +84,9 @@ class ArgoTest(unittest.TestCase):
         self.assertEqual(
             wf["spec"]["templates"][1]["container"]["volumeMounts"][0],
             volume_mount.to_dict(),
+        )
+        self.assertEqual(
+            wf["spec"]["templates"][1]["container"]["workingDir"], "/mnt/src"
         )
         couler._cleanup()
 
