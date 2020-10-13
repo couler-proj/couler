@@ -50,9 +50,9 @@ class TypedArtifact(Artifact):
         self,
         artifact_type,
         path,
-        accesskey_id,
-        accesskey_secret,
-        bucket,
+        accesskey_id=None,
+        accesskey_secret=None,
+        bucket=None,
         key=None,
         endpoint="",
         is_global=False,
@@ -61,14 +61,7 @@ class TypedArtifact(Artifact):
         self.id = f"output-{self.type}-{utils._get_uuid()}"
         # path is used for local path
         self.path = path
-
         self.is_global = is_global
-
-        if accesskey_secret is None or accesskey_id is None or bucket is None:
-            raise SyntaxError(
-                f"need to input the correct config for {self.type}"
-            )
-
         self.bucket = bucket
 
         if key is None:
@@ -79,20 +72,32 @@ class TypedArtifact(Artifact):
 
         self.endpoint = endpoint
 
-        secrets = {"accessKey": accesskey_id, "secretKey": accesskey_secret}
-        # TODO: check this secret exist or not
-        self.secret = couler.create_secret(secrets)
+        if accesskey_id and accesskey_secret:
+            secret = {"accessKey": accesskey_id, "secretKey": accesskey_secret}
+            # TODO: check this secret exist or not
+            self.secret = couler.create_secret(secret)
+        else:
+            self.secret = None
 
     def to_yaml(self):
-        config = OrderedDict(
-            {
-                "endpoint": self.endpoint,
-                "bucket": self.bucket,
-                "key": self.key,
-                "accessKeySecret": {"name": self.secret, "key": "accessKey"},
-                "secretKeySecret": {"name": self.secret, "key": "secretKey"},
-            }
-        )
+        config = OrderedDict({"key": self.key})
+        if self.secret is not None:
+            config.update(
+                {
+                    "accessKeySecret": {
+                        "name": self.secret,
+                        "key": "accessKey",
+                    },
+                    "secretKeySecret": {
+                        "name": self.secret,
+                        "key": "secretKey",
+                    },
+                }
+            )
+        if self.bucket is not None:
+            config.update({"bucket": self.bucket})
+        if self.endpoint:
+            config.update({"endpoint": self.endpoint})
         yaml_output = OrderedDict(
             {"name": self.id, "path": self.path, self.type: config}
         )
