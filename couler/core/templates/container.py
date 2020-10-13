@@ -41,6 +41,7 @@ class Container(Template):
         enable_ulogfs=True,
         daemon=False,
         volume_mounts=None,
+        working_dir=None,
     ):
         Template.__init__(
             self,
@@ -61,6 +62,7 @@ class Container(Template):
         self.resources = resources
         self.image_pull_policy = image_pull_policy
         self.volume_mounts = volume_mounts
+        self.working_dir = working_dir
 
     def to_dict(self):
         template = Template.to_dict(self)
@@ -159,6 +161,8 @@ class Container(Template):
             container["volumeMounts"] = [
                 vm.to_dict() for vm in self.volume_mounts
             ]
+        if self.working_dir is not None:
+            container["workingDir"] = self.working_dir
         return container
 
     def _convert_args_to_input_parameters(self, args):

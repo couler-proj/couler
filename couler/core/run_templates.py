@@ -98,6 +98,7 @@ def run_container(
     enable_ulogfs=True,
     daemon=False,
     volume_mounts=None,
+    working_dir=None,
 ):
     """
     Generate an Argo container template.  For example, the template whalesay
@@ -174,6 +175,7 @@ def run_container(
             enable_ulogfs=enable_ulogfs,
             daemon=daemon,
             volume_mounts=volume_mounts,
+            working_dir=working_dir,
         )
         states.workflow.add_template(template)
 

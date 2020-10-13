@@ -76,6 +76,7 @@ class ArgoTest(unittest.TestCase):
             command=["bash", "-c"],
             step_name="A",
             volume_mounts=[volume_mount],
+            working_dir="/mnt/src",
         )
 
         wf = couler.workflow_yaml()
@@ -83,6 +84,9 @@ class ArgoTest(unittest.TestCase):
         self.assertEqual(
             wf["spec"]["templates"][1]["container"]["volumeMounts"][0],
             volume_mount.to_dict(),
+        )
+        self.assertEqual(
+            wf["spec"]["templates"][1]["container"]["workingDir"], "/mnt/src"
         )
         couler._cleanup()
 
@@ -157,10 +161,8 @@ class ArgoTest(unittest.TestCase):
         self.assertTrue(
             params["value"]
             in [
-                # Note that the "output-id-92" case is needed for
-                # Python 3.8.
-                '"{{workflow.outputs.parameters.output-id-113}}"',
-                '"{{workflow.outputs.parameters.output-id-114}}"',
+                '"{{workflow.outputs.parameters.output-id-117}}"',
+                '"{{workflow.outputs.parameters.output-id-118}}"',
             ]
         )
         # Check input parameters for step B
