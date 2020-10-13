@@ -25,7 +25,7 @@ function get_workflow_status {
     echo ${wf_status}
 }
 
-for i in {1..20}; do
+for i in {1..100}; do
     WF_STATUS=$(get_workflow_status ${WF_NAME})
 
     if [[ "$WF_STATUS" == "Succeeded" ]]; then
