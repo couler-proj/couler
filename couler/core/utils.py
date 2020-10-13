@@ -58,6 +58,8 @@ def invocation_location():
     else:
         func_name = argo_safe_name(stack[2][3])
         line_number = stack[3][2]
+    if func_name == "<module>":
+        func_name = "module-" + _get_uuid()
     return func_name, line_number
 
 
