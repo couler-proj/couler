@@ -9,6 +9,8 @@
 Couler aims to provide a unified interface for constructing and managing workflows on
 different workflow engines, such as [Argo Workflows](https://github.com/argoproj/argo), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/).
 
+Couler is included in [CNCF Cloud Native Landscape](https://landscape.cncf.io/) and [LF AI Landscape](https://landscape.lfai.foundation).
+
 ## Who uses Couler?
 
 You can find a list of organizations who are using Couler in [ADOPTERS.md](ADOPTERS.md). If you'd like to add your organization to the list, please send us a pull request.
