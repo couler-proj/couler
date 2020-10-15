@@ -177,8 +177,8 @@ class ArgoTest(unittest.TestCase):
         self.assertTrue(
             params["value"]
             in [
-                '"{{workflow.outputs.parameters.output-id-117}}"',
-                '"{{workflow.outputs.parameters.output-id-118}}"',
+                '"{{workflow.outputs.parameters.output-id-133}}"',
+                '"{{workflow.outputs.parameters.output-id-134}}"',
             ]
         )
         # Check input parameters for step B
