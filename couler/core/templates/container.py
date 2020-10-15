@@ -42,6 +42,7 @@ class Container(Template):
         daemon=False,
         volume_mounts=None,
         working_dir=None,
+        node_selector=None,
     ):
         Template.__init__(
             self,
@@ -63,6 +64,7 @@ class Container(Template):
         self.image_pull_policy = image_pull_policy
         self.volume_mounts = volume_mounts
         self.working_dir = working_dir
+        self.node_selector = node_selector
 
     def to_dict(self):
         template = Template.to_dict(self)
@@ -107,6 +109,11 @@ class Container(Template):
                     template["inputs"] = OrderedDict()
 
                 template["inputs"]["artifacts"] = _input_list
+
+        # Node selector
+        if self.node_selector is not None:
+            # TODO: Support inferring node selector values from Argo parameters
+            template["nodeSelector"] = self.node_selector
 
         # Container
         if not utils.gpu_requested(self.resources):

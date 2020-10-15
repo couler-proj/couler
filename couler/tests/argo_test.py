@@ -90,6 +90,22 @@ class ArgoTest(unittest.TestCase):
         )
         couler._cleanup()
 
+    def test_run_container_with_node_selector(self):
+        couler.run_container(
+            image="docker/whalesay:latest",
+            args=["echo -n hello world"],
+            command=["bash", "-c"],
+            step_name="A",
+            node_selector={"beta.kubernetes.io/arch": "amd64"},
+        )
+
+        wf = couler.workflow_yaml()
+        self.assertEqual(
+            wf["spec"]["templates"][1]["nodeSelector"],
+            {"beta.kubernetes.io/arch": "amd64"},
+        )
+        couler._cleanup()
+
     def test_run_container_with_workflow_volume(self):
         pvc = VolumeClaimTemplate("workdir")
         volume_mount = VolumeMount("workdir", "/mnt/vol")
@@ -161,8 +177,8 @@ class ArgoTest(unittest.TestCase):
         self.assertTrue(
             params["value"]
             in [
-                '"{{workflow.outputs.parameters.output-id-117}}"',
-                '"{{workflow.outputs.parameters.output-id-118}}"',
+                '"{{workflow.outputs.parameters.output-id-133}}"',
+                '"{{workflow.outputs.parameters.output-id-134}}"',
             ]
         )
         # Check input parameters for step B
