@@ -30,7 +30,6 @@ for i in {1..50}; do
 
     if [[ "$WF_STATUS" == "Succeeded" ]]; then
       echo "Workflow ${WF_NAME} succeeded."
-      kubectl -n argo delete workflow ${WF_NAME}
       exit 0
     elif [[ "$WF_STATUS" == "Failed" ]] ||
         [[ "$WF_STATUS" == "Error" ]]; then
