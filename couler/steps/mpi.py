@@ -36,8 +36,8 @@ def train(
     timeout=None,
 ):
     name = "mpi-train-%s" % str(uuid.uuid4())
-    success_condition = "status.mpiReplicaStatuses.Worker.succeeded > 0"
-    failure_condition = "status.mpiReplicaStatuses.Worker.failed > 0"
+    success_condition = "status.replicaStatuses.Worker.succeeded > 0"
+    failure_condition = "status.replicaStatuses.Worker.failed > 0"
 
     manifest = copy.deepcopy(manifest_template)
     manifest["metadata"].update({"name": name})

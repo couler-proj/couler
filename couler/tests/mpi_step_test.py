@@ -41,11 +41,11 @@ class MPITestCase(ArgoYamlTest):
         self.assertEqual(resource["setOwnerReference"], "true")
         self.assertEqual(
             resource["successCondition"],
-            "status.mpiReplicaStatuses.Worker.succeeded > 0",
+            "status.replicaStatuses.Worker.succeeded > 0",
         )
         self.assertEqual(
             resource["failureCondition"],
-            "status.mpiReplicaStatuses.Worker.failed > 0",
+            "status.replicaStatuses.Worker.failed > 0",
         )
         # Check the MPIJob spec
         mpi_job = yaml.load(

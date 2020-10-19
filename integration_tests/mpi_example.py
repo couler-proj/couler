@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # Copyright 2020 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,15 +10,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set -e
 
-python -m integration_tests.mpi_example
-python -m integration_tests.dag_example
-python -m integration_tests.flip_coin_example
+import couler.argo as couler
+from couler.argo_submitter import ArgoSubmitter
+from couler.steps import mpi
 
-# Validate workflow statuses
-kubectl -n argo get workflows
-for WF_NAME in $(kubectl -n argo get workflows --no-headers -o custom-columns=":metadata.name")
-do
-    bash scripts/validate_workflow_statuses.sh ${WF_NAME}
-done
+if __name__ == "__main__":
+    couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
+
+    mpi.train(
+        image="alpine:3.6",
+        command=["sh", "-c", 'echo "running"; exit 0'],
+        num_workers=1,
+    )
+    submitter = ArgoSubmitter(namespace="argo")
+    wf = couler.run(submitter=submitter)
+    wf_name = wf["metadata"]["name"]
+    print("Workflow %s has been submitted for MPI example" % wf_name)
