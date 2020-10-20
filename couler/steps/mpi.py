@@ -36,7 +36,9 @@ def train(
     timeout=None,
 ):
     name = "mpi-train-%s" % str(uuid.uuid4())
-    success_condition = "status.replicaStatuses.Worker.succeeded > 0"
+    success_condition = (
+        "status.replicaStatuses.Worker.succeeded == %s" % num_workers
+    )
     failure_condition = "status.replicaStatuses.Worker.failed > 0"
 
     manifest = copy.deepcopy(manifest_template)
