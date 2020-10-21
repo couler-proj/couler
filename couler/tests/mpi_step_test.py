@@ -41,7 +41,7 @@ class MPITestCase(ArgoYamlTest):
         self.assertEqual(resource["setOwnerReference"], "true")
         self.assertEqual(
             resource["successCondition"],
-            "status.replicaStatuses.Worker.succeeded > 0",
+            "status.replicaStatuses.Worker.succeeded == 3",
         )
         self.assertEqual(
             resource["failureCondition"],

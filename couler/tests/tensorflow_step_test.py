@@ -45,11 +45,11 @@ class TensorflowTestCase(ArgoYamlTest):
         self.assertEqual(resource["setOwnerReference"], "true")
         self.assertEqual(
             resource["successCondition"],
-            "status.tfReplicaStatuses.Worker.succeeded > 0",
+            "status.replicaStatuses.Worker.succeeded == 3",
         )
         self.assertEqual(
             resource["failureCondition"],
-            "status.tfReplicaStatuses.Worker.failed > 0",
+            "status.replicaStatuses.Worker.failed > 0",
         )
         # Check the tfjob spec
         tfjob = yaml.load(

@@ -42,11 +42,11 @@ class PyTorchTestCase(ArgoYamlTest):
         self.assertEqual(resource["setOwnerReference"], "true")
         self.assertEqual(
             resource["successCondition"],
-            "status.pytorchReplicaStatuses.Worker.succeeded > 0",
+            "status.replicaStatuses.Worker.succeeded == 3",
         )
         self.assertEqual(
             resource["failureCondition"],
-            "status.pytorchReplicaStatuses.Worker.failed > 0",
+            "status.replicaStatuses.Worker.failed > 0",
         )
         # Check the PyTorchJob spec
         pytorch_job = yaml.load(
