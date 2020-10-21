@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Chat on Slack
+    url: https://join.slack.com/t/couler/shared_invite/zt-i0m7ziol-1gz4_p_aXmWM7KVpxJ4k9Q
+    about: Chatting with the community can help
+  - name: Share your use case
+      url: https://github.com/couler-proj/couler/blob/master/ADOPTERS.md
+      about: Add your organization to the list of Couler adopters and talk with the maintainers
