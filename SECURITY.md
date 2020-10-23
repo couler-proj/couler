@@ -7,7 +7,7 @@ or [contacting one of the maintainers](https://github.com/orgs/couler-proj/teams
 
 ## Public Disclosure
 
-All security vulnerabilities will be disclosed via [RELEASE.md).
+All security vulnerabilities will be disclosed via [RELEASE.md](RELEASE.md).
 
 ## Vulnerability Scanning
 
