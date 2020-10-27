@@ -19,7 +19,7 @@ from couler.core import utils
 
 
 class Secret(object):
-    def __init__(self, namespace, data):
+    def __init__(self, namespace, data, name=None):
 
         if not isinstance(data, dict):
             raise TypeError("The secret data is required to be a dict")
@@ -31,7 +31,10 @@ class Secret(object):
         cypher_md5 = hashlib.md5(
             json.dumps(data, sort_keys=True).encode("utf-8")
         ).hexdigest()
-        self.name = "couler-%s" % cypher_md5
+        if name is None:
+            self.name = "couler-%s" % cypher_md5
+        else:
+            self.name = name
 
         self.data = {k: utils.encode_base64(v) for k, v in data.items()}
 
