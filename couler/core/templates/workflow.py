@@ -168,7 +168,7 @@ class Workflow(object):
         if self.cluster_config is not None and hasattr(
             self.cluster_config, "config_workflow"
         ):
-            sig = getfullargspec(self.cluster_config.config_pod)
+            sig = getfullargspec(self.cluster_config.config_workflow)
             if len(sig.args) == 2:
                 workflow_spec = self.cluster_config.config_workflow(
                     workflow_spec
