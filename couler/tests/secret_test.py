@@ -10,7 +10,7 @@ class SecretTest(ArgoYamlTest):
     def test_create_secret(self):
         # First job with secret1
         user_info = {"uname": "abc", "passwd": "def"}
-        secret1 = couler.create_secret(secret_data=user_info)
+        secret1 = couler.create_secret(secret_data=user_info, name="dummy1")
         couler.run_container(
             image="python:3.6", secret=secret1, command="echo $uname"
         )
@@ -18,7 +18,7 @@ class SecretTest(ArgoYamlTest):
         # Second job with secret2
         access_key = {"access_key": "key1234", "access_value": "value5678"}
         secret2 = couler.create_secret(
-            secret_data=access_key, namespace="test"
+            secret_data=access_key, namespace="test", name="dummy2"
         )
         couler.run_container(
             image="python:3.6", secret=secret2, command="echo $access_value"
@@ -30,6 +30,7 @@ class SecretTest(ArgoYamlTest):
         secret2_yaml = couler.states._secrets[secret2].to_yaml()
 
         self.assertEqual(secret1_yaml["metadata"]["namespace"], "default")
+        self.assertEqual(secret1_yaml["metadata"]["name"], "dummy1")
         self.assertEqual(len(secret1_yaml["data"]), 2)
         self.assertEqual(
             secret1_yaml["data"]["uname"], utils.encode_base64("abc")
@@ -39,6 +40,7 @@ class SecretTest(ArgoYamlTest):
         )
 
         self.assertEqual(secret2_yaml["metadata"]["namespace"], "test")
+        self.assertEqual(secret2_yaml["metadata"]["name"], "dummy2")
         self.assertEqual(len(secret2_yaml["data"]), 2)
         self.assertEqual(
             secret2_yaml["data"]["access_key"], utils.encode_base64("key1234")

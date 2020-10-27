@@ -210,13 +210,12 @@ def create_s3_artifact(
     )
 
 
-# TODO: why we use "default" namespace here?
-def create_secret(secret_data={}, namespace="default"):
+def create_secret(secret_data, namespace="default", name=None, dry_run=False):
     """Store the input dict as a secret in k8s, and return the secret name."""
-    secret = Secret(namespace=namespace, data=secret_data)
+    secret = Secret(namespace=namespace, data=secret_data, name=name)
 
     # avoid create the secret for same input dict
-    if secret.name not in states._secrets:
+    if secret.name not in states._secrets and not dry_run:
         states._secrets[secret.name] = secret
 
     return secret.name
