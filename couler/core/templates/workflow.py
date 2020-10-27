@@ -132,11 +132,18 @@ class Workflow(object):
             ) and self.cluster_config is not None:
                 sig = getfullargspec(self.cluster_config.config_pod)
                 num_args = len(sig.args)
+                # This is to support cluster configuration whose
+                # implementation has the following signature:
+                # `config_pod(self, template)`.
                 if num_args == 2:
                     template_dict = self.cluster_config.config_pod(
                         template_dict
                     )
-                elif num_args == 3:
+                # This is to support old cluster configuration whose
+                # implementation has the following signature:
+                # `config_pod(self, template, pool, enable_ulogfs)`.
+                # TODO (terrytangyuan): Remove sensitive words here.
+                elif num_args == 4:
                     template_dict = self.cluster_config.config_pod(
                         template_dict, template.pool, template.enable_ulogfs
                     )
@@ -169,6 +176,9 @@ class Workflow(object):
             self.cluster_config, "config_workflow"
         ):
             sig = getfullargspec(self.cluster_config.config_workflow)
+            # This is to support cluster configuration to modify the
+            # workflow spec whose implementation has the following signature:
+            # `config_workflow(self, workflow_spec)`.
             if len(sig.args) == 2:
                 workflow_spec = self.cluster_config.config_workflow(
                     workflow_spec
