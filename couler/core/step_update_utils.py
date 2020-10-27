@@ -98,17 +98,21 @@ def _update_dag_tasks(
             else:
                 task_template["dependencies"] = [dependencies]
 
+    t_name = function_name if template_name is None else template_name
+    step = Step(name=function_id, template=t_name)
     if states._exit_handler_enable:
-        t_name = function_name if template_name is None else template_name
-        step = Step(name=function_id, template=t_name)
-        if states._when_prefix is not None:
-            step.when = states._when_prefix
         if function_id in states.workflow.exit_handler_step:
             states.workflow.exit_handler_step.get(function_id).append(
                 step.to_dict()
             )
         else:
             states.workflow.exit_handler_step[function_id] = [step.to_dict()]
+    elif states._when_prefix is not None:
+        step.when = states._when_prefix
+        if step.name not in states.workflow.dag_tasks.keys():
+            step_spec = step.to_dict()
+            step_spec["dependencies"] = [states._when_task]
+            states.workflow.dag_tasks[step.name] = step_spec
     else:
         states.workflow.update_dag_task(function_id, task_template)
 

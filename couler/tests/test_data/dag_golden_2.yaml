@@ -1,0 +1,91 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: pytest-
+spec:
+  entrypoint: pytest-
+  templates:
+    - name: pytest-
+      dag:
+        tasks:
+          - name: A
+            template: A
+            arguments:
+              parameters:
+                - name: para-A-0
+                  value: A
+          - name: B
+            dependencies:
+              - A
+            template: B
+            arguments:
+              parameters:
+                - name: para-B-0
+                  value: B
+          - name: flip-coin-0
+            dependencies:
+              - B
+            template: flip-coin-0
+          - name: heads-0
+            template: heads-0
+            when: '{{tasks.flip-coin-0.outputs.result}} == heads'
+            dependencies:
+              - flip-coin-0
+    - name: A
+      inputs:
+        parameters:
+          - name: para-A-0
+      container:
+        image: docker/whalesay:latest
+        command:
+          - cowsay
+        args:
+          - "{{inputs.parameters.para-A-0}}"
+        env:
+          - name: NVIDIA_VISIBLE_DEVICES
+            value: null
+          - name: NVIDIA_DRIVER_CAPABILITIES
+            value: null
+    - name: B
+      inputs:
+        parameters:
+          - name: para-B-0
+      container:
+        image: docker/whalesay:latest
+        command:
+          - cowsay
+        args:
+          - "{{inputs.parameters.para-B-0}}"
+        env:
+          - name: NVIDIA_VISIBLE_DEVICES
+            value: null
+          - name: NVIDIA_DRIVER_CAPABILITIES
+            value: null
+    - name: flip-coin-0
+      script:
+        image: python:3.6
+        command:
+          - python
+        source: |2
+
+          import random
+
+          result = "heads" if random.randint(0, 1) == 0 else "tails"
+          print(result)
+        env:
+          - name: NVIDIA_VISIBLE_DEVICES
+            value: null
+          - name: NVIDIA_DRIVER_CAPABILITIES
+            value: null
+    - name: heads-0
+      container:
+        image: python:3.6
+        command:
+          - bash
+          - -c
+          - 'echo "it was heads"'
+        env:
+          - name: NVIDIA_VISIBLE_DEVICES
+            value: null
+          - name: NVIDIA_DRIVER_CAPABILITIES
+            value: null

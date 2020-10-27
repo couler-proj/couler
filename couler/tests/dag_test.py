@@ -41,6 +41,27 @@ def job_d(message):
     )
 
 
+def random_code():
+    import random
+
+    result = "heads" if random.randint(0, 1) == 0 else "tails"
+    print(result)
+
+
+def flip_coin():
+    return couler.run_script(
+        image="python:3.6", source=random_code, step_name="flip-coin-0"
+    )
+
+
+def heads():
+    return couler.run_container(
+        image="python:3.6",
+        command=["bash", "-c", 'echo "it was heads"'],
+        step_name="heads-0",
+    )
+
+
 class DAGTest(ArgoYamlTest):
     def test_input_dag_linear(self):
         #  A
@@ -75,6 +96,17 @@ class DAGTest(ArgoYamlTest):
         couler.set_dependencies(lambda: job_d(message="D"), dependencies=["B"])
 
         self.check_argo_yaml("dag_golden_1.yaml")
+
+    def test_set_dependencies_with_conditional(self):
+        couler.set_dependencies(lambda: job_a(message="A"), dependencies=None)
+        couler.set_dependencies(lambda: job_b(message="B"), dependencies=["A"])
+        couler.set_dependencies(
+            lambda: couler.when(
+                couler.equal(flip_coin(), "heads"), lambda: heads()
+            ),
+            dependencies=["B"],
+        )
+        self.check_argo_yaml("dag_golden_2.yaml")
 
     def test_method_dependencies(self):
         class A:
