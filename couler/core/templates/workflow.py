@@ -12,6 +12,7 @@
 # limitations under the License.
 
 from collections import OrderedDict
+from inspect import getfullargspec
 
 from couler.core import utils
 from couler.core.templates import Container, Job, Script, Step, Template
@@ -129,9 +130,27 @@ class Workflow(object):
                 or isinstance(template, Job)
                 or isinstance(template, Script)
             ) and self.cluster_config is not None:
-                template_dict = self.cluster_config.config_pod(
-                    template_dict, template.pool, template.enable_ulogfs
-                )
+                sig = getfullargspec(self.cluster_config.config_pod)
+                num_args = len(sig.args)
+                # This is to support cluster configuration whose
+                # implementation has the following signature:
+                # `config_pod(self, template)`.
+                if num_args == 2:
+                    template_dict = self.cluster_config.config_pod(
+                        template_dict
+                    )
+                # This is to support old cluster configuration whose
+                # implementation has the following signature:
+                # `config_pod(self, template, pool, enable_ulogfs)`.
+                # TODO (terrytangyuan): Remove sensitive words here.
+                elif num_args == 4:
+                    template_dict = self.cluster_config.config_pod(
+                        template_dict, template.pool, template.enable_ulogfs
+                    )
+                else:
+                    raise ValueError(
+                        "Unsupported signature for cluster spec: %s" % sig
+                    )
             ts.append(template_dict)
         if len(self.exit_handler_step) > 0:
             workflow_spec["onExit"] = "exit-handler"
@@ -153,6 +172,21 @@ class Workflow(object):
             workflow_spec["ttlSecondsAfterFinished"] = self.clean_ttl
 
         # Spec part
+        if self.cluster_config is not None and hasattr(
+            self.cluster_config, "config_workflow"
+        ):
+            sig = getfullargspec(self.cluster_config.config_workflow)
+            # This is to support cluster configuration to modify the
+            # workflow spec whose implementation has the following signature:
+            # `config_workflow(self, workflow_spec)`.
+            if len(sig.args) == 2:
+                workflow_spec = self.cluster_config.config_workflow(
+                    workflow_spec
+                )
+            else:
+                raise ValueError(
+                    "Unsupported signature for cluster spec: %s" % sig
+                )
         if self.cron_config is not None:
             d["spec"] = self.cron_config
             for key, value in self.cron_config.items():
