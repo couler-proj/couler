@@ -43,18 +43,6 @@ self.assertTrue(func_name in ["pytest", "runpy"])
         decode = str(base64.b64decode(encode), "utf-8")
         self.assertEqual(s, decode)
 
-    def test_check_gpu(self):
-        with self.assertRaises(TypeError):
-            utils.gpu_requested("cpu=1")
-        self.assertFalse(utils.gpu_requested(None))
-        self.assertFalse(utils.gpu_requested({}))
-        self.assertFalse(utils.gpu_requested({"cpu": 1}))
-        self.assertFalse(utils.gpu_requested({"cpu": 1, "memory": 2}))
-        self.assertTrue(utils.gpu_requested({"gpu": 1}))
-        self.assertTrue(utils.gpu_requested({" gpu ": 1}))
-        self.assertTrue(utils.gpu_requested({"GPU": 1}))
-        self.assertTrue(utils.gpu_requested({"cpu": 1, "memory": 2, "gpu": 1}))
-
     def test_non_empty(self):
         self.assertFalse(utils.non_empty(None))
         self.assertFalse(utils.non_empty([]))

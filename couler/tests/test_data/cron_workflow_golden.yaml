@@ -24,8 +24,3 @@ spec:
             - bash
             - -c
             - 'echo "run schedule job"'
-          env:
-            - name: NVIDIA_VISIBLE_DEVICES
-              value: null
-            - name: NVIDIA_DRIVER_CAPABILITIES
-              value: null

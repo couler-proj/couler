@@ -4,7 +4,6 @@ from collections import OrderedDict
 import yaml
 
 import couler.argo as couler
-from couler.core import utils
 from couler.core.templates.volume import Volume, VolumeMount
 from couler.core.templates.volume_claim import VolumeClaimTemplate
 
@@ -230,20 +229,7 @@ class ArgoTest(unittest.TestCase):
         expected_container_spec = (
             "container",
             OrderedDict(
-                [
-                    ("image", "docker/whalesay:latest"),
-                    ("command", ["cowsay"]),
-                    (
-                        "env",
-                        [
-                            {"name": "NVIDIA_VISIBLE_DEVICES", "value": ""},
-                            {
-                                "name": "NVIDIA_DRIVER_CAPABILITIES",
-                                "value": "",
-                            },
-                        ],
-                    ),
-                ]
+                [("image", "docker/whalesay:latest"), ("command", ["cowsay"])]
             ),
         )
         self.assertEqual(
@@ -463,22 +449,6 @@ class ArgoTest(unittest.TestCase):
     def _verify_script_body(
         self, script_to_check, image, command, source, env
     ):
-        if env is None:
-            env = utils.convert_dict_to_env_list(
-                {
-                    "NVIDIA_VISIBLE_DEVICES": "",
-                    "NVIDIA_DRIVER_CAPABILITIES": "",
-                }
-            )
-        else:
-            env.append(
-                utils.convert_dict_to_env_list(
-                    {
-                        "NVIDIA_VISIBLE_DEVICES": "",
-                        "NVIDIA_DRIVER_CAPABILITIES": "",
-                    }
-                )
-            )
         self.assertEqual(script_to_check.get("image", None), image)
         self.assertEqual(script_to_check.get("command", None), command)
         self.assertEqual(script_to_check.get("source", None), source)

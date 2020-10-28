@@ -31,11 +31,6 @@ spec:
           - cowsay
         args:
           - "{{inputs.parameters.para-whalesay-0}}"
-        env:
-          - name: "NVIDIA_VISIBLE_DEVICES"
-            value: null
-          - name: "NVIDIA_DRIVER_CAPABILITIES"
-            value: null
     - name: generate-number
       script:
         image: python:3.6
@@ -51,8 +46,3 @@ spec:
               print(result)
 
           '
-        env:
-          - name: "NVIDIA_VISIBLE_DEVICES"
-            value: null
-          - name: "NVIDIA_DRIVER_CAPABILITIES"
-            value: null

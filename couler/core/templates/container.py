@@ -15,7 +15,6 @@ import copy
 from collections import OrderedDict
 
 from couler.core import utils
-from couler.core.constants import OVERWRITE_GPU_ENVS
 from couler.core.templates.artifact import TypedArtifact
 from couler.core.templates.output import OutputArtifact, OutputJob
 from couler.core.templates.secret import Secret
@@ -116,10 +115,6 @@ class Container(Template):
             template["nodeSelector"] = self.node_selector
 
         # Container
-        if not utils.gpu_requested(self.resources):
-            if self.env is None:
-                self.env = {}
-            self.env.update(OVERWRITE_GPU_ENVS)
         template["container"] = self.container_dict()
 
         # Output

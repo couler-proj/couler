@@ -24,11 +24,6 @@ spec:
               print(result)
 
           '
-        env:
-          - name: "NVIDIA_VISIBLE_DEVICES"
-            value: null
-          - name: "NVIDIA_DRIVER_CAPABILITIES"
-            value: null
     - name: exec-while-flip-coin
       steps:
         - - name: flip-coin-18

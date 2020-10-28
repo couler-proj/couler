@@ -15,7 +15,6 @@ import copy
 from collections import OrderedDict
 
 from couler.core import utils
-from couler.core.constants import OVERWRITE_GPU_ENVS
 from couler.core.templates.secret import Secret
 from couler.core.templates.template import Template
 
@@ -54,10 +53,6 @@ class Script(Template):
 
     def to_dict(self):
         template = Template.to_dict(self)
-        if not utils.gpu_requested(self.resources):
-            if self.env is None:
-                self.env = {}
-            self.env.update(OVERWRITE_GPU_ENVS)
         template["script"] = self.script_dict()
         return template
 
