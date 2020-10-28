@@ -58,8 +58,14 @@ def invocation_location():
     else:
         func_name = argo_safe_name(stack[2][3])
         line_number = stack[3][2]
-    if func_name == "<module>":
-        func_name = "module-" + _get_uuid()
+    # We need to strip the unnecessary "<>" pattern that appears when the
+    # function is invoked:
+    # 1. at module-level, e.g. `python -m module_name`, where `func_name`
+    #   is "<module>".
+    # 2. via standard input, e.g. `cat run.py | python -u`, where `func_name`
+    #   is "<stdin>".
+    if func_name.startswith("<") and func_name.endswith(">"):
+        func_name = "%s-%s" % (func_name.strip("<|>"), _get_uuid())
     return func_name, line_number
 
 
