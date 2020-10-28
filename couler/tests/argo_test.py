@@ -174,11 +174,7 @@ class ArgoTest(unittest.TestCase):
         ][0]
         self.assertEqual(params["name"], "para-B-0")
         self.assertTrue(
-            params["value"]
-            in [
-                '"{{workflow.outputs.parameters.output-id-133}}"',
-                '"{{workflow.outputs.parameters.output-id-134}}"',
-            ]
+            '"{{workflow.outputs.parameters.output-id-' in params["value"]
         )
         # Check input parameters for step B
         template = wf["spec"]["templates"][2]
