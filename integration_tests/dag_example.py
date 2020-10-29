@@ -67,6 +67,27 @@ def exit_handler_failed():
     )
 
 
+def random_code():
+    import random
+
+    res = "heads" if random.randint(0, 1) == 0 else "tails"
+    print(res)
+
+
+def conditional_parent():
+    return couler.run_script(
+        image="python:3.6", source=random_code, step_name="condition-parent"
+    )
+
+
+def conditional_child():
+    return couler.run_container(
+        image="python:3.6",
+        command=["bash", "-c", 'echo "child is triggered based on condition"'],
+        step_name="condition-child",
+    )
+
+
 #     A
 #    / \
 #   B   C
@@ -99,8 +120,21 @@ def diamond():
 if __name__ == "__main__":
     couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
 
+    # 1) Add a linear DAG.
     linear()
+    # 2) Add another step that depends on D and flips a coin.
+    # 3) If the result is "heads", another child step is also
+    # added to the entire workflow.
+    couler.set_dependencies(
+        lambda: couler.when(
+            couler.equal(conditional_parent(), "heads"),
+            lambda: conditional_child(),
+        ),
+        dependencies=["D"],
+    )
+    # 4) Add an exit handler that runs when the workflow succeeds.
     couler.set_exit_handler(couler.WFStatus.Succeeded, exit_handler_succeeded)
+    # 5) Add an exit handler that runs when the workflow failed.
     couler.set_exit_handler(couler.WFStatus.Failed, exit_handler_failed)
 
     submitter = ArgoSubmitter(namespace="argo")
