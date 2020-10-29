@@ -35,6 +35,11 @@ def argo_safe_name(name):
     """
     if name is None:
         return None
+    # Strip the unnecessary "<>" pattern that appears when the
+    # file is invoked via standard input, e.g. `cat run.py | python -u`,
+    # where `name` is "<stdin>".
+    if name.startswith("<") and name.endswith(">"):
+        name = name.strip("<|>")
     # '_' and '.' are not allowed
     return re.sub(r"_|\.", "-", name)
 
