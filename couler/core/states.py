@@ -30,6 +30,7 @@ workflow = Workflow(workflow_filename=workflow_filename)
 # '_when_prefix' represents 'when' prefix in Argo YAML. For example,
 # https://github.com/argoproj/argo/blob/master/examples/README.md#conditionals
 _when_prefix = None
+_when_task = None
 # '_condition_id' records the line number where the 'couler.when()' is invoked.
 _condition_id = None
 # '_while_steps' records the step of recursive logic

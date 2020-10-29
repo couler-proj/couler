@@ -44,7 +44,13 @@ def when(condition, function):
 
     post_value = post_dict["value"]
 
-    states._when_prefix = "{{steps.%s.%s}} %s %s" % (
+    if states._upstream_dag_task is not None:
+        step_type = "tasks"
+        states._when_task = pre_dict["id"]
+    else:
+        step_type = "steps"
+    states._when_prefix = "{{%s.%s.%s}} %s %s" % (
+        step_type,
         pre_dict["id"],
         pre_dict["output"],
         condition_suffix,
