@@ -64,12 +64,18 @@ def run(submitter=ArgoSubmitter):
     secrets = states._secrets.values()
     validate_workflow_yaml(wf)
     if isinstance(submitter, ArgoSubmitter):
-        return submitter.submit(wf, secrets=secrets)
+        res = submitter.submit(wf, secrets=secrets)
     elif issubclass(submitter, ArgoSubmitter):
         submitter = ArgoSubmitter()
-        return submitter.submit(wf, secrets=secrets)
+        res = submitter.submit(wf, secrets=secrets)
     else:
         raise ValueError("Only ArgoSubmitter is supported currently.")
+
+    # Clean up the saved states of the workflow since we made a copy of
+    # the workflow above and no longer need the original reference. This
+    # would also allow users to define a new workflow after submission.
+    _cleanup()
+    return res
 
 
 def delete(
