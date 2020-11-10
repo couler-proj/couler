@@ -46,7 +46,6 @@ _exit_handler_enable = False
 # step output results
 _steps_outputs: OrderedDict = OrderedDict()
 _secrets: dict = {}
-_secret_envs: dict = {}
 # for passing the artifact implicitly
 _outputs_tmp = None
 # print yaml at exit
@@ -61,11 +60,6 @@ def get_step_output(step_name):
 def get_secret(name: str):
     """Get secret by name."""
     return _secrets.get(name, None)
-
-
-def get_secret_envs(name: str):
-    """Get secret by name."""
-    return _secret_envs.get(name, None)
 
 
 def _cleanup():

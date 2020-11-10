@@ -166,7 +166,6 @@ def run_container(
             args=args,
             env=env,
             secret=states.get_secret(secret),
-            secret_envs=states.get_secret_envs(secret),
             resources=resources,
             image_pull_policy=image_pull_policy,
             retry=retry,

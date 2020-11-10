@@ -19,7 +19,7 @@ from couler.core import utils
 
 
 class Secret(object):
-    def __init__(self, namespace, data, name=None):
+    def __init__(self, namespace, data, name=None, dry_run=False):
 
         if not isinstance(data, dict):
             raise TypeError("The secret data is required to be a dict")
@@ -37,6 +37,7 @@ class Secret(object):
             self.name = name
 
         self.data = {k: utils.encode_base64(v) for k, v in data.items()}
+        self.dry_run = dry_run
 
     def to_yaml(self):
         """Covert the secret to a secret CRD specification."""
