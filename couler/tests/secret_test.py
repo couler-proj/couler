@@ -77,14 +77,14 @@ class SecretTest(ArgoYamlTest):
     def test_create_secrete_duplicate(self):
         def job_1():
             user_info = {"uname": "abc", "passwd": "def"}
-            secret1 = couler.create_secret(secret_data=user_info)
+            secret1 = couler.create_secret(secret_data=user_info, dry_run=True)
             couler.run_container(
                 image="python:3.6", secret=secret1, command="echo $uname"
             )
 
         def job_2():
             user_info = {"uname": "abc", "passwd": "def"}
-            secret1 = couler.create_secret(secret_data=user_info)
+            secret1 = couler.create_secret(secret_data=user_info, dry_run=True)
             couler.run_container(
                 image="python:3.6", secret=secret1, command="echo $uname"
             )

@@ -144,7 +144,8 @@ def _dump_yaml():
 
     # TODO(weiyan): add unittest for verifying multiple secrets outputs
     for secret in states._secrets.values():
-        yaml_str += "\n---\n" + pyaml.dump(secret.to_yaml())
+        if not secret.dry_run:
+            yaml_str += "\n---\n" + pyaml.dump(secret.to_yaml())
 
     if states._enable_print_yaml:
         print(yaml_str)
