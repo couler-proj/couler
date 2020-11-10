@@ -145,7 +145,7 @@ class Container(Template):
             )
         if utils.non_empty(self.env):
             container["env"] = utils.convert_dict_to_env_list(self.env)
-        if self.secret is not None and self.secret.dry_run:
+        if self.secret is not None:
             if not isinstance(self.secret, Secret):
                 raise ValueError(
                     "Parameter secret should be an instance of Secret"
