@@ -31,6 +31,7 @@ class Container(Template):
         args=None,
         env=None,
         secret=None,
+        secret_envs=None,
         resources=None,
         image_pull_policy=None,
         retry=None,
@@ -60,6 +61,7 @@ class Container(Template):
         self.args = args
         self.env = env
         self.secret = secret
+        self.secret_envs = secret_envs
         self.resources = resources
         self.image_pull_policy = image_pull_policy
         self.volume_mounts = volume_mounts
@@ -145,7 +147,7 @@ class Container(Template):
             )
         if utils.non_empty(self.env):
             container["env"] = utils.convert_dict_to_env_list(self.env)
-        if self.secret is not None and self.secret.dry_run:
+        if self.secret is not None:
             if not isinstance(self.secret, Secret):
                 raise ValueError(
                     "Parameter secret should be an instance of Secret"
@@ -154,6 +156,11 @@ class Container(Template):
                 container["env"] = self.secret.to_env_list()
             else:
                 container["env"].extend(self.secret.to_env_list())
+        if self.secret_envs is not None:
+            if self.env is None:
+                container["env"] = self.secret_envs
+            else:
+                container["env"].extend(self.secret_envs)
         if self.resources is not None:
             container["resources"] = {
                 "requests": self.resources,
