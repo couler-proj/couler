@@ -144,7 +144,8 @@ def _dump_yaml():
 
     # TODO(weiyan): add unittest for verifying multiple secrets outputs
     for secret in states._secrets.values():
-        yaml_str += "\n---\n" + pyaml.dump(secret.to_yaml())
+        if not secret.dry_run:
+            yaml_str += "\n---\n" + pyaml.dump(secret.to_yaml())
 
     if states._enable_print_yaml:
         print(yaml_str)
@@ -218,10 +219,12 @@ def create_s3_artifact(
 
 def create_secret(secret_data, namespace="default", name=None, dry_run=False):
     """Store the input dict as a secret in k8s, and return the secret name."""
-    secret = Secret(namespace=namespace, data=secret_data, name=name)
+    secret = Secret(
+        namespace=namespace, data=secret_data, name=name, dry_run=dry_run
+    )
 
     # avoid create the secret for same input dict
-    if secret.name not in states._secrets and not dry_run:
+    if secret.name not in states._secrets:
         states._secrets[secret.name] = secret
 
     return secret.name
