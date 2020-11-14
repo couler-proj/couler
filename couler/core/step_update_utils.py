@@ -94,7 +94,7 @@ def _update_dag_tasks(
         # step exist on the dag, thus, we update its dependency
         if dependencies is not None:
             if "dependencies" in task_template:
-                task_template["dependencies"].append(dependencies)
+                task_template["dependencies"].extend(dependencies)
             else:
                 task_template["dependencies"] = [dependencies]
 
