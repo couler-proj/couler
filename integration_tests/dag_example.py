@@ -112,7 +112,7 @@ def diamond():
             [lambda: job_a(message="A"), lambda: job_b(message="B")],  # A -> B
             [lambda: job_a(message="A"), lambda: job_c(message="C")],  # A -> C
             [lambda: job_b(message="B"), lambda: job_d(message="D")],  # B -> D
-            [lambda: job_b(message="C"), lambda: job_d(message="D")],  # C -> D
+            [lambda: job_c(message="C"), lambda: job_d(message="D")],  # C -> D
         ]
     )
 
