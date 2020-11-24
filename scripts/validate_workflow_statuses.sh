@@ -25,11 +25,12 @@ function get_workflow_status {
     echo ${wf_status}
 }
 
-for i in {1..50}; do
+for i in {1..70}; do
     WF_STATUS=$(get_workflow_status ${WF_NAME})
 
     if [[ "$WF_STATUS" == "Succeeded" ]]; then
       echo "Workflow ${WF_NAME} succeeded."
+      kubectl -n argo delete workflow ${WF_NAME}
       exit 0
     elif [[ "$WF_STATUS" == "Failed" ]] ||
         [[ "$WF_STATUS" == "Error" ]]; then
@@ -41,6 +42,8 @@ for i in {1..50}; do
       sleep ${CHECK_INTERVAL_SECS}
     fi
 done
+
+kubectl -n argo describe workflow ${WF_NAME}
 echo "Workflow ${WF_NAME} timed out."
 
 exit 1
