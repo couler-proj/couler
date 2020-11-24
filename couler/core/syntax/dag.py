@@ -41,25 +41,38 @@ def dag(dependency_graph):
                     raise TypeError("require loop over a function to run")
 
 
-def set_dependencies(step_function, dependencies):
+def set_dependencies(step_function, dependencies=None):
     """
     :param step_function: step to run
-    :param dependencies: the dependencies step_name to run
+    :param dependencies: the list of dependencies of this step. This can be in
+        either of the following forms:
+        1. a list of step names;
+        2. a string representing the enhanced depends logic that specifies
+        dependencies based on their statuses. See the link below for the
+        supported syntax:
+        https://github.com/argoproj/argo/blob/master/docs/enhanced-depends-logic.md
     :return:
     """
 
-    if dependencies is not None and not isinstance(dependencies, list):
-        raise SyntaxError("require input as list")
+    if dependencies is not None:
+        if isinstance(dependencies, list):
+            # A list of dependencies
+            states._upstream_dag_task = dependencies
+            states._upstream_dag_depends_logic = None
+        elif isinstance(dependencies, str):
+            # Dependencies using enhanced depends logic
+            states._upstream_dag_depends_logic = dependencies
+            states._upstream_dag_task = None
+        else:
+            raise SyntaxError("dependencies must be a list or a string")
 
     if not callable(step_function):
         raise SyntaxError("require step_function to a function")
 
     states.workflow.enable_dag_mode()
 
-    states._upstream_dag_task = dependencies
-
     states._outputs_tmp = []
-    if dependencies is not None:
+    if dependencies is not None and isinstance(dependencies, list):
         for step in dependencies:
             output = states.get_step_output(step)
 
