@@ -58,9 +58,11 @@ def set_dependencies(step_function, dependencies=None):
         if isinstance(dependencies, list):
             # A list of dependencies
             states._upstream_dag_task = dependencies
+            states._upstream_dag_depends_logic = None
         elif isinstance(dependencies, str):
             # Dependencies using enhanced depends logic
             states._upstream_dag_depends_logic = dependencies
+            states._upstream_dag_task = None
         else:
             raise SyntaxError("dependencies must be a list or a string")
 
