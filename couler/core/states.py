@@ -40,7 +40,7 @@ _while_lock = False
 # dependency edges
 _upstream_dag_task = None
 # Enhanced depends logic
-_upstream_dag_depends = None
+_upstream_dag_depends_logic = None
 # dag function caller line
 _dag_caller_line = None
 # start exit handler
@@ -67,11 +67,11 @@ def get_secret(name: str):
 def _cleanup():
     """Cleanup the cached fields, just used for unit test.
     """
-    global _secrets, _update_steps_lock, _dag_caller_line, _upstream_dag_task, _upstream_dag_depends, workflow, _steps_outputs  # noqa: E501
+    global _secrets, _update_steps_lock, _dag_caller_line, _upstream_dag_task, _upstream_dag_depends_logic, workflow, _steps_outputs  # noqa: E501
     _secrets = {}
     _update_steps_lock = True
     _dag_caller_line = None
     _upstream_dag_task = None
-    _upstream_dag_depends = None
+    _upstream_dag_depends_logic = None
     _steps_outputs = OrderedDict()
     workflow.cleanup()

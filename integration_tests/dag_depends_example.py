@@ -31,22 +31,22 @@ if __name__ == "__main__":
             step_name=name,
         )
 
-    couler.set_dependencies(lambda: pass_step("A"), depends=None)
-    couler.set_dependencies(lambda: pass_step("B"), depends="A")
-    couler.set_dependencies(lambda: fail_step("C"), depends="A")
+    couler.set_dependencies(lambda: pass_step("A"), dependencies=None)
+    couler.set_dependencies(lambda: pass_step("B"), dependencies="A")
+    couler.set_dependencies(lambda: fail_step("C"), dependencies="A")
     couler.set_dependencies(
         lambda: pass_step("should-execute-1"),
-        depends="A && (C.Succeeded || C.Failed)",
+        dependencies="A && (C.Succeeded || C.Failed)",
     )
     couler.set_dependencies(
-        lambda: pass_step("should-execute-2"), depends="B || C"
+        lambda: pass_step("should-execute-2"), dependencies="B || C"
     )
     couler.set_dependencies(
-        lambda: pass_step("should-not-execute"), depends="B && C"
+        lambda: pass_step("should-not-execute"), dependencies="B && C"
     )
     couler.set_dependencies(
         lambda: pass_step("should-execute-3"),
-        depends="should-execute-2.Succeeded || should-not-execute",
+        dependencies="should-execute-2.Succeeded || should-not-execute",
     )
 
     submitter = ArgoSubmitter(namespace="argo")

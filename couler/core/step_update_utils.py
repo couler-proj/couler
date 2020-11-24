@@ -24,7 +24,7 @@ def update_step(func_name, args, step_name, caller_line):
             func_name,
             states._dag_caller_line,
             states._upstream_dag_task,
-            states._upstream_dag_depends,
+            states._upstream_dag_depends_logic,
             args,
             step_name=step_name,
         )
@@ -47,7 +47,7 @@ def _update_dag_tasks(
     function_name,
     caller_line,
     dependencies,
-    depends,
+    depends_logic,
     args=None,
     template_name=None,
     step_name=None,
@@ -71,8 +71,8 @@ def _update_dag_tasks(
             else:
                 task_template["dependencies"] = dependencies
 
-        if depends is not None:
-            task_template["depends"] = depends
+        if depends_logic is not None:
+            task_template["depends"] = depends_logic
 
         if template_name is None:
             task_template["template"] = function_name
@@ -102,8 +102,8 @@ def _update_dag_tasks(
                 task_template["dependencies"].extend(dependencies)
             else:
                 task_template["dependencies"] = [dependencies]
-        if depends is not None:
-            task_template["depends"] = depends
+        if depends_logic is not None:
+            task_template["depends"] = depends_logic
 
     t_name = function_name if template_name is None else template_name
     step = Step(name=function_id, template=t_name)
