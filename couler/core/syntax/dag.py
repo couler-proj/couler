@@ -70,7 +70,7 @@ def set_dependencies(step_function, dependencies=None):
     states.workflow.enable_dag_mode()
 
     states._outputs_tmp = []
-    if dependencies is not None:
+    if dependencies is not None and isinstance(dependencies, list):
         for step in dependencies:
             output = states.get_step_output(step)
 
