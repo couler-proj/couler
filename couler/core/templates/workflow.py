@@ -143,14 +143,20 @@ class Workflow(object):
                 # implementation has the following signature:
                 # `config_pod(self, template, pool, enable_ulogfs)`.
                 # TODO (terrytangyuan): Remove sensitive words here.
-                elif num_args == 4:
-                    template_dict = self.cluster_config.config_pod(
-                        template_dict, template.pool, template.enable_ulogfs
-                    )
                 else:
-                    raise ValueError(
-                        "Unsupported signature for cluster spec: %s" % sig
-                    )
+                    # The try-except here is necessary in case the
+                    # implementation of `config_pod` supports additional
+                    # arguments with default values.
+                    try:
+                        template_dict = self.cluster_config.config_pod(
+                            template_dict,
+                            template.pool,
+                            template.enable_ulogfs,
+                        )
+                    except Exception:
+                        raise ValueError(
+                            "Unsupported signature for cluster spec: %s" % sig
+                        )
             ts.append(template_dict)
         if len(self.exit_handler_step) > 0:
             workflow_spec["onExit"] = "exit-handler"
