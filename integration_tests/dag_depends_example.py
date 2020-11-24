@@ -19,16 +19,12 @@ if __name__ == "__main__":
 
     def pass_step(name):
         return couler.run_container(
-            image="reg.docker.alibaba-inc.com/couler/python:3.6",
-            command=["bash", "-c", "exit 0"],
-            step_name=name,
+            image="alpine:3.6", command=["sh", "-c", "exit 0"], step_name=name
         )
 
     def fail_step(name):
         return couler.run_container(
-            image="reg.docker.alibaba-inc.com/couler/python:3.6",
-            command=["bash", "-c", "exit 1"],
-            step_name=name,
+            image="alpine:3.6", command=["sh", "-c", "exit 1"], step_name=name
         )
 
     couler.set_dependencies(lambda: pass_step("A"), dependencies=None)
