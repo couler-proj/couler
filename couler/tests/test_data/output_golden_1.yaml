@@ -12,7 +12,7 @@ spec:
             arguments:
               parameters:
                 - name: para-producer-0
-                  value: 'echo -n hello world > /tmp/hello_world.txt'
+                  value: 'echo -n hello world > /mnt/hello_world.txt'
         - - name: consumer-24
             template: consumer
             arguments:
@@ -35,11 +35,17 @@ spec:
             value: null
           - name: "NVIDIA_DRIVER_CAPABILITIES"
             value: null
+        volumeMounts:
+          - name: couler-out-dir-0
+            mountPath: /mnt
       outputs:
         parameters:
           - name: output-id-6
             valueFrom:
-              path: /tmp/hello_world.txt
+              path: /mnt/hello_world.txt
+      volumes:
+        - emptyDir: {}
+          name: couler-out-dir-0
     - name: consumer
       inputs:
         parameters:

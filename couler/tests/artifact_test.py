@@ -14,7 +14,7 @@ class ArtifactTest(ArgoYamlTest):
 
     def _oss_check_helper(self, artifact):
         self.assertIn("output-oss", artifact["name"])
-        self.assertEqual("/tmp/t1.txt", artifact["path"])
+        self.assertEqual("/mnt/t1.txt", artifact["path"])
         oss_config = artifact["oss"]
         self.assertIsNotNone(oss_config)
         self.assertEqual(oss_config["endpoint"], "xyz.com")
@@ -26,7 +26,7 @@ class ArtifactTest(ArgoYamlTest):
     def test_output_oss_artifact(self):
         # the content of local file would be uploaded to OSS
         output_artifact = couler.create_oss_artifact(
-            path="/tmp/t1.txt",
+            path="/mnt/t1.txt",
             bucket="test-bucket/",
             accesskey_id="abcde",
             accesskey_secret="abc12345",
@@ -48,7 +48,7 @@ class ArtifactTest(ArgoYamlTest):
 
     def test_input_oss_artifact(self):
         input_artifact = couler.create_oss_artifact(
-            path="/tmp/t1.txt",
+            path="/mnt/t1.txt",
             bucket="test-bucket/",
             accesskey_id="abcde",
             accesskey_secret="abc12345",
@@ -72,7 +72,7 @@ class ArtifactTest(ArgoYamlTest):
 
     def _s3_check_helper(self, artifact):
         self.assertIn("output-s3", artifact["name"])
-        self.assertEqual("/tmp/t1.txt", artifact["path"])
+        self.assertEqual("/mnt/t1.txt", artifact["path"])
         s3_config = artifact["s3"]
         self.assertIsNotNone(s3_config)
         self.assertEqual(s3_config["endpoint"], "xyz.com")
@@ -84,7 +84,7 @@ class ArtifactTest(ArgoYamlTest):
     def test_output_s3_artifact(self):
         # the content of local file would be uploaded to OSS
         output_artifact = couler.create_s3_artifact(
-            path="/tmp/t1.txt",
+            path="/mnt/t1.txt",
             bucket="test-bucket/",
             accesskey_id="abcde",
             accesskey_secret="abc12345",
@@ -106,7 +106,7 @@ class ArtifactTest(ArgoYamlTest):
 
     def test_input_s3_artifact(self):
         input_artifact = couler.create_s3_artifact(
-            path="/tmp/t1.txt",
+            path="/mnt/t1.txt",
             bucket="test-bucket/",
             accesskey_id="abcde",
             accesskey_secret="abc12345",
@@ -131,7 +131,7 @@ class ArtifactTest(ArgoYamlTest):
     def test_artifact_passing(self):
         def producer():
             output_artifact = couler.create_oss_artifact(
-                path="/tmp/t1.txt",
+                path="/mnt/t1.txt",
                 bucket="test-bucket/",
                 accesskey_id="abcde",
                 accesskey_secret="abc12345",
@@ -171,7 +171,7 @@ class ArtifactTest(ArgoYamlTest):
     def test_set_dependencies_with_upstream(self):
         def producer(step_name):
             output_artifact = couler.create_oss_artifact(
-                path="/tmp/t1.txt",
+                path="/mnt/t1.txt",
                 bucket="test-bucket/",
                 accesskey_id="abcde",
                 accesskey_secret="abc12345",
@@ -217,7 +217,7 @@ class ArtifactTest(ArgoYamlTest):
 
     def test_set_dependencies_with_passing_artifact_implicitly(self):
 
-        default_path = "/tmp/t1.txt"
+        default_path = "/mnt/t1.txt"
 
         def producer(step_name):
             output_artifact = couler.create_oss_artifact(

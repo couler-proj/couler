@@ -127,7 +127,7 @@ class ArgoTest(unittest.TestCase):
         couler._cleanup()
 
     def test_run_container_with_dependency_implicit_params_passing(self):
-        output_path = "/tmp/hello_world.txt"
+        output_path = "/mnt/hello_world.txt"
 
         def producer(step_name):
             output_place = couler.create_parameter_artifact(
@@ -181,6 +181,19 @@ class ArgoTest(unittest.TestCase):
                 '"{{workflow.outputs.parameters.output-id-134}}"',
             ]
         )
+        # Check automatically created emptyDir volume and volume mount
+        self.assertEqual(
+            template["volumes"], [{"emptyDir": {}, "name": "couler-out-dir-0"}]
+        )
+        self.assertEqual(
+            template["container"]["volumeMounts"],
+            [
+                OrderedDict(
+                    [("name", "couler-out-dir-0"), ("mountPath", "/mnt")]
+                )
+            ],
+        )
+
         # Check input parameters for step B
         template = wf["spec"]["templates"][2]
         self.assertEqual(
@@ -321,7 +334,7 @@ class ArgoTest(unittest.TestCase):
                         command: ["python random_num.py"]
                 """
 
-        output_path = "/tmp/hello_world.txt"
+        output_path = "/mnt/hello_world.txt"
 
         def producer(step_name):
             output_place = couler.create_parameter_artifact(path=output_path)

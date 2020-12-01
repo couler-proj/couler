@@ -13,7 +13,7 @@ spec:
             arguments:
               parameters:
                 - name: para-A-0
-                  value: 'echo -n A > /tmp/t1.txt && echo -n B > /tmp/t2.txt'
+                  value: 'echo -n A > /mnt/t1.txt && echo -n B > /mnt/t2.txt'
           - name: B
             dependencies:
               - A
@@ -42,14 +42,20 @@ spec:
             value: null
           - name: NVIDIA_DRIVER_CAPABILITIES
             value: null
+        volumeMounts:
+          - name: couler-out-dir-0
+            mountPath: /mnt
       outputs:
         parameters:
           - name: output-id-208
             valueFrom:
-              path: /tmp/t1.txt
+              path: /mnt/t1.txt
           - name: output-id-211
             valueFrom:
-              path: /tmp/t2.txt
+              path: /mnt/t2.txt
+      volumes:
+        - emptyDir: {}
+          name: couler-out-dir-0
     - name: B
       inputs:
         parameters:
