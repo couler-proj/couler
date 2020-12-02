@@ -13,6 +13,12 @@
 
 from enum import Enum
 
+# For cpu-only containers, we need to overwrite these envs
+OVERWRITE_GPU_ENVS = {
+    "NVIDIA_VISIBLE_DEVICES": "",
+    "NVIDIA_DRIVER_CAPABILITIES": "",
+}
+
 
 class WorkflowCRD(object):
     PLURAL = "workflows"

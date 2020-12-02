@@ -242,6 +242,21 @@ def make_list_if_not(item):
     return [item]
 
 
+def gpu_requested(resources):
+    """
+    Check whether the requested resources contains GPU.
+    Here resources is a dict like {"cpu": 1, "memory": 2,...}.
+    """
+    if resources is None:
+        return False
+    if not isinstance(resources, dict):
+        raise TypeError("Parameter resources is required to be a dict")
+    for k, v in resources.items():
+        if "gpu" in k.strip().lower() and int(v) > 0:
+            return True
+    return False
+
+
 def non_empty(d):
     """
     Check whether the `collection` is none or empty.
