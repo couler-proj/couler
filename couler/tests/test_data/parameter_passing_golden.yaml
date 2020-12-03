@@ -37,11 +37,6 @@ spec:
           - -c
         args:
           - "{{inputs.parameters.para-A-0}}"
-        env:
-          - name: NVIDIA_VISIBLE_DEVICES
-            value: null
-          - name: NVIDIA_DRIVER_CAPABILITIES
-            value: null
       outputs:
         parameters:
           - name: output-id-208
@@ -64,8 +59,3 @@ spec:
           - "{{inputs.parameters.para-B-0}}"
           - "{{inputs.parameters.para-B-1}}"
           - "{{inputs.parameters.para-B-2}}"
-        env:
-          - name: NVIDIA_VISIBLE_DEVICES
-            value: null
-          - name: NVIDIA_DRIVER_CAPABILITIES
-            value: null

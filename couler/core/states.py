@@ -52,6 +52,9 @@ _secrets: dict = {}
 _outputs_tmp = None
 # print yaml at exit
 _enable_print_yaml = True
+# Whether to overwrite NVIDIA GPU environment variables
+# to containers and templates
+_overwrite_nvidia_gpu_envs = False
 
 
 def get_step_output(step_name):

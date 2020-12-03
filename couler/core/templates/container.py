@@ -14,7 +14,7 @@
 import copy
 from collections import OrderedDict
 
-from couler.core import utils
+from couler.core import states, utils
 from couler.core.constants import OVERWRITE_GPU_ENVS
 from couler.core.templates.artifact import TypedArtifact
 from couler.core.templates.output import OutputArtifact, OutputJob
@@ -116,7 +116,10 @@ class Container(Template):
             template["nodeSelector"] = self.node_selector
 
         # Container
-        if not utils.gpu_requested(self.resources):
+        if (
+            not utils.gpu_requested(self.resources)
+            and states._overwrite_nvidia_gpu_envs
+        ):
             if self.env is None:
                 self.env = {}
             self.env.update(OVERWRITE_GPU_ENVS)

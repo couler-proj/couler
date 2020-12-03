@@ -38,11 +38,6 @@ spec:
           - -c
         args:
           - "{{inputs.parameters.para-job-one-0}}"
-        env:
-          - name: "NVIDIA_VISIBLE_DEVICES"
-            value: null
-          - name: "NVIDIA_DRIVER_CAPABILITIES"
-            value: null
       outputs:
         parameters:
           - name: output-id-95
@@ -59,11 +54,6 @@ spec:
           - -c
         args:
           - "{{inputs.parameters.para-job-two-0}}"
-        env:
-          - name: "NVIDIA_VISIBLE_DEVICES"
-            value: null
-          - name: "NVIDIA_DRIVER_CAPABILITIES"
-            value: null
       outputs:
         parameters:
           - name: output-id-95
@@ -83,8 +73,3 @@ spec:
         args:
           - "{{inputs.parameters.para-summary-0}}"
           - "{{inputs.parameters.para-summary-1}}"
-        env:
-          - name: "NVIDIA_VISIBLE_DEVICES"
-            value: null
-          - name: "NVIDIA_DRIVER_CAPABILITIES"
-            value: null
