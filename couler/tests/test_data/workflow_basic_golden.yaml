@@ -21,11 +21,6 @@ spec:
 
           result = "heads" if random.randint(0, 1) == 0 else "tails"
           print(result)
-        env:
-          - name: "NVIDIA_VISIBLE_DEVICES"
-            value: null
-          - name: "NVIDIA_DRIVER_CAPABILITIES"
-            value: null
     - name: heads
       container:
         image: python:3.6
@@ -33,11 +28,6 @@ spec:
           - bash
           - -c
           - 'echo "it was heads"'
-        env:
-          - name: "NVIDIA_VISIBLE_DEVICES"
-            value: null
-          - name: "NVIDIA_DRIVER_CAPABILITIES"
-            value: null
     - name: tails
       container:
         image: python:3.6
@@ -45,11 +35,6 @@ spec:
           - bash
           - -c
           - 'echo "it was tails"'
-        env:
-          - name: "NVIDIA_VISIBLE_DEVICES"
-            value: null
-          - name: "NVIDIA_DRIVER_CAPABILITIES"
-            value: null
     - name: exit-handler
       steps:
         - - name: heads-637

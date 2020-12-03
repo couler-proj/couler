@@ -48,11 +48,6 @@ spec:
           - cowsay
         args:
           - "{{inputs.parameters.para-A-0}}"
-        env:
-          - name: NVIDIA_VISIBLE_DEVICES
-            value: null
-          - name: NVIDIA_DRIVER_CAPABILITIES
-            value: null
     - name: B
       inputs:
         parameters:
@@ -63,11 +58,6 @@ spec:
           - cowsay
         args:
           - "{{inputs.parameters.para-B-0}}"
-        env:
-          - name: NVIDIA_VISIBLE_DEVICES
-            value: null
-          - name: NVIDIA_DRIVER_CAPABILITIES
-            value: null
     - name: C
       inputs:
         parameters:
@@ -78,11 +68,6 @@ spec:
           - cowsay
         args:
           - "{{inputs.parameters.para-C-0}}"
-        env:
-          - name: NVIDIA_VISIBLE_DEVICES
-            value: null
-          - name: NVIDIA_DRIVER_CAPABILITIES
-            value: null
     - name: D
       inputs:
         parameters:
@@ -93,8 +78,3 @@ spec:
           - cowsay
         args:
           - "{{inputs.parameters.para-D-0}}"
-        env:
-          - name: NVIDIA_VISIBLE_DEVICES
-            value: null
-          - name: NVIDIA_DRIVER_CAPABILITIES
-            value: null

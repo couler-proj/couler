@@ -50,13 +50,9 @@ class EnvUnitTest(unittest.TestCase):
                 self.assertEqual(
                     container["command"], ["bash", "-c", "echo ${MESSAGE}"]
                 )
-                self.assertEqual(len(container["env"]), len(self.envs) + 2)
+                self.assertEqual(len(container["env"]), len(self.envs))
                 for env in container["env"]:
-                    if env["name"] == "NVIDIA_VISIBLE_DEVICES":
-                        self.assertEqual(env["value"], "")
-                    elif env["name"] == "NVIDIA_DRIVER_CAPABILITIES":
-                        self.assertEqual(env["value"], "")
-                    elif env["name"] == "str_env":
+                    if env["name"] == "str_env":
                         self.assertEqual(env["value"], self.envs["str_env"])
                     elif env["name"] == "bool_env":
                         self.assertEqual(
@@ -79,13 +75,9 @@ class EnvUnitTest(unittest.TestCase):
                 self.assertEqual(len(script), 4)
                 self.assertEqual(script["image"], "python:3.6")
                 self.assertEqual(script["command"], ["python"])
-                self.assertEqual(len(script["env"]), len(self.envs) + 2)
+                self.assertEqual(len(script["env"]), len(self.envs))
                 for env in script["env"]:
-                    if env["name"] == "NVIDIA_VISIBLE_DEVICES":
-                        self.assertEqual(env["value"], "")
-                    elif env["name"] == "NVIDIA_DRIVER_CAPABILITIES":
-                        self.assertEqual(env["value"], "")
-                    elif env["name"] == "str_env":
+                    if env["name"] == "str_env":
                         self.assertEqual(env["value"], self.envs["str_env"])
                     elif env["name"] == "bool_env":
                         self.assertEqual(

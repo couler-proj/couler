@@ -30,11 +30,6 @@ spec:
           - -c
         args:
           - "{{inputs.parameters.para-producer-0}}"
-        env:
-          - name: "NVIDIA_VISIBLE_DEVICES"
-            value: null
-          - name: "NVIDIA_DRIVER_CAPABILITIES"
-            value: null
         volumeMounts:
           - name: couler-out-dir-0
             mountPath: /mnt
@@ -56,8 +51,3 @@ spec:
           - cowsay
         args:
           - "{{inputs.parameters.para-consumer-0}}"
-        env:
-          - name: "NVIDIA_VISIBLE_DEVICES"
-            value: null
-          - name: "NVIDIA_DRIVER_CAPABILITIES"
-            value: null

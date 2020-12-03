@@ -33,11 +33,6 @@ spec:
           - cowsay
         args:
           - "{{inputs.parameters.para-whalesay-0}}"
-        env:
-          - name: "NVIDIA_VISIBLE_DEVICES"
-            value: null
-          - name: "NVIDIA_DRIVER_CAPABILITIES"
-            value: null
     - name: concurrent-task-1
       steps:
         - - name: whalesay-99

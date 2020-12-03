@@ -32,10 +32,6 @@ class MapTest(ArgoYamlTest):
             "image": "docker/whalesay:latest",
             "command": ["cowsay"],
             "args": ['"{{inputs.parameters.para-consume-0}}"'],
-            "env": [
-                {"name": "NVIDIA_VISIBLE_DEVICES", "value": ""},
-                {"name": "NVIDIA_DRIVER_CAPABILITIES", "value": ""},
-            ],
         }
         self.assertDictEqual(consume_template["container"], expected_container)
 

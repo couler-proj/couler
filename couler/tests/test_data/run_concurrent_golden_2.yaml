@@ -33,11 +33,6 @@ spec:
           - cowsay
         args:
           - "{{inputs.parameters.para-whalesay-0}}"
-        env:
-          - name: "NVIDIA_VISIBLE_DEVICES"
-            value: null
-          - name: "NVIDIA_DRIVER_CAPABILITIES"
-            value: null
     - name: tails
       container:
         image: docker/whalesay
@@ -45,8 +40,3 @@ spec:
           - bash
           - -c
           - 'echo "it was tails"'
-        env:
-          - name: "NVIDIA_VISIBLE_DEVICES"
-            value: null
-          - name: "NVIDIA_DRIVER_CAPABILITIES"
-            value: null
