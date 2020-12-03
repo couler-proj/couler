@@ -191,6 +191,36 @@ class DAGTest(ArgoYamlTest):
             assert_dep = assert_deps[task["name"]]
             self.assertEqual(task.get("depends"), assert_dep)
 
+    def test_raise(self):
+        with self.assertRaises(ValueError):
+
+            def some_raise():
+                raise ValueError("test this")
+
+            couler.set_exit_handler(couler.WFStatus.Failed, some_raise)
+        couler._cleanup()
+        couler.set_dependencies(lambda: job_a(message="A"), dependencies=None)
+        content = pyaml.dump(couler.workflow_yaml())
+        self.assertNotIn("onExit", content)
+
+    # TODO: Fix exit_handler
+    # def test_set_dependencies_none2(self):
+    #     couler.set_dependencies(lambda: job_a(message="A"),
+    # dependencies=None)
+    #     couler.set_dependencies(lambda: job_b(message="B"),
+    # dependencies=["A"])
+
+    #     def job_exit():
+    #         return couler.run_container(
+    #             image="docker/whalesay:latest",
+    #             command=["cowsay"],
+    #             step_name="C",
+    #         )
+
+    #     couler.set_exit_handler(couler.WFStatus.Failed, job_exit)
+    #     content = pyaml.dump(couler.workflow_yaml())
+    #     self.assertIn("{{workflow.state}}", content)
+
     # TODO: Provide new test case without `tf.train`.
     # def test_set_dependencies_for_job(self):
     #
