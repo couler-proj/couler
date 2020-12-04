@@ -11,14 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import distutils.cmd
 import io
 import os
 
 from setuptools import find_packages, setup
-import distutils.cmd
+
 
 class ProtocCommand(distutils.cmd.Command):
-    description = 'run protoc to compile protobuf files'
+    description = "run protoc to compile protobuf files"
     user_options = []
 
     def initialize_options(self):
@@ -32,7 +33,11 @@ class ProtocCommand(distutils.cmd.Command):
     def run(self):
         os.system("protoc --python_out=couler proto/couler.proto")
         os.system("touch couler/proto/__init__.py")
-        self.announce("proto file generated under couler/proto.", level=distutils.log.INFO)
+        self.announce(
+            "proto file generated under couler/proto.",
+            level=distutils.log.INFO,
+        )
+
 
 with open("requirements.txt") as f:
     required_deps = f.read().splitlines()
@@ -57,5 +62,5 @@ setup(
     python_requires=">=3.6",
     packages=find_packages(exclude=["*test*"]),
     package_data={"": ["requirements.txt"]},
-    cmdclass={'proto': ProtocCommand}
+    cmdclass={"proto": ProtocCommand},
 )
