@@ -12,6 +12,7 @@ __pycache__
 # Distribution / packaging
 .Python
 build/
+couler/proto/
 develop-eggs/
 dist/
 downloads/

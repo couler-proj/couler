@@ -31,6 +31,7 @@ jobs:
         pre-commit run --all
     - name: Unit tests
       run: |
+        python setup.py proto
         python setup.py install
         python -m pytest
     - uses: opsgang/ga-setup-minikube@v0.1.1

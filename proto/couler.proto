@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package couler.v1;
+
+message Parameter {
+  string name = 1;
+  string value = 2;
+}
+
+message Artifact {
+  string name = 1;
+  string type = 2;  // HTTP/GIT/...
+  string value = 3;
+}
+
+message StdOut {
+  string name = 1;
+}
+
+message StepIO {
+  string name = 1;
+  int32 source = 2;
+  oneof step_io {
+    Parameter parameter = 3;
+    Artifact  artifact = 4;
+    StdOut stdout = 5;
+  }
+}
+
+message Step {
+  int32 id = 1;
+  string name = 2;      // name for reference
+  string tmpl_name = 3; // name for generate template
+  string image = 4;
+  repeated string command = 5;
+  string script = 6;
+  repeated StepIO inputs = 7;
+  repeated StepIO outputs = 8;
+  repeated int32  dependencies = 9;
+}
+
+message Workflow {
+  repeated Step steps = 1;
+  int32 parallelism = 2;
+  string secret = 3;
+}
+
