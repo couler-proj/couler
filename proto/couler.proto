@@ -27,12 +27,23 @@ message StepIO {
   }
 }
 
+message ContainerSpec {
+    string image = 1;
+    repeated string command = 2;
+}
+
+message ResourceSpec {
+    string manifest = 1;
+    string success_condition = 2;
+    string failure_condition = 3;
+}
+
 message Step {
   int32 id = 1;
   string name = 2;      // name for reference
-  string tmpl_name = 3; // name for generate template
-  string image = 4;
-  repeated string command = 5;
+  string tmpl_name = 3; // name for generating template
+  ContainerSpec container_spec = 4;
+  ResourceSpec resource_spec = 5;
   string script = 6;
   repeated StepIO inputs = 7;
   repeated StepIO outputs = 8;
@@ -44,4 +55,3 @@ message Workflow {
   int32 parallelism = 2;
   string secret = 3;
 }
-
