@@ -1,7 +1,6 @@
-import unittest
-
 import couler.argo as couler
 import couler.steps.katib as katib
+from couler.tests.argo_test import ArgoBaseTestCase
 
 xgb_cmd = """ \
 python /opt/katib/train_xgboost.py \
@@ -36,7 +35,7 @@ xgboost_mainifest_template = """
 )
 
 
-class KatibTest(unittest.TestCase):
+class KatibTest(ArgoBaseTestCase):
     def test_katib_with_xgboost_training(self):
         katib.run(
             tuning_params=[

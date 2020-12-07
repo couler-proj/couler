@@ -1,41 +1,17 @@
 import json
 import os
 import re
-import unittest
 
 import pyaml
 import yaml
 
 import couler.argo as couler
-from couler.core import states
+from couler.tests.argo_test import ArgoBaseTestCase
 
 _test_data_dir = "test_data"
 
 
-class ArgoYamlTest(unittest.TestCase):
-    def setUp(self):
-        self.state_keys = dir(states)
-        self.tc_dump = {}
-        for key in self.state_keys:
-            if key.startswith("__"):
-                continue
-            if key.startswith("_"):
-                value = getattr(states, key)
-                self.tc_dump[key] = value
-
-        couler._cleanup()
-
-    def tearDown(self):
-        couler._cleanup()
-        for key in self.state_keys:
-            if key.startswith("__"):
-                continue
-            if key.startswith("_"):
-                value = getattr(states, key)
-                self.assertEqual(
-                    value, self.tc_dump[key], msg="state not cleanup:%s" % key
-                )
-
+class ArgoYamlTest(ArgoBaseTestCase):
     @staticmethod
     def mock_dict(x, mock_str="pytest"):
         # The following fields are overwritten so we won't be
