@@ -55,7 +55,10 @@ def step_repr(
     else:
         raise ValueError("command must be str or list")
     if source is not None:
-        pb_step.script = utils.body(source)
+        if isinstance(source, str):
+            pb_step.script = source
+        else:
+            pb_step.script = utils.body(source)
 
     if script_output is not None:
         o = couler_pb2.StepIO()
