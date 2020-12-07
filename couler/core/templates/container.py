@@ -43,6 +43,7 @@ class Container(Template):
         volume_mounts=None,
         working_dir=None,
         node_selector=None,
+        volumes=None,
     ):
         Template.__init__(
             self,
@@ -65,6 +66,7 @@ class Container(Template):
         self.volume_mounts = volume_mounts
         self.working_dir = working_dir
         self.node_selector = node_selector
+        self.volumes = volumes
 
     def to_dict(self):
         template = Template.to_dict(self)
@@ -136,6 +138,15 @@ class Container(Template):
                 template["outputs"] = {"artifacts": _output_list}
             else:
                 template["outputs"] = {"parameters": _output_list}
+
+        # Volume
+        if self.volume_mounts is not None:
+            if self.volumes is None:
+                template["volumes"] = []
+            for volume_mount in self.volume_mounts:
+                template["volumes"].append(
+                    {"name": volume_mount.name, "emptyDir": {}}
+                )
 
         return template
 

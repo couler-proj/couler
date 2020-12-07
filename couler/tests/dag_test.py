@@ -132,8 +132,8 @@ class DAGTest(ArgoYamlTest):
 
     def test_set_dependencies_with_passing_parameter_artifact_implicitly(self):
         def producer_two(step_name):
-            output_one = couler.create_parameter_artifact(path="/tmp/t1.txt")
-            output_two = couler.create_parameter_artifact(path="/tmp/t2.txt")
+            output_one = couler.create_parameter_artifact(path="/mnt/t1.txt")
+            output_two = couler.create_parameter_artifact(path="/mnt/t2.txt")
             c1 = "echo -n A > %s" % output_one.path
             c2 = "echo -n B > %s" % output_two.path
             command = "%s && %s" % (c1, c2)

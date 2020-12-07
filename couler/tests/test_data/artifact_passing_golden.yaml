@@ -13,7 +13,7 @@ spec:
             arguments:
               parameters:
                 - name: para-A-0
-                  value: 'echo -n hello world > /tmp/t1.txt'
+                  value: 'echo -n hello world > /mnt/t1.txt'
           - name: B
             dependencies:
               - A
@@ -36,10 +36,13 @@ spec:
           - -c
         args:
           - "{{inputs.parameters.para-A-0}}"
+        volumeMounts:
+          - name: couler-out-dir-0
+            mountPath: /mnt
       outputs:
         artifacts:
           - name: output-oss-1c392c25
-            path: /tmp/t1.txt
+            path: /mnt/t1.txt
             oss:
               endpoint: xyz.com
               bucket: test-bucket/
@@ -50,13 +53,16 @@ spec:
               secretKeySecret:
                 key: secretKey
                 name: couler-fd7fe83868ddaf22ddda8bca5f3d83d1
+      volumes:
+        - emptyDir: {}
+          name: couler-out-dir-0
     - name: B
       inputs:
         parameters:
           - name: para-B-0
         artifacts:
           - name: output-oss-1c392c25
-            path: /tmp/t1.txt
+            path: /mnt/t1.txt
             oss:
               endpoint: xyz.com
               bucket: test-bucket/
@@ -70,7 +76,7 @@ spec:
       container:
         image: docker/whalesay:latest
         command:
-          - 'cat /tmp/t1.txt'
+          - 'cat /mnt/t1.txt'
         args:
           - "{{inputs.parameters.para-B-0}}"
           - "{{inputs.artifacts.output-oss-1c392c25}}"
