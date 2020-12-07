@@ -23,6 +23,8 @@ from couler.core.constants import ImagePullPolicy
 from couler.core.templates import Output
 from couler.core.templates.output import parse_argo_output
 
+STEP_ID = 0
+
 
 def argo_safe_name(name):
     """Some names are to be used in the Argo YAML file. For example,
@@ -274,3 +276,8 @@ def bool_to_str(bool_val):
     if not isinstance(bool_val, bool):
         raise TypeError("The bool_val is required to be boolean type")
     return "true" if bool_val else "false"
+
+
+def get_uniq_step_id():
+    global STEP_ID
+    return STEP_ID
