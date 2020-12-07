@@ -1,12 +1,12 @@
 import copy
-import unittest
 
 import couler.argo as couler
+from couler.tests.argo_test import ArgoBaseTestCase
 
 
-class EnvUnitTest(unittest.TestCase):
+class EnvUnitTest(ArgoBaseTestCase):
     def setUp(self):
-        couler._cleanup()
+        super().setUp()
         self.envs = {"str_env": "abc", "bool_env": False, "num_env": 1234}
 
     def run_a_container(self):

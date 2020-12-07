@@ -1,10 +1,10 @@
 import base64
-import unittest
 
 from couler.core import utils
+from couler.tests.argo_test import ArgoBaseTestCase
 
 
-class PyfuncTest(unittest.TestCase):
+class PyfuncTest(ArgoBaseTestCase):
     def test_argo_safe_name(self):
         self.assertIsNone(utils.argo_safe_name(None))
         self.assertEqual(utils.argo_safe_name("a_b"), "a-b")

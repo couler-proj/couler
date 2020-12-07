@@ -1,23 +1,17 @@
 import json
 import os
 import re
-import unittest
 
 import pyaml
 import yaml
 
 import couler.argo as couler
+from couler.tests.argo_test import ArgoBaseTestCase
 
 _test_data_dir = "test_data"
 
 
-class ArgoYamlTest(unittest.TestCase):
-    def setUp(self):
-        couler._cleanup()
-
-    def tearDown(self):
-        couler._cleanup()
-
+class ArgoYamlTest(ArgoBaseTestCase):
     @staticmethod
     def mock_dict(x, mock_str="pytest"):
         # The following fields are overwritten so we won't be

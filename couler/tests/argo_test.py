@@ -4,13 +4,43 @@ from collections import OrderedDict
 import yaml
 
 import couler.argo as couler
+from couler.core import states
 from couler.core.templates.volume import Volume, VolumeMount
 from couler.core.templates.volume_claim import VolumeClaimTemplate
 
 
-class ArgoTest(unittest.TestCase):
+class ArgoBaseTestCase(unittest.TestCase):
+    def setUp(self):
+        self.state_keys = dir(states)
+        self.tc_dump = {}
+        for key in self.state_keys:
+            if key.startswith("__"):
+                continue
+            if key.startswith("_"):
+                value = getattr(states, key)
+                if callable(value):
+                    continue
+                self.tc_dump[key] = value
+        couler._cleanup()
+
+    def tearDown(self):
+        couler._cleanup()
+        for key in self.state_keys:
+            if key.startswith("__"):
+                continue
+            if key.startswith("_"):
+                value = getattr(states, key)
+                if callable(value):
+                    continue
+                self.assertEqual(
+                    value, self.tc_dump[key], msg="state not cleanup:%s" % key
+                )
+
+
+class ArgoTest(ArgoBaseTestCase):
     def setUp(self):
         couler._cleanup()
+        super().setUp()
 
     def test_run_none_source(self):
         with self.assertRaises(ValueError):
@@ -44,7 +74,7 @@ class ArgoTest(unittest.TestCase):
             template["script"],
             image="image1",
             command=["python"],
-            source="\ncouler._cleanup()\n",
+            source="\ncouler._cleanup()\nsuper().setUp()\n",
             env=None,
         )
 
@@ -61,7 +91,7 @@ class ArgoTest(unittest.TestCase):
             template["script"],
             image="image1",
             command=["python"],
-            source="\ncouler._cleanup()\n",
+            source="\ncouler._cleanup()\nsuper().setUp()\n",
             env=None,
         )
 
@@ -181,7 +211,6 @@ class ArgoTest(unittest.TestCase):
         self.assertEqual(
             template["inputs"]["parameters"], [{"name": "para-B-0"}]
         )
-        couler._cleanup()
 
     def test_set_dependencies_with_exit_handler(self):
         def producer():
@@ -236,7 +265,6 @@ class ArgoTest(unittest.TestCase):
             wf["spec"]["templates"][4],
             OrderedDict([("name", "failure-exit"), expected_container_spec]),
         )
-        couler._cleanup()
 
     def test_create_job(self):
         success_condition = "status.succeeded > 0"
@@ -353,7 +381,6 @@ class ArgoTest(unittest.TestCase):
         self.assertTrue(
             "{{tasks.A.outputs.parameters.output-id-" in envs["value"]
         )
-        couler._cleanup()
 
     def test_run_job_with_dependency_implicit_params_passing_from_job(self):
         success_condition = "status.succeeded > 0"
@@ -440,7 +467,6 @@ class ArgoTest(unittest.TestCase):
             [{"name": "para-B-0"}, {"name": "para-B-1"}, {"name": "para-B-2"}],
             template["inputs"]["parameters"],
         )
-        couler._cleanup()
 
     def _verify_script_body(
         self, script_to_check, image, command, source, env

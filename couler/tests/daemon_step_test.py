@@ -1,10 +1,12 @@
-import unittest
-
 import couler.argo as couler
+from couler.tests.argo_test import ArgoBaseTestCase
 
 
-class DaemonStepTest(unittest.TestCase):
+class DaemonStepTest(ArgoBaseTestCase):
     def setUp(self) -> None:
+        couler._cleanup()
+
+    def tearDown(self):
         couler._cleanup()
 
     def test_run_daemon_container(self):
