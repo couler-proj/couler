@@ -52,3 +52,17 @@ jobs:
         kubectl apply -n argo -f manifests/mpi-operator.yaml
 
         scripts/integration_tests.sh
+  go-unittest:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.14.1' # The Go version to download (if necessary) and use.
+    - name: Go Unit Tests
+      run: |
+        bash ./scripts/install-ci.sh
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        go generate ./...
+        go test ./... -v
