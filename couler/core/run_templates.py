@@ -81,7 +81,12 @@ def run_script(
 
     # TODO(typhoonzero): return pb_step when using a couler server.
     pb_step = proto_repr.step_repr(  # noqa: F841
-        step_name, func_name, image, command, source, rets
+        step_name=step_name,
+        tmpl_name=func_name,
+        image=image,
+        command=command,
+        source=source,
+        script_output=rets,
     )
 
     return rets
@@ -203,12 +208,12 @@ def run_container(
     states._steps_outputs[step_name] = rets
 
     pb_step = proto_repr.step_repr(  # noqa: F841
-        step_name,
-        func_name,
-        image,
-        command,
-        None,
-        None,
+        step_name=step_name,
+        tmpl_name=func_name,
+        image=image,
+        command=command,
+        source=None,
+        script_output=None,
         input=_input,
         output=_output,
     )

@@ -15,6 +15,7 @@ from couler.core import utils
 from couler.proto import couler_pb2
 
 DEFAULT_WORKFLOW = None
+STEP_ID = 0
 
 
 def get_default_proto_workflow():
@@ -27,22 +28,33 @@ def get_default_proto_workflow():
 
 def cleanup_proto_workflow():
     global DEFAULT_WORKFLOW
+    global STEP_ID
     DEFAULT_WORKFLOW = None
+    STEP_ID = 0
+
+
+def get_uniq_step_id():
+    global STEP_ID
+    STEP_ID += 1
+    return STEP_ID
 
 
 def step_repr(
-    step_name,
-    tmpl_name,
-    image,
-    command,
-    source,
-    script_output,
+    step_name=None,
+    tmpl_name=None,
+    image=None,
+    command=None,
+    source=None,
+    script_output=None,
     input=None,
     output=None,
 ):
+    assert step_name is not None
+    assert tmpl_name is not None
+    assert image is not None
     # generate protobuf step representation
     pb_step = couler_pb2.Step()
-    pb_step.id = utils.get_uniq_step_id()
+    pb_step.id = get_uniq_step_id()
     pb_step.name = step_name
     pb_step.tmpl_name = tmpl_name
     pb_step.image = image
