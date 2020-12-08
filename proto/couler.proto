@@ -58,3 +58,41 @@ message Workflow {
   int32 parallelism = 2;
   string secret = 3;
 }
+
+
+
+message Response {
+  // SUCCESS or not
+  ResponseStatus status = 1;
+  // Represent detailed error message if fails.
+  string error = 2;
+}
+
+enum ResponseStatus {
+  SUCCESS = 0;
+  ERROR = 1;
+  NOT_FOUND = 2;
+}
+
+// Request represents a gRPC request which includes
+// workflow description and the correlative configuration to
+// operate the workflow, e.g. cluster, namespace and workflow name.
+message Request {
+  Workflow workflow = 1;
+  string cluster = 2;
+  string namespace = 3;
+  string name = 4;
+}
+
+service WorkflowService {
+  // Submit a workflow
+  rpc Submit(Request) returns (Response) {};
+  // Pause a workflow
+  rpc Pause(Request) returns (Response) {};
+  // Resume a workflow
+  rpc Resume(Request) returns (Response) {};
+  // Stop a workflow
+  rpc Stop(Request) returns (Response) {};
+  // Delete a workflow
+  rpc Delete(Request) returns (Response) {};
+}

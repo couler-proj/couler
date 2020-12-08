@@ -52,3 +52,14 @@ jobs:
         kubectl apply -n argo -f manifests/mpi-operator.yaml
 
         scripts/integration_tests.sh
+  go-test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: unittest 
+      user: actions/setup-go@v2
+        with:
+          go-version: '^1.13.1' # The Go version to download (if necessary) and use.
+      run: |
+        go get github.com/golang/protobuf/protoc-gen-go@v1.3.2
+        go generate ./...
+        go test ./... -v
