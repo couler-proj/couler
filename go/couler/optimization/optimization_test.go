@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/alecthomas/assert"
-	opt "github.com/couler-proj/couler/go/couler/optimizer"
+	opt "github.com/couler-proj/couler/go/couler/optimization"
 	pb "github.com/couler-proj/couler/go/couler/proto/couler_v1"
 )
 
