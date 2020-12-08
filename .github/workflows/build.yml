@@ -63,6 +63,7 @@ jobs:
     - name: Go Unit Tests
       run: |
         bash ./scripts/install-ci.sh
-        echo "$HOME/.local/bin;$HOME/go/bin" >> $GITHUB_PATH
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        echo "$HOME/go/bin" >> $GITHUB_PATH
         go generate ./...
         go test ./... -v
