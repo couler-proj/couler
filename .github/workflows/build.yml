@@ -24,9 +24,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
+        set -e
+        sudo apt-get update && sudo apt-get install -y protobuf-compiler
         python -m pip install --upgrade pip
         python -m pip install -r requirements.txt -r requirements-dev.txt
-        sudo apt-get update && sudo apt-get install -y protobuf-compiler
     - name: Sanity checks
       run: |
         pre-commit run --all
