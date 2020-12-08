@@ -60,10 +60,11 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: '1.14.1' # The Go version to download (if necessary) and use.
-    - name: Go Unit Tests
+    - name: Install Dependencies
       run: |
         bash ./scripts/install-ci.sh
         echo "$HOME/.local/bin" >> $GITHUB_PATH
         echo "$HOME/go/bin" >> $GITHUB_PATH
+    - name: Run Go unit tests 
         go generate ./...
         go test ./... -v
