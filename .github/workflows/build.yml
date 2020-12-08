@@ -55,8 +55,8 @@ jobs:
   go-test:
     runs-on: ubuntu-latest
     steps:
-    - name: unittest 
-      user: actions/setup-go@v2
+    - uses: actions/checkout@v2
+    - user: actions/setup-go@v2
         with:
           go-version: '^1.13.1' # The Go version to download (if necessary) and use.
       run: |
