@@ -66,5 +66,6 @@ jobs:
         echo "$HOME/.local/bin" >> $GITHUB_PATH
         echo "$HOME/go/bin" >> $GITHUB_PATH
     - name: Run Go unit tests 
+      run: |
         go generate ./...
         go test ./... -v
