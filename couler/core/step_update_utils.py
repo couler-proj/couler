@@ -108,6 +108,8 @@ def _update_dag_tasks(
     t_name = function_name if template_name is None else template_name
     step = Step(name=function_id, template=t_name)
     if states._exit_handler_enable:
+        if states._when_prefix is not None:
+            step.when = states._when_prefix
         if function_id in states.workflow.exit_handler_step:
             states.workflow.exit_handler_step.get(function_id).append(
                 step.to_dict()
