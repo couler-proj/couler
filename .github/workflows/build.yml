@@ -38,6 +38,7 @@ jobs:
       run: |
         python setup.py proto
         ls couler/proto
+        cat couler/proto/couler_pb2.py
         python setup.py install
         python -m pytest
     - uses: opsgang/ga-setup-minikube@v0.1.1

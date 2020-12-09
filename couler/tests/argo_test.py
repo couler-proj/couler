@@ -449,3 +449,7 @@ class ArgoTest(unittest.TestCase):
         self.assertEqual(script_to_check.get("command", None), command)
         self.assertEqual(script_to_check.get("source", None), source)
         self.assertEqual(script_to_check.get("env", None), env)
+
+
+if __name__ == "__main__":
+    unittest.main()
