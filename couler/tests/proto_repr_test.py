@@ -19,7 +19,7 @@ class ProtoReprTest(unittest.TestCase):
     def test_output_oss_artifact(self):
         # the content of local file would be uploaded to OSS
         output_artifact = couler.create_oss_artifact(
-            path="/tmp/t1.txt",
+            path="/home/t1.txt",
             bucket="test-bucket/",
             accesskey_id="abcde",
             accesskey_secret="abc12345",
@@ -34,7 +34,7 @@ class ProtoReprTest(unittest.TestCase):
         )
         proto_wf = get_default_proto_workflow()
         s = proto_wf.steps[0]
-        self.assertEqual(s.image, "docker/whalesay:latest")
+        self.assertEqual(s.container_spec.image, "docker/whalesay:latest")
         self.assertTrue(s.outputs[0].artifact.name.startswith("output-oss"))
 
         couler._cleanup()
