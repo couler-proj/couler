@@ -12,7 +12,7 @@ func TestArgoWorkflowConversion(t *testing.T) {
 	w.Steps = []*pb.Step{&pb.Step{Name: "node1"}}
 
 	assert.Equal(t, len(w.Steps), 2)
-	out, err := ConvertToArgoWorkflowYAML(w)
+	out, err := convertToArgoWorkflowYAML(w)
 	assert.NoError(t, err)
 	assert.Equal(t, w.String(), out)
 }
