@@ -68,4 +68,5 @@ jobs:
     - name: Run Go unit tests 
       run: |
         go generate ./...
+        pre-commit run -a --show-diff-on-failure
         go test ./... -v

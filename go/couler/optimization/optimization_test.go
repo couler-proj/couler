@@ -5,7 +5,7 @@ import (
 
 	"github.com/alecthomas/assert"
 	opt "github.com/couler-proj/couler/go/couler/optimization"
-	pb "github.com/couler-proj/couler/go/couler/proto/couler_v1"
+	pb "github.com/couler-proj/couler/go/couler/proto/couler/v1"
 )
 
 type EndNodePass struct{}

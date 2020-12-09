@@ -3,7 +3,7 @@ package server
 import (
 	"fmt"
 
-	pb "github.com/couler-proj/couler/go/couler/proto/couler_v1"
+	pb "github.com/couler-proj/couler/go/couler/proto/couler/v1"
 )
 
 // Pass is the interface of the optimization pass
@@ -18,10 +18,11 @@ type ComposedPass struct {
 
 // Run all optimization passes
 func (c *ComposedPass) Run(w *pb.Workflow) (*pb.Workflow, error) {
+	var err error
 	for i, pass := range c.passes {
-		w, e := pass.Run(w)
-		if e != nil {
-			return w, fmt.Errorf("optimization failed on %d-th pass", i)
+		w, err = pass.Run(w)
+		if err != nil {
+			return nil, fmt.Errorf("optimization failed on %d-th pass", i)
 		}
 	}
 	return w, nil
