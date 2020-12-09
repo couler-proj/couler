@@ -22,18 +22,29 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.15.0' # The Go version to download (if necessary) and use.
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install -r requirements.txt -r requirements-dev.txt
+        bash ./scripts/install-ci.sh
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        echo "$HOME/go/bin" >> $GITHUB_PATH
     - name: Sanity checks
       run: |
-        pre-commit run --all
+        pre-commit run -a --show-diff-on-failure
     - name: Unit tests
       run: |
         python setup.py proto
         python setup.py install
         python -m pytest
+    - name: Go Unit tests
+      run: |
+        go generate ./...
+        go test ./... -v
     - uses: opsgang/ga-setup-minikube@v0.1.1
       with:
           minikube-version: 1.11.0
@@ -52,21 +63,3 @@ jobs:
         kubectl apply -n argo -f manifests/mpi-operator.yaml
 
         scripts/integration_tests.sh
-  go-unittest:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: '1.14.1' # The Go version to download (if necessary) and use.
-    - name: Install Dependencies
-      run: |
-        bash ./scripts/install-ci.sh
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-        echo "$HOME/go/bin" >> $GITHUB_PATH
-    - name: Run Go unit tests 
-      run: |
-        go generate ./...
-        pre-commit run -a --show-diff-on-failure
-        go test ./... -v
