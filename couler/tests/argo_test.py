@@ -278,6 +278,32 @@ class ArgoTest(ArgoBaseTestCase):
             wf["spec"]["templates"][4],
             OrderedDict([("name", "failure-exit"), expected_container_spec]),
         )
+        self.assertEqual(
+            wf["spec"]["templates"][5],
+            {
+                "name": "exit-handler",
+                "steps": [
+                    [
+                        OrderedDict(
+                            [
+                                ("name", "success-exit"),
+                                ("template", "success-exit"),
+                                ("when", "{{workflow.status}} == Succeeded"),
+                            ]
+                        )
+                    ],
+                    [
+                        OrderedDict(
+                            [
+                                ("name", "failure-exit"),
+                                ("template", "failure-exit"),
+                                ("when", "{{workflow.status}} == Failed"),
+                            ]
+                        )
+                    ],
+                ],
+            },
+        )
 
     def test_create_job(self):
         success_condition = "status.succeeded > 0"
@@ -488,3 +514,7 @@ class ArgoTest(ArgoBaseTestCase):
         self.assertEqual(script_to_check.get("command", None), command)
         self.assertEqual(script_to_check.get("source", None), source)
         self.assertEqual(script_to_check.get("env", None), env)
+
+
+if __name__ == "__main__":
+    unittest.main()

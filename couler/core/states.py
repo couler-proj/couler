@@ -14,6 +14,7 @@
 from collections import OrderedDict
 
 from couler.core import utils
+from couler.core.proto_repr import cleanup_proto_workflow
 from couler.core.templates import Workflow
 
 _sub_steps = None
@@ -84,3 +85,4 @@ def _cleanup():
     _concurrent_func_line = -1
     _steps_outputs = OrderedDict()
     workflow.cleanup()
+    cleanup_proto_workflow()
