@@ -4,7 +4,7 @@ import couler.argo as couler
 from couler.core.proto_repr import get_default_proto_workflow
 
 
-class ArtifactTest(unittest.TestCase):
+class ProtoReprTest(unittest.TestCase):
     def test_script_step(self):
         def echo():
             print("echo")
