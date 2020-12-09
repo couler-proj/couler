@@ -11,20 +11,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import docker
 import logging
+
+import docker
 
 
 class DockerSubmitter(object):
-
-    def submit(self, workflow_yaml, secrets=None):
-        logging.info(type(workflow_yaml))
-
     @staticmethod
     def run_docker_container(image, command):
         client = docker.from_env()
-        command = ["bash", "-c", "echo start && sleep 20 && echo finish"]
-        container = client.containers.run("ubuntu:latest", command, detach=True)
+        container = client.containers.run(image, command, detach=True)
+        # Streaming the logs
         for line in container.logs(stream=True):
-            print(line.strip())
-        print("finished")
+            logging.info(line.strip())
