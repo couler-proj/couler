@@ -23,7 +23,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Protoc
-        uses: arduino/setup-protoc@v1
+      uses: arduino/setup-protoc@v1
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
