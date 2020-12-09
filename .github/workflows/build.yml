@@ -22,12 +22,11 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install Protoc
-      uses: arduino/setup-protoc@v1
-      with:
-        version: '3.7.1'
     - name: Install dependencies
       run: |
+        set -e
+        sudo apt-get update && sudo apt-get install -y protobuf-compiler
+        protoc --version
         python -m pip install --upgrade pip
         python -m pip install -r requirements.txt -r requirements-dev.txt
     - name: Sanity checks
