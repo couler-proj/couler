@@ -37,6 +37,8 @@ jobs:
     - name: Unit tests
       run: |
         python setup.py proto
+        ls couler
+        ls couler/proto
         python setup.py install
         python -m pytest
     - uses: opsgang/ga-setup-minikube@v0.1.1
