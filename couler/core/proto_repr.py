@@ -57,13 +57,13 @@ def step_repr(
     pb_step.id = get_uniq_step_id()
     pb_step.name = step_name
     pb_step.tmpl_name = tmpl_name
-    pb_step.image = image
+    pb_step.container_spec.image = image
     if command is None:
-        pb_step.command.append("python")
+        pb_step.container_spec.command.append("python")
     elif isinstance(command, list):
-        pb_step.command.extend(command)
+        pb_step.container_spec.command.extend(command)
     elif isinstance(command, str):
-        pb_step.command.append(command)
+        pb_step.container_spec.command.append(command)
     else:
         raise ValueError("command must be str or list")
     if source is not None:

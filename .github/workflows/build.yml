@@ -22,13 +22,10 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Install Protoc
+        uses: arduino/setup-protoc@v1
     - name: Install dependencies
       run: |
-        curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0/protoc-3.13.0-linux-x86_64.zip
-        sudo unzip protoc-3.13.0-linux-x86_64.zip -d /usr/local
-        sudo chmod +rx /usr/local/bin/protoc
-        sudo chown -R runner:runner /usr/local/include/google
-        protoc --version
         python -m pip install --upgrade pip
         python -m pip install -r requirements.txt -r requirements-dev.txt
     - name: Sanity checks
@@ -37,8 +34,6 @@ jobs:
     - name: Unit tests
       run: |
         python setup.py proto
-        ls couler/proto
-        cat couler/proto/couler_pb2.py
         python setup.py install
         python -m pytest
     - uses: opsgang/ga-setup-minikube@v0.1.1
