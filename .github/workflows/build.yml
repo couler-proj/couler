@@ -34,7 +34,7 @@ jobs:
         #echo "$HOME/.local/bin" >> $GITHUB_PATH
         #echo "$HOME/go/bin" >> $GITHUB_PATH
     - name: Install protoc
-      users: arduino/setup-protoc@v1
+      uses: arduino/setup-protoc@v1
       with:
           version: '3.14.0'
     - name: Sanity checks
