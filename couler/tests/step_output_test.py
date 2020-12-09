@@ -6,7 +6,7 @@ couler.config_workflow(name="pytest")
 
 def producer():
     output_place = couler.create_parameter_artifact(
-        path="/tmp/hello_world.txt"
+        path="/mnt/hello_world.txt"
     )
     return couler.run_container(
         image="docker/whalesay:latest",
@@ -31,10 +31,10 @@ class StepOutputTest(ArgoYamlTest):
     def test_multiple_outputs(self):
         def producer_two():
             output_one = couler.create_parameter_artifact(
-                path="/tmp/place_one.txt"
+                path="/mnt/place_one.txt"
             )
             output_two = couler.create_parameter_artifact(
-                path="/tmp/place_two.txt"
+                path="/mnt/place_two.txt"
             )
             c1 = "echo -n output one > %s" % output_one.path
             c2 = "echo -n output tw0 > %s" % output_two.path

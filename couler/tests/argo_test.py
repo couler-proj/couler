@@ -4,13 +4,43 @@ from collections import OrderedDict
 import yaml
 
 import couler.argo as couler
+from couler.core import states
 from couler.core.templates.volume import Volume, VolumeMount
 from couler.core.templates.volume_claim import VolumeClaimTemplate
 
 
-class ArgoTest(unittest.TestCase):
+class ArgoBaseTestCase(unittest.TestCase):
+    def setUp(self):
+        self.state_keys = dir(states)
+        self.tc_dump = {}
+        for key in self.state_keys:
+            if key.startswith("__"):
+                continue
+            if key.startswith("_"):
+                value = getattr(states, key)
+                if callable(value):
+                    continue
+                self.tc_dump[key] = value
+        couler._cleanup()
+
+    def tearDown(self):
+        couler._cleanup()
+        for key in self.state_keys:
+            if key.startswith("__"):
+                continue
+            if key.startswith("_"):
+                value = getattr(states, key)
+                if callable(value):
+                    continue
+                self.assertEqual(
+                    value, self.tc_dump[key], msg="state not cleanup:%s" % key
+                )
+
+
+class ArgoTest(ArgoBaseTestCase):
     def setUp(self):
         couler._cleanup()
+        super().setUp()
 
     def test_run_none_source(self):
         with self.assertRaises(ValueError):
@@ -44,7 +74,7 @@ class ArgoTest(unittest.TestCase):
             template["script"],
             image="image1",
             command=["python"],
-            source="\ncouler._cleanup()\n",
+            source="\ncouler._cleanup()\nsuper().setUp()\n",
             env=None,
         )
 
@@ -61,7 +91,7 @@ class ArgoTest(unittest.TestCase):
             template["script"],
             image="image1",
             command=["python"],
-            source="\ncouler._cleanup()\n",
+            source="\ncouler._cleanup()\nsuper().setUp()\n",
             env=None,
         )
 
@@ -126,7 +156,7 @@ class ArgoTest(unittest.TestCase):
         couler._cleanup()
 
     def test_run_container_with_dependency_implicit_params_passing(self):
-        output_path = "/tmp/hello_world.txt"
+        output_path = "/mnt/hello_world.txt"
 
         def producer(step_name):
             output_place = couler.create_parameter_artifact(
@@ -176,12 +206,24 @@ class ArgoTest(unittest.TestCase):
         self.assertTrue(
             '"{{workflow.outputs.parameters.output-id-' in params["value"]
         )
+        # Check automatically created emptyDir volume and volume mount
+        self.assertEqual(
+            template["volumes"], [{"emptyDir": {}, "name": "couler-out-dir-0"}]
+        )
+        self.assertEqual(
+            template["container"]["volumeMounts"],
+            [
+                OrderedDict(
+                    [("name", "couler-out-dir-0"), ("mountPath", "/mnt")]
+                )
+            ],
+        )
+
         # Check input parameters for step B
         template = wf["spec"]["templates"][2]
         self.assertEqual(
             template["inputs"]["parameters"], [{"name": "para-B-0"}]
         )
-        couler._cleanup()
 
     def test_set_dependencies_with_exit_handler(self):
         def producer():
@@ -236,7 +278,32 @@ class ArgoTest(unittest.TestCase):
             wf["spec"]["templates"][4],
             OrderedDict([("name", "failure-exit"), expected_container_spec]),
         )
-        couler._cleanup()
+        self.assertEqual(
+            wf["spec"]["templates"][5],
+            {
+                "name": "exit-handler",
+                "steps": [
+                    [
+                        OrderedDict(
+                            [
+                                ("name", "success-exit"),
+                                ("template", "success-exit"),
+                                ("when", "{{workflow.status}} == Succeeded"),
+                            ]
+                        )
+                    ],
+                    [
+                        OrderedDict(
+                            [
+                                ("name", "failure-exit"),
+                                ("template", "failure-exit"),
+                                ("when", "{{workflow.status}} == Failed"),
+                            ]
+                        )
+                    ],
+                ],
+            },
+        )
 
     def test_create_job(self):
         success_condition = "status.succeeded > 0"
@@ -303,7 +370,7 @@ class ArgoTest(unittest.TestCase):
                         command: ["python random_num.py"]
                 """
 
-        output_path = "/tmp/hello_world.txt"
+        output_path = "/mnt/hello_world.txt"
 
         def producer(step_name):
             output_place = couler.create_parameter_artifact(path=output_path)
@@ -353,7 +420,6 @@ class ArgoTest(unittest.TestCase):
         self.assertTrue(
             "{{tasks.A.outputs.parameters.output-id-" in envs["value"]
         )
-        couler._cleanup()
 
     def test_run_job_with_dependency_implicit_params_passing_from_job(self):
         success_condition = "status.succeeded > 0"
@@ -440,7 +506,6 @@ class ArgoTest(unittest.TestCase):
             [{"name": "para-B-0"}, {"name": "para-B-1"}, {"name": "para-B-2"}],
             template["inputs"]["parameters"],
         )
-        couler._cleanup()
 
     def _verify_script_body(
         self, script_to_check, image, command, source, env

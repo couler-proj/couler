@@ -11,6 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 import pyaml
 import yaml
 
@@ -28,6 +30,7 @@ from couler.core.templates.output import (
     _job_output,
     _script_output,
 )
+from couler.core.templates.volume import VolumeMount
 
 
 def run_script(
@@ -168,6 +171,26 @@ def run_container(
             for arg in args:
                 if isinstance(arg, (OutputArtifact, OutputJob)):
                     input.append(arg)
+
+        # Automatically append emptyDir volume and volume mount to work with
+        # Argo k8sapi executor.
+        # More info: https://argoproj.github.io/argo/empty-dir/
+        if output is not None:
+            if not isinstance(output, list):
+                output = [output]
+            if volume_mounts is None:
+                volume_mounts = []
+            mounted_path = []
+            for i, out in enumerate(output):
+                if "/tmp" in out.path:
+                    raise ValueError("Mounting to /tmp is not supported")
+                path_to_mount = os.path.dirname(out.path)
+                # Avoid duplicate mount paths
+                if path_to_mount not in mounted_path:
+                    volume_mounts.append(
+                        VolumeMount("couler-out-dir-%s" % i, path_to_mount)
+                    )
+                    mounted_path.append(path_to_mount)
 
         # Generate container and template
         template = Container(

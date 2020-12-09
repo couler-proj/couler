@@ -79,7 +79,7 @@ class ConcurrentTest(ArgoYamlTest):
     def test_concurrent_with_output(self):
         def job_one():
             output_place = couler.create_parameter_artifact(
-                path="/tmp/job_one.txt"
+                path="/mnt/job_one.txt"
             )
             return couler.run_container(
                 image="python:3.6",
@@ -89,7 +89,7 @@ class ConcurrentTest(ArgoYamlTest):
 
         def job_two():
             output_place = couler.create_parameter_artifact(
-                path="/tmp/job_two.txt"
+                path="/mnt/job_two.txt"
             )
             return couler.run_container(
                 image="python:3.6",

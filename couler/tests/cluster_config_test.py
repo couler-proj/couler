@@ -1,10 +1,10 @@
 import os
-import unittest
 
 import couler.argo as couler
+from couler.tests.argo_test import ArgoBaseTestCase
 
 
-class ArgoTest(unittest.TestCase):
+class ArgoClusterTest(ArgoBaseTestCase):
     def test_cluster_config(self):
 
         couler.config_workflow(

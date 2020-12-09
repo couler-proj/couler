@@ -1,3 +1,5 @@
+import pyaml
+
 import couler.argo as couler
 from couler.tests.argo_yaml_test import ArgoYamlTest
 
@@ -130,8 +132,8 @@ class DAGTest(ArgoYamlTest):
 
     def test_set_dependencies_with_passing_parameter_artifact_implicitly(self):
         def producer_two(step_name):
-            output_one = couler.create_parameter_artifact(path="/tmp/t1.txt")
-            output_two = couler.create_parameter_artifact(path="/tmp/t2.txt")
+            output_one = couler.create_parameter_artifact(path="/mnt/t1.txt")
+            output_two = couler.create_parameter_artifact(path="/mnt/t2.txt")
             c1 = "echo -n A > %s" % output_one.path
             c2 = "echo -n B > %s" % output_two.path
             command = "%s && %s" % (c1, c2)
@@ -159,6 +161,62 @@ class DAGTest(ArgoYamlTest):
         )
 
         self.check_argo_yaml("parameter_passing_golden.yaml")
+
+    def test_set_dependencies_none(self):
+        couler.set_dependencies(lambda: job_a(message="A"), dependencies=None)
+        couler.set_dependencies(lambda: job_b(message="B"), dependencies=["A"])
+        couler.set_dependencies(lambda: job_c(message="C"), dependencies=None)
+        pyaml.dump(couler.workflow_yaml())
+        wf_tree = couler.workflow_yaml()
+        tasks = wf_tree["spec"]["templates"][0]["dag"]["tasks"]
+        assert_deps = {"A": None, "B": ["A"], "C": None}
+        self.assertEqual(len(tasks), 3)
+        for task in tasks:
+            assert_dep = assert_deps[task["name"]]
+            self.assertEqual(task.get("dependencies"), assert_dep)
+
+    def test_set_depends_none(self):
+        couler.set_dependencies(lambda: job_a(message="A"), dependencies=None)
+        couler.set_dependencies(
+            lambda: job_b(message="B"), dependencies="A.Succeeded"
+        )
+        couler.set_dependencies(lambda: job_c(message="C"), dependencies=None)
+        content = pyaml.dump(couler.workflow_yaml())
+        self.assertNotIn("dependencies", content)
+        wf_tree = couler.workflow_yaml()
+        tasks = wf_tree["spec"]["templates"][0]["dag"]["tasks"]
+        assert_deps = {"A": None, "B": "A.Succeeded", "C": None}
+        self.assertEqual(len(tasks), 3)
+        for task in tasks:
+            assert_dep = assert_deps[task["name"]]
+            self.assertEqual(task.get("depends"), assert_dep)
+
+    def test_raise(self):
+        with self.assertRaises(ValueError):
+
+            def some_raise():
+                raise ValueError("test this")
+
+            couler.set_exit_handler(couler.WFStatus.Failed, some_raise)
+        couler._cleanup()
+        couler.set_dependencies(lambda: job_a(message="A"), dependencies=None)
+        content = pyaml.dump(couler.workflow_yaml())
+        self.assertNotIn("onExit", content)
+
+    def test_set_dependencies_none_with_exit_handler(self):
+        couler.set_dependencies(lambda: job_a(message="A"), dependencies=None)
+        couler.set_dependencies(lambda: job_b(message="B"), dependencies=["A"])
+
+        def job_exit():
+            return couler.run_container(
+                image="docker/whalesay:latest",
+                command=["cowsay"],
+                step_name="C",
+            )
+
+        couler.set_exit_handler(couler.WFStatus.Failed, job_exit)
+        content = pyaml.dump(couler.workflow_yaml())
+        self.assertIn("{{workflow.status}} == Failed", content)
 
     # TODO: Provide new test case without `tf.train`.
     # def test_set_dependencies_for_job(self):

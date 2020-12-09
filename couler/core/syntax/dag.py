@@ -65,7 +65,9 @@ def set_dependencies(step_function, dependencies=None):
             states._upstream_dag_task = None
         else:
             raise SyntaxError("dependencies must be a list or a string")
-
+    else:
+        states._upstream_dag_depends_logic = None
+        states._upstream_dag_task = None
     if not callable(step_function):
         raise SyntaxError("require step_function to a function")
 
