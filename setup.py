@@ -32,7 +32,7 @@ class ProtocCommand(distutils.cmd.Command):
 
     def run(self):
         os.system("mkdir -p couler/proto")
-        os.system("protoc --python_out=couler/proto proto/couler.proto")
+        os.system("protoc --python_out=couler proto/couler.proto")
         os.system("touch couler/proto/__init__.py")
         self.announce(
             "proto file generated under couler/proto.",
