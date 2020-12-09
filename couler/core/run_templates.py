@@ -16,7 +16,7 @@ import os
 import pyaml
 import yaml
 
-from couler.core import states, step_update_utils, utils
+from couler.core import proto_repr, states, step_update_utils, utils
 from couler.core.templates import (
     Container,
     Job,
@@ -81,6 +81,17 @@ def run_script(
     )
     rets = _script_output(step_name, func_name)
     states._steps_outputs[step_name] = rets
+
+    # TODO(typhoonzero): return pb_step when using a couler server.
+    pb_step = proto_repr.step_repr(  # noqa: F841
+        step_name=step_name,
+        tmpl_name=func_name,
+        image=image,
+        command=command,
+        source=source,
+        script_output=rets,
+    )
+
     return rets
 
 
@@ -212,9 +223,24 @@ def run_container(
     _output = (
         states.workflow.get_template(func_name).to_dict().get("outputs", None)
     )
+    _input = (
+        states.workflow.get_template(func_name).to_dict().get("inputs", None)
+    )
 
     rets = _container_output(step_name, func_name, _output)
     states._steps_outputs[step_name] = rets
+
+    pb_step = proto_repr.step_repr(  # noqa: F841
+        step_name=step_name,
+        tmpl_name=func_name,
+        image=image,
+        command=command,
+        source=None,
+        script_output=None,
+        input=_input,
+        output=_output,
+    )
+
     return rets
 
 
