@@ -22,3 +22,4 @@ repos:
   - id: go-fmt
   - id: go-lint 
   - id: no-go-testing
+  - id: go-mod-tidy
