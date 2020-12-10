@@ -315,7 +315,9 @@ def run_job(
         )
         states.workflow.add_template(template)
 
-    step_update_utils.update_step(func_name, args, step_name, caller_line)
+    step_name = step_update_utils.update_step(
+        func_name, args, step_name, caller_line
+    )
 
     # return job name and job uid for reference
     rets = _job_output(step_name, func_name)
