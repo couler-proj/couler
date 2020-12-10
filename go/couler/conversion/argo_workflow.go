@@ -1,87 +1,55 @@
 package conversion
 
 import (
-	"flag"
-	"fmt"
+	wfv1 "github.com/argoproj/argo/pkg/apis/workflow/v1alpha1"
 	pb "github.com/couler-proj/couler/go/couler/proto/couler/v1"
-	"os/user"
-	"path/filepath"
-
-	"github.com/argoproj/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
-	"k8s.io/client-go/tools/clientcmd"
-
-	wfv1 "github.com/argoproj/argo/pkg/apis/workflow/v1alpha1"
-	wfclientset "github.com/argoproj/argo/pkg/client/clientset/versioned"
 )
 
-var (
-	helloWorldWorkflow = wfv1.Workflow{
+func convertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Workflow, error) {
+	templates := []wfv1.Template{{}}
+	// TODO: Handle DAG tasks.
+	for _, step := range workflowPb.GetSteps() {
+		template := wfv1.Template{Name: step.TmplName}
+		// TODO: Check mutual exclusivity of different specs.
+		if step.GetContainerSpec() != nil || step.GetScript() != "" {
+			containerSpec := step.GetContainerSpec()
+			container := &corev1.Container{
+				Image:   containerSpec.GetImage(),
+				Command: containerSpec.GetCommand(),
+				// TODO: Convert type map[string]*any.Any) to type []EnvVar that's supported by Argo.
+				//Env: containerSpec.GetEnv(),
+			}
+			if script := step.GetScript(); script != "" {
+				template.Script = &wfv1.ScriptTemplate{
+					Container: *container,
+					Source:    script,
+				}
+			} else {
+				template.Container = container
+			}
+		} else if resourceSpec := step.GetResourceSpec(); resourceSpec != nil {
+			template.Resource = &wfv1.ResourceTemplate{
+				// TODO: Check whether these hard-coded fields need to be exposed.
+				SetOwnerReference: true,
+				Action:            "create",
+				Manifest:          resourceSpec.GetManifest(),
+				SuccessCondition:  resourceSpec.GetSuccessCondition(),
+				FailureCondition:  resourceSpec.GetSuccessCondition(),
+			}
+		}
+		templates = append(templates, template)
+	}
+	argoWorkflow := wfv1.Workflow{
 		ObjectMeta: metav1.ObjectMeta{
-			GenerateName: "hello-world-",
+			GenerateName: namePrefix,
 		},
 		Spec: wfv1.WorkflowSpec{
-			Entrypoint: "whalesay",
-			Templates: []wfv1.Template{
-				{
-					Name: "whalesay",
-					Container: &corev1.Container{
-						Image:   "docker/whalesay:latest",
-						Command: []string{"cowsay", "hello world"},
-					},
-				},
-			},
+			Entrypoint: workflowPb.GetSteps()[0].TmplName, // TODO: Check whether we can rely on this order.
+			Templates:  templates,
 		},
 	}
-)
-
-func convertToArgoWorkflowYAML(w *pb.Workflow) (string, error) {
-	return w.String(), nil
-}
-
-func main() {
-	// get current user to determine home directory
-	usr, err := user.Current()
-	checkErr(err)
-
-	// get kubeconfig file location
-	kubeconfig := flag.String("kubeconfig", filepath.Join(usr.HomeDir, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	flag.Parse()
-
-	// use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	checkErr(err)
-	namespace := "default"
-
-	// create the workflow client
-	wfClient := wfclientset.NewForConfigOrDie(config).ArgoprojV1alpha1().Workflows(namespace)
-
-	// submit the hello world workflow
-	createdWf, err := wfClient.Create(&helloWorldWorkflow)
-	checkErr(err)
-	fmt.Printf("Workflow %s submitted\n", createdWf.Name)
-
-	// wait for the workflow to complete
-	fieldSelector := fields.ParseSelectorOrDie(fmt.Sprintf("metadata.name=%s", createdWf.Name))
-	watchIf, err := wfClient.Watch(metav1.ListOptions{FieldSelector: fieldSelector.String()})
-	errors.CheckError(err)
-	defer watchIf.Stop()
-	for next := range watchIf.ResultChan() {
-		wf, ok := next.Object.(*wfv1.Workflow)
-		if !ok {
-			continue
-		}
-		if !wf.Status.FinishedAt.IsZero() {
-			fmt.Printf("Workflow %s %s at %v\n", wf.Name, wf.Status.Phase, wf.Status.FinishedAt)
-			break
-		}
-	}
-}
-
-func checkErr(err error) {
-	if err != nil {
-		panic(err.Error())
-	}
+	// TODO: Handle workflow schema validation and propagate any errors.
+	return argoWorkflow, nil
 }
