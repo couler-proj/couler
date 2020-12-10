@@ -1,6 +1,8 @@
 package conversion
 
 import (
+	wfv1 "github.com/argoproj/argo/pkg/apis/workflow/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	"testing"
 
 	"github.com/alecthomas/assert"
@@ -9,13 +11,61 @@ import (
 
 func TestArgoWorkflowConversion(t *testing.T) {
 	pbWf := &pb.Workflow{}
-	pbWf.Steps = []*pb.Step{{TmplName: "whalesay", ContainerSpec: &pb.ContainerSpec{
-		Image:   "docker/whalesay:latest",
-		Command: []string{"cowsay", "hello world"},
-	}}}
+	containerStep := &pb.Step{
+		TmplName: "container-test", ContainerSpec: &pb.ContainerSpec{
+			Image:   "docker/whalesay:latest",
+			Command: []string{"cowsay", "hello world"},
+		}}
+	scriptStep := &pb.Step{
+		TmplName: "script-test", Script: "print(3)", ContainerSpec: &pb.ContainerSpec{
+			Image:   "docker/whalesay:latest",
+			Command: []string{"python"},
+		}}
+	manifest := `
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          generateName: pi-job-
+        spec:
+          template:
+            metadata:
+              name: pi
+            spec:
+              containers:
+              - name: pi
+                image: perl
+                command: ["perl",  "-Mbignum=bpi", "-wle", "print bpi(2000)"]
+              restartPolicy: Never
+          backoffLimit: 4`
+	resourceStep := &pb.Step{
+		TmplName: "resource-test", ResourceSpec: &pb.ResourceSpec{
+			Manifest:         manifest,
+			SuccessCondition: "status.succeeded > 0",
+			FailureCondition: "status.failed > 3",
+		},
+	}
+	pbWf.Steps = []*pb.Step{containerStep, scriptStep, resourceStep}
 
-	assert.Equal(t, len(pbWf.Steps), 1)
 	argoWf, err := convertToArgoWorkflow(pbWf, "hello-world-")
 	assert.NoError(t, err)
-	assert.Equal(t, argoWf.String(), "&Workflow{ObjectMeta:{ hello-world-     0 0001-01-01 00:00:00 +0000 UTC <nil> <nil> map[] map[] [] []  []},Spec:WorkflowSpec{Templates:[]Template{Template{Name:,Template:,Arguments:Arguments{Parameters:[]Parameter{},Artifacts:[]Artifact{},},TemplateRef:nil,Inputs:Inputs{Parameters:[]Parameter{},Artifacts:[]Artifact{},},Outputs:Outputs{Parameters:[]Parameter{},Artifacts:[]Artifact{},Result:nil,},NodeSelector:map[string]string{},Affinity:nil,Metadata:Metadata{Annotations:map[string]string{},Labels:map[string]string{},},Daemon:nil,Steps:[]ParallelSteps{},Container:nil,Script:nil,Resource:nil,DAG:nil,Suspend:nil,Volumes:[]Volume{},InitContainers:[]UserContainer{},Sidecars:[]UserContainer{},ArchiveLocation:nil,ActiveDeadlineSeconds:nil,RetryStrategy:nil,Parallelism:nil,Tolerations:[]Toleration{},SchedulerName:,PriorityClassName:,Priority:nil,ServiceAccountName:,HostAliases:[]HostAlias{},SecurityContext:nil,PodSpecPatch:,AutomountServiceAccountToken:nil,Executor:nil,},Template{Name:whalesay,Template:,Arguments:Arguments{Parameters:[]Parameter{},Artifacts:[]Artifact{},},TemplateRef:nil,Inputs:Inputs{Parameters:[]Parameter{},Artifacts:[]Artifact{},},Outputs:Outputs{Parameters:[]Parameter{},Artifacts:[]Artifact{},Result:nil,},NodeSelector:map[string]string{},Affinity:nil,Metadata:Metadata{Annotations:map[string]string{},Labels:map[string]string{},},Daemon:nil,Steps:[]ParallelSteps{},Container:&v1.Container{Name:,Image:docker/whalesay:latest,Command:[cowsay hello world],Args:[],WorkingDir:,Ports:[]ContainerPort{},Env:[]EnvVar{},Resources:ResourceRequirements{Limits:ResourceList{},Requests:ResourceList{},},VolumeMounts:[]VolumeMount{},LivenessProbe:nil,ReadinessProbe:nil,Lifecycle:nil,TerminationMessagePath:,ImagePullPolicy:,SecurityContext:nil,Stdin:false,StdinOnce:false,TTY:false,EnvFrom:[]EnvFromSource{},TerminationMessagePolicy:,VolumeDevices:[]VolumeDevice{},StartupProbe:nil,},Script:nil,Resource:nil,DAG:nil,Suspend:nil,Volumes:[]Volume{},InitContainers:[]UserContainer{},Sidecars:[]UserContainer{},ArchiveLocation:nil,ActiveDeadlineSeconds:nil,RetryStrategy:nil,Parallelism:nil,Tolerations:[]Toleration{},SchedulerName:,PriorityClassName:,Priority:nil,ServiceAccountName:,HostAliases:[]HostAlias{},SecurityContext:nil,PodSpecPatch:,AutomountServiceAccountToken:nil,Executor:nil,},},Entrypoint:whalesay,Arguments:Arguments{Parameters:[]Parameter{},Artifacts:[]Artifact{},},ServiceAccountName:,Volumes:[]Volume{},VolumeClaimTemplates:[]PersistentVolumeClaim{},Parallelism:nil,ArtifactRepositoryRef:nil,Suspend:nil,NodeSelector:map[string]string{},Affinity:nil,Tolerations:[]Toleration{},ImagePullSecrets:[]LocalObjectReference{},HostNetwork:nil,DNSPolicy:nil,DNSConfig:nil,OnExit:,TTLSecondsAfterFinished:nil,ActiveDeadlineSeconds:nil,Priority:nil,SchedulerName:,PodGC:nil,PodPriorityClassName:,PodPriority:nil,HostAliases:[]HostAlias{},SecurityContext:nil,PodSpecPatch:,AutomountServiceAccountToken:nil,Executor:nil,TTLStrategy:nil,},Status:WorkflowStatus{Phase:,StartedAt:0001-01-01 00:00:00 +0000 UTC,FinishedAt:0001-01-01 00:00:00 +0000 UTC,Message:,CompressedNodes:,Nodes:Nodes{},PersistentVolumeClaims:[]Volume{},Outputs:nil,StoredTemplates:map[string]Template{},OffloadNodeStatusVersion:,},}")
+
+	assert.Equal(t, wfv1.Template{Name: containerStep.TmplName, Container: &corev1.Container{
+		Image:   containerStep.ContainerSpec.Image,
+		Command: containerStep.ContainerSpec.Command,
+	}}, argoWf.Spec.Templates[1])
+
+	assert.Equal(t, wfv1.Template{Name: scriptStep.TmplName, Script: &wfv1.ScriptTemplate{
+		Container: corev1.Container{
+			Image:   scriptStep.ContainerSpec.Image,
+			Command: scriptStep.ContainerSpec.Command,
+		},
+		Source: scriptStep.Script,
+	}}, argoWf.Spec.Templates[2])
+	assert.Equal(t, wfv1.Template{Name: resourceStep.TmplName, Resource: &wfv1.ResourceTemplate{
+		Manifest:          resourceStep.ResourceSpec.Manifest,
+		SuccessCondition:  resourceStep.ResourceSpec.SuccessCondition,
+		FailureCondition:  resourceStep.ResourceSpec.FailureCondition,
+		SetOwnerReference: true,
+		Action:            "create",
+	}}, argoWf.Spec.Templates[3])
 }

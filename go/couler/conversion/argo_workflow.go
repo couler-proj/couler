@@ -8,6 +8,7 @@ import (
 )
 
 func convertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Workflow, error) {
+	// TODO: Add missing entrypoint template.
 	templates := []wfv1.Template{{}}
 	// TODO: Handle DAG tasks.
 	for _, step := range workflowPb.GetSteps() {
@@ -36,7 +37,7 @@ func convertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Wor
 				Action:            "create",
 				Manifest:          resourceSpec.GetManifest(),
 				SuccessCondition:  resourceSpec.GetSuccessCondition(),
-				FailureCondition:  resourceSpec.GetSuccessCondition(),
+				FailureCondition:  resourceSpec.GetFailureCondition(),
 			}
 		}
 		templates = append(templates, template)
@@ -46,7 +47,9 @@ func convertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Wor
 			GenerateName: namePrefix,
 		},
 		Spec: wfv1.WorkflowSpec{
-			Entrypoint: workflowPb.GetSteps()[0].TmplName, // TODO: Check whether we can rely on this order.
+			// TODO: Check whether we can rely on this order. We need to use
+			// 	the step that has the smallest id here instead.
+			Entrypoint: workflowPb.GetSteps()[0].TmplName,
 			Templates:  templates,
 		},
 	}
