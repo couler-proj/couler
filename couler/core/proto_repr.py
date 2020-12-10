@@ -86,11 +86,24 @@ def step_repr(
                     o = couler_pb2.StepIO()
                     o.source = pb_step.id
                     o.artifact.name = a["name"]
+                    o.artifact.value = a["path"]
+                    attrs = None
                     if "oss" in a:
                         o.artifact.type = "OSS"
+                        attrs = a["oss"]
                     elif "s3" in a:
                         o.artifact.type = "S3"
-                    o.artifact.value = a["path"]
+                        attrs = a["s3"]
+                    o.artifact.key = attrs["key"]
+                    o.artifact.endpoint = attrs["endpoint"]
+                    o.artifact.bucket = attrs["bucket"]
+                    o.artifact.ak.name = attrs["accessKeySecret"]["name"]
+                    o.artifact.ak.key = attrs["accessKeySecret"]["key"]
+                    o.artifact.sk.name = attrs["secretKeySecret"]["name"]
+                    o.artifact.sk.key = attrs["secretKeySecret"]["key"]
+                    if "globalName" in a:
+                        o.artifact.global_name = a["globalName"]
+
                     # TODO(typhoonzero): add artifact details from:
                     # templates/artifact.py
                     if i == 0:
