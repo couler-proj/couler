@@ -49,16 +49,25 @@ def step_repr(
     script_output=None,
     input=None,
     output=None,
+    manifest=None,
+    success_cond=None,
+    failure_cond=None,
 ):
     assert step_name is not None
     assert tmpl_name is not None
-    assert image is not None
     # generate protobuf step representation
     pb_step = couler_pb2.Step()
     pb_step.id = get_uniq_step_id()
     pb_step.name = step_name
     pb_step.tmpl_name = tmpl_name
-    pb_step.container_spec.image = image
+    # image can be None if manifest specified.
+    if image is not None:
+        pb_step.container_spec.image = image
+    if manifest is not None:
+        pb_step.resource_spec.manifest = manifest
+    if success_cond is not None:
+        pb_step.resource_spec.success_condition = success_cond
+        pb_step.resource_spec.failure_condition = failure_cond
     if command is None:
         pb_step.container_spec.command.append("python")
     elif isinstance(command, list):
@@ -82,24 +91,25 @@ def step_repr(
     for i, io in enumerate([input, output]):
         if io is not None:
             # NOTE: run_job will pass type OutputJob here
-            if isinstance(io, OutputJob):
-                o = couler_pb2.StepIO()
-                o.source = pb_step.id
-                o.parameter.name = "job-name"
-                o.parameter.value = io.job_name
-                pb_step.outputs.append(o)
+            if isinstance(io, list) and isinstance(io[0], OutputJob):
+                for oj in io:
+                    o = couler_pb2.StepIO()
+                    o.source = pb_step.id
+                    o.parameter.name = "job-name"
+                    o.parameter.value = oj.job_name
+                    pb_step.outputs.append(o)
 
-                o = couler_pb2.StepIO()
-                o.source = pb_step.id
-                o.parameter.name = "job-id"
-                o.parameter.value = io.job_id
-                pb_step.outputs.append(o)
+                    o = couler_pb2.StepIO()
+                    o.source = pb_step.id
+                    o.parameter.name = "job-id"
+                    o.parameter.value = oj.job_id
+                    pb_step.outputs.append(o)
 
-                o = couler_pb2.StepIO()
-                o.source = pb_step.id
-                o.parameter.name = "job-obj"
-                o.parameter.value = io.job_obj
-                pb_step.outputs.append(o)
+                    o = couler_pb2.StepIO()
+                    o.source = pb_step.id
+                    o.parameter.name = "job-obj"
+                    o.parameter.value = oj.job_obj
+                    pb_step.outputs.append(o)
                 break
 
             if "artifacts" in io:
