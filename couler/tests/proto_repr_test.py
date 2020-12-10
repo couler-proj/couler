@@ -39,6 +39,33 @@ class ProtoReprTest(unittest.TestCase):
 
         couler._cleanup()
 
+    def test_run_job(self):
+        success_condition = "status.succeeded > 0"
+        failure_condition = "status.failed > 3"
+        manifest = """apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: rand-num-
+spec:
+    template:
+      spec:
+        containers:
+        - name: rand
+          image: python:3.6
+          command: ["python random_num.py"]
+"""
+        couler.run_job(
+            manifest=manifest,
+            success_condition=success_condition,
+            failure_condition=failure_condition,
+            step_name="test_run_job",
+        )
+        proto_wf = get_default_proto_workflow()
+        s = proto_wf.steps[0]
+        self.assertEqual(s.container_spec.image, "python:3.6")
+
+        couler._cleanup()
+
 
 if __name__ == "__main__":
     unittest.main()

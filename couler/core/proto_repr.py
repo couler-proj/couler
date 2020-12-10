@@ -12,6 +12,7 @@
 # limitations under the License.
 
 from couler.core import utils
+from couler.core.templates.output import OutputJob
 from couler.proto import couler_pb2
 
 DEFAULT_WORKFLOW = None
@@ -80,6 +81,27 @@ def step_repr(
 
     for i, io in enumerate([input, output]):
         if io is not None:
+            # NOTE: run_job will pass type OutputJob here
+            if isinstance(io, OutputJob):
+                o = couler_pb2.StepIO()
+                o.source = pb_step.id
+                o.parameter.name = "job-name"
+                o.parameter.value = io.job_name
+                pb_step.outputs.append(o)
+
+                o = couler_pb2.StepIO()
+                o.source = pb_step.id
+                o.parameter.name = "job-id"
+                o.parameter.value = io.job_id
+                pb_step.outputs.append(o)
+
+                o = couler_pb2.StepIO()
+                o.source = pb_step.id
+                o.parameter.name = "job-obj"
+                o.parameter.value = io.job_obj
+                pb_step.outputs.append(o)
+                break
+
             if "artifacts" in io:
                 art_list = io["artifacts"]
                 for a in art_list:

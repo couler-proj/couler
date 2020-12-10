@@ -271,6 +271,9 @@ def run_job(
     if manifest is None:
         raise ValueError("Input manifest can not be null")
 
+    manifest_image = None
+    manifest_command = None
+
     func_name, caller_line = utils.invocation_location()
     func_name = (
         utils.argo_safe_name(step_name) if step_name is not None else func_name
@@ -320,4 +323,24 @@ def run_job(
     # return job name and job uid for reference
     rets = _job_output(step_name, func_name)
     states._steps_outputs[step_name] = rets
+
+    # get image, command from manifest, raise exception if no
+    manifest_dict = yaml.safe_load(manifest)
+    manifest_image = manifest_dict["spec"]["template"]["spec"]["containers"][
+        0
+    ]["image"]
+    manifest_command = manifest_dict["spec"]["template"]["spec"]["containers"][
+        0
+    ]["command"]
+    pb_step = proto_repr.step_repr(  # noqa: F841
+        step_name=step_name,
+        tmpl_name=func_name,
+        image=manifest_image,
+        command=manifest_command,
+        source=None,
+        script_output=None,
+        input=None,
+        output=rets,
+    )
+
     return rets
