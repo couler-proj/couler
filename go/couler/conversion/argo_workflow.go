@@ -7,8 +7,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const sequentialStepsTemplateSuffix = "main-template"
+
 func convertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Workflow, error) {
-	templates := []wfv1.Template{{Name: namePrefix + "main-template"}} // TODO: Move to constant
+	templates := []wfv1.Template{{Name: namePrefix + sequentialStepsTemplateSuffix}}
 	// TODO: Handle DAG tasks.
 	for _, step := range workflowPb.GetSteps() {
 		templates[0].Steps = append(templates[0].Steps,
