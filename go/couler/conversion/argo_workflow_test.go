@@ -49,6 +49,18 @@ func TestArgoWorkflowConversion(t *testing.T) {
 	argoWf, err := convertToArgoWorkflow(pbWf, "hello-world-")
 	assert.NoError(t, err)
 
+	assert.Equal(t,
+		[]wfv1.ParallelSteps{
+			{Steps: []wfv1.WorkflowStep{
+				{Name: containerStep.TmplName, Template: containerStep.TmplName},
+			}},
+			{Steps: []wfv1.WorkflowStep{
+				{Name: scriptStep.TmplName, Template: scriptStep.TmplName},
+			}},
+			{Steps: []wfv1.WorkflowStep{
+				{Name: resourceStep.TmplName, Template: resourceStep.TmplName},
+			}}}, argoWf.Spec.Templates[0].Steps)
+
 	assert.Equal(t, wfv1.Template{Name: containerStep.TmplName, Container: &corev1.Container{
 		Image:   containerStep.ContainerSpec.Image,
 		Command: containerStep.ContainerSpec.Command,

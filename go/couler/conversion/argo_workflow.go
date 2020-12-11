@@ -8,10 +8,12 @@ import (
 )
 
 func convertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Workflow, error) {
-	// TODO: Add missing entrypoint template.
-	templates := []wfv1.Template{{}}
+	templates := []wfv1.Template{{Name: namePrefix + "main-template"}} // TODO: Move to constant
 	// TODO: Handle DAG tasks.
 	for _, step := range workflowPb.GetSteps() {
+		templates[0].Steps = append(templates[0].Steps,
+			wfv1.ParallelSteps{
+				Steps: []wfv1.WorkflowStep{{Name: step.TmplName, Template: step.TmplName}}})
 		template := wfv1.Template{Name: step.TmplName}
 		// TODO: Check mutual exclusivity of different specs.
 		if step.GetContainerSpec() != nil || step.GetScript() != "" {
