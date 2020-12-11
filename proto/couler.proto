@@ -21,10 +21,10 @@ message Secret {
 message Artifact {
   string name = 1;
   string type = 2;  // HTTP/GIT/...
-  string value = 3; // path
-  string key = 4; // remote path (oss key)
-  Secret ak = 5;
-  Secret sk = 6;
+  string local_path = 3;
+  string remote_path = 4;
+  Secret access_key = 5;
+  Secret secret_key = 6;
   string endpoint = 7;
   string bucket = 8;
   string global_name = 9;
