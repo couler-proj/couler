@@ -13,10 +13,21 @@ message Parameter {
   string value = 2;
 }
 
+message Secret {
+  string name = 1;
+  string key = 2;
+}
+
 message Artifact {
   string name = 1;
   string type = 2;  // HTTP/GIT/...
-  string value = 3;
+  string local_path = 3;
+  string remote_path = 4;
+  Secret access_key = 5;
+  Secret secret_key = 6;
+  string endpoint = 7;
+  string bucket = 8;
+  string global_name = 9;
 }
 
 message StdOut {

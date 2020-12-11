@@ -37,6 +37,12 @@ class ProtoReprTest(unittest.TestCase):
         s = proto_wf.steps[0]
         self.assertEqual(s.container_spec.image, "docker/whalesay:latest")
         self.assertTrue(s.outputs[0].artifact.name.startswith("output-oss"))
+        self.assertEqual(s.outputs[0].artifact.local_path, "/home/t1.txt")
+        self.assertEqual(s.outputs[0].artifact.endpoint, "xyz.com")
+        self.assertEqual(s.outputs[0].artifact.bucket, "test-bucket/")
+
+        self.assertEqual(s.outputs[0].artifact.access_key.key, "accessKey")
+        self.assertEqual(s.outputs[0].artifact.secret_key.key, "secretKey")
 
     def test_run_job(self):
         success_condition = "status.succeeded > 0"
