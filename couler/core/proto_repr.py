@@ -95,19 +95,16 @@ def step_repr(
                         o.artifact.type = "S3"
                         attrs = a["s3"]
                     # NOTE: attrs["key"] stores the remote path on OSS/S3.
-                    o.artifact.remote_path = attrs["key"]
-                    o.artifact.endpoint = attrs["endpoint"]
-                    o.artifact.bucket = attrs["bucket"]
-                    o.artifact.access_key.name = attrs["accessKeySecret"][
-                        "name"
-                    ]
-                    o.artifact.access_key.key = attrs["accessKeySecret"]["key"]
-                    o.artifact.secret_key.name = attrs["secretKeySecret"][
-                        "name"
-                    ]
-                    o.artifact.secret_key.key = attrs["secretKeySecret"]["key"]
+                    a = o.artifact
+                    a.remote_path = attrs["key"]
+                    a.endpoint = attrs["endpoint"]
+                    a.bucket = attrs["bucket"]
+                    a.access_key.name = attrs["accessKeySecret"]["name"]
+                    a.access_key.key = attrs["accessKeySecret"]["key"]
+                    a.secret_key.name = attrs["secretKeySecret"]["name"]
+                    a.secret_key.key = attrs["secretKeySecret"]["key"]
                     if "globalName" in a:
-                        o.artifact.global_name = a["globalName"]
+                        a.global_name = a["globalName"]
 
                     if i == 0:
                         pb_step.inputs.append(o)
