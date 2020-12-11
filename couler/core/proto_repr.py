@@ -82,18 +82,18 @@ def step_repr(
         if io is not None:
             if "artifacts" in io:
                 art_list = io["artifacts"]
-                for a in art_list:
+                for art in art_list:
                     o = couler_pb2.StepIO()
                     o.source = pb_step.id
-                    o.artifact.name = a["name"]
-                    o.artifact.local_path = a["path"]
+                    o.artifact.name = art["name"]
+                    o.artifact.local_path = art["path"]
                     attrs = None
-                    if "oss" in a:
+                    if "oss" in art:
                         o.artifact.type = "OSS"
-                        attrs = a["oss"]
-                    elif "s3" in a:
+                        attrs = art["oss"]
+                    elif "s3" in art:
                         o.artifact.type = "S3"
-                        attrs = a["s3"]
+                        attrs = art["s3"]
                     # NOTE: attrs["key"] stores the remote path on OSS/S3.
                     a = o.artifact
                     a.remote_path = attrs["key"]
@@ -103,8 +103,8 @@ def step_repr(
                     a.access_key.key = attrs["accessKeySecret"]["key"]
                     a.secret_key.name = attrs["secretKeySecret"]["name"]
                     a.secret_key.key = attrs["secretKeySecret"]["key"]
-                    if "globalName" in a:
-                        a.global_name = a["globalName"]
+                    if "globalName" in art:
+                        a.global_name = art["globalName"]
 
                     if i == 0:
                         pb_step.inputs.append(o)
