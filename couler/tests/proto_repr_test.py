@@ -14,7 +14,7 @@ class ProtoReprTest(unittest.TestCase):
 
         couler.run_script(image="docker/whalesay:latest", source=echo)
         proto_wf = get_default_proto_workflow()
-        s = proto_wf.steps[0]
+        s = proto_wf.steps[0].steps[0]
         self.assertEqual(s.script, '\nprint("echo")\n')
 
     def test_output_oss_artifact(self):
@@ -34,7 +34,7 @@ class ProtoReprTest(unittest.TestCase):
             output=output_artifact,
         )
         proto_wf = get_default_proto_workflow()
-        s = proto_wf.steps[0]
+        s = proto_wf.steps[0].steps[0]
         self.assertEqual(s.container_spec.image, "docker/whalesay:latest")
         self.assertTrue(s.outputs[0].artifact.name.startswith("output-oss"))
         self.assertEqual(s.outputs[0].artifact.local_path, "/home/t1.txt")
@@ -66,7 +66,7 @@ spec:
             step_name="test_run_job",
         )
         proto_wf = get_default_proto_workflow()
-        s = proto_wf.steps[0]
+        s = proto_wf.steps[0].steps[0]
         self.assertEqual(s.resource_spec.manifest, manifest)
         self.assertEqual(s.resource_spec.success_condition, success_condition)
         self.assertEqual(s.resource_spec.failure_condition, failure_condition)
