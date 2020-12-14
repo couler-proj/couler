@@ -16,6 +16,7 @@ message Parameter {
 message Secret {
   string name = 1;
   string key = 2;
+  string value = 3;  // BASE64 encoded secret value
 }
 
 message Artifact {

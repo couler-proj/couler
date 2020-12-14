@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from couler.core import utils
+from couler.core import states, utils  # noqa: F401
 from couler.core.templates.output import OutputJob
 from couler.proto import couler_pb2
 
@@ -133,8 +133,12 @@ def step_repr(
                     a.bucket = attrs["bucket"]
                     a.access_key.name = attrs["accessKeySecret"]["name"]
                     a.access_key.key = attrs["accessKeySecret"]["key"]
+                    s = states._secrets[a.access_key.name]
+                    a.access_key.value = s.data[a.access_key.key]
                     a.secret_key.name = attrs["secretKeySecret"]["name"]
                     a.secret_key.key = attrs["secretKeySecret"]["key"]
+                    s = states._secrets[a.secret_key.name]
+                    a.secret_key.value = s.data[a.secret_key.key]
                     if "globalName" in art:
                         a.global_name = art["globalName"]
 
