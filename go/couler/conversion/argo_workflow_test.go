@@ -1,9 +1,10 @@
 package conversion
 
 import (
+	"testing"
+
 	wfv1 "github.com/argoproj/argo/pkg/apis/workflow/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
-	"testing"
 
 	"github.com/alecthomas/assert"
 	pb "github.com/couler-proj/couler/go/couler/proto/couler/v1"
@@ -44,7 +45,12 @@ func TestArgoWorkflowConversion(t *testing.T) {
 			FailureCondition: "status.failed > 3",
 		},
 	}
-	pbWf.Steps = []*pb.Step{containerStep, scriptStep, resourceStep}
+
+	pbWf.Steps = []*pb.ConcurrentSteps{
+		{Steps: []*pb.Step{containerStep}},
+		{Steps: []*pb.Step{scriptStep}},
+		{Steps: []*pb.Step{resourceStep}},
+	}
 
 	argoWf, err := convertToArgoWorkflow(pbWf, "hello-world-")
 	assert.NoError(t, err)

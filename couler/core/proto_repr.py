@@ -156,5 +156,7 @@ def step_repr(
                         pb_step.outputs.append(o)
     # add step to proto workflow
     wf = get_default_proto_workflow()
-    wf.steps.append(pb_step)
+    concurrent_step = couler_pb2.ConcurrentSteps()
+    concurrent_step.steps.append(pb_step)
+    wf.steps.append(concurrent_step)
     return pb_step

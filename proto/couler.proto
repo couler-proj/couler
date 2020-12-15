@@ -68,8 +68,16 @@ message Step {
   repeated int32  dependencies = 9;
 }
 
-message Workflow {
+message ConcurrentSteps {
   repeated Step steps = 1;
+}
+
+message Workflow {
+  // sequential steps: [ [step], [step], [step], ...]
+  // concurrent steps: [ [step], [step, step, step], ...]
+  // if dependencies was set, no matter what structure the
+  // "steps" field stores, generate a DAG.
+  repeated ConcurrentSteps steps = 1;
   int32 parallelism = 2;
   string secret = 3;
 }
