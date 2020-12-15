@@ -1,6 +1,7 @@
 import unittest
 
 import couler.argo as couler
+from couler.core import states
 from couler.core.proto_repr import get_default_proto_workflow
 
 
@@ -42,7 +43,11 @@ class ProtoReprTest(unittest.TestCase):
         self.assertEqual(s.outputs[0].artifact.bucket, "test-bucket/")
 
         self.assertEqual(s.outputs[0].artifact.access_key.key, "accessKey")
-        self.assertEqual(s.outputs[0].artifact.secret_key.key, "secretKey")
+        proto_sk = s.outputs[0].artifact.secret_key
+        self.assertEqual(proto_sk.key, "secretKey")
+        self.assertEqual(
+            proto_sk.value, states._secrets[proto_sk.name].data[proto_sk.key]
+        )
 
     def test_run_job(self):
         success_condition = "status.succeeded > 0"
