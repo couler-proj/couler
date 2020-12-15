@@ -55,6 +55,8 @@ message ResourceSpec {
     string manifest = 1;
     string success_condition = 2;
     string failure_condition = 3;
+    string action = 4;
+    bool set_owner_reference = 5;
 }
 
 message Step {
