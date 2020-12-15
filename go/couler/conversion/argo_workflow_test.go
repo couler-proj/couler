@@ -52,7 +52,7 @@ func TestArgoWorkflowConversion(t *testing.T) {
 		{Steps: []*pb.Step{resourceStep}},
 	}
 
-	argoWf, err := convertToArgoWorkflow(pbWf, "hello-world-")
+	argoWf, err := ConvertToArgoWorkflow(pbWf, "hello-world-")
 	assert.NoError(t, err)
 
 	assert.Equal(t, 4, len(argoWf.Spec.Templates))

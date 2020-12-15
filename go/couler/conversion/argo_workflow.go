@@ -9,7 +9,8 @@ import (
 
 const sequentialStepsTemplateSuffix = "main-template"
 
-func convertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Workflow, error) {
+// ConvertToArgoWorkflow converts a workflow from protobuf to an Argo Workflow
+func ConvertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Workflow, error) {
 	templates := []wfv1.Template{{Name: namePrefix + sequentialStepsTemplateSuffix}}
 	// TODO: Handle DAG tasks.
 	for _, step := range workflowPb.GetSteps() {
