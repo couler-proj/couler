@@ -29,12 +29,14 @@ const manifest = `
 
 var (
 	containerStep = &pb.Step{
+		Name:     "container-test-step",
 		TmplName: "container-test",
 		ContainerSpec: &pb.ContainerSpec{
 			Image:   "docker/whalesay:latest",
 			Command: []string{"cowsay", "hello world"},
 		}}
 	scriptStep = &pb.Step{
+		Name:     "script-test-step",
 		TmplName: "script-test",
 		Script:   "print(3)",
 		ContainerSpec: &pb.ContainerSpec{
@@ -42,6 +44,7 @@ var (
 			Command: []string{"python"},
 		}}
 	resourceStep = &pb.Step{
+		Name:     "resource-test-step",
 		TmplName: "resource-test",
 		ResourceSpec: &pb.ResourceSpec{
 			Manifest:          manifest,
