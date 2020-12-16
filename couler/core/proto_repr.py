@@ -12,7 +12,7 @@
 # limitations under the License.
 
 from couler.core import states, utils  # noqa: F401
-from couler.core.templates.output import OutputJob, OutputArtifact
+from couler.core.templates.output import OutputArtifact, OutputJob
 from couler.proto import couler_pb2
 
 DEFAULT_WORKFLOW = None
@@ -89,7 +89,8 @@ def step_repr(
         proto_step_tmpl = couler_pb2.StepTemplate()
         proto_step_tmpl.name = tmpl_name
         _add_io_to_template(
-            proto_step_tmpl, pb_step.id, input, output, script_output)
+            proto_step_tmpl, pb_step.id, input, output, script_output
+        )
         wf.templates[tmpl_name].CopyFrom(proto_step_tmpl)
 
     # add step arguments
@@ -98,15 +99,18 @@ def step_repr(
             if isinstance(arg, OutputArtifact):
                 pb_art = couler_pb2.StepIO()
                 pb_art.artifact.name = arg.artifact["name"]
-                pb_art.artifact.value = \
+                pb_art.artifact.value = (
                     '"{{inputs.artifacts.%s}}"' % pb_art.artifact.name
+                )
                 pb_step.args.append(pb_art)
             else:
                 pb_param = couler_pb2.StepIO()
-                pb_param.parameter.name = \
-                    utils.input_parameter_name(pb_step.name, i)
-                pb_param.parameter.value = \
+                pb_param.parameter.name = utils.input_parameter_name(
+                    pb_step.name, i
+                )
+                pb_param.parameter.value = (
                     '"{{inputs.parameters.%s}}"' % pb_param.parameter.name
+                )
                 pb_step.args.append(pb_param)
 
     # add step to proto workflow
@@ -117,11 +121,8 @@ def step_repr(
 
 
 def _add_io_to_template(
-    pb_tmpl,
-    source_step_id, 
-    input=None,
-    output=None,
-    script_output=None):
+    pb_tmpl, source_step_id, input=None, output=None, script_output=None
+):
     if script_output is not None:
         o = couler_pb2.StepIO()
         o.source = source_step_id
