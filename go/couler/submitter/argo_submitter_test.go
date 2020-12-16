@@ -2,6 +2,7 @@ package submitter
 
 import (
 	"github.com/alecthomas/assert"
+	wfv1 "github.com/argoproj/argo/pkg/apis/workflow/v1alpha1"
 	"github.com/couler-proj/couler/go/couler/conversion"
 	pb "github.com/couler-proj/couler/go/couler/proto/couler/v1"
 	"os"
@@ -66,6 +67,14 @@ func TestArgoWorkflowSubmitter(t *testing.T) {
 		namespace:      "argo",
 		kubeConfigPath: filepath.Join(usr.HomeDir, ".kube", "config"),
 	}
-	_, err = submitter.Submit(argoWf)
+	finishedArgoWf, err := submitter.Submit(argoWf, true)
 	assert.NoError(t, err)
+	assert.Equal(t, wfv1.NodeSucceeded, finishedArgoWf.Status.Phase)
+	assert.False(t, finishedArgoWf.Status.FinishedAt.IsZero())
+
+	unfinishedArgoWf, err := conversion.ConvertToArgoWorkflow(pbWf, "unfinished-hello-world-")
+	assert.NoError(t, err)
+	submittedUnfinishedArgoWf, err := submitter.Submit(unfinishedArgoWf, false)
+	assert.NoError(t, err)
+	assert.True(t, submittedUnfinishedArgoWf.Status.FinishedAt.IsZero())
 }
