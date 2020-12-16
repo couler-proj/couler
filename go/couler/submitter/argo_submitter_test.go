@@ -48,9 +48,11 @@ func TestArgoWorkflowSubmitter(t *testing.T) {
 	resourceStep := &pb.Step{
 		Name:     "resource-test-step",
 		TmplName: "resource-test", ResourceSpec: &pb.ResourceSpec{
-			Manifest:         manifest,
-			SuccessCondition: "status.succeeded > 0",
-			FailureCondition: "status.failed > 3",
+			Manifest:          manifest,
+			SuccessCondition:  "status.succeeded > 0",
+			FailureCondition:  "status.failed > 3",
+			SetOwnerReference: true,
+			Action:            "create",
 		},
 	}
 	pbWf.Steps = []*pb.ConcurrentSteps{
