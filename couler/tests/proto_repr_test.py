@@ -36,14 +36,15 @@ class ProtoReprTest(unittest.TestCase):
         )
         proto_wf = get_default_proto_workflow()
         s = proto_wf.steps[0].steps[0]
+        t = proto_wf.templates[s.tmpl_name]
         self.assertEqual(s.container_spec.image, "docker/whalesay:latest")
-        self.assertTrue(s.outputs[0].artifact.name.startswith("output-oss"))
-        self.assertEqual(s.outputs[0].artifact.local_path, "/home/t1.txt")
-        self.assertEqual(s.outputs[0].artifact.endpoint, "xyz.com")
-        self.assertEqual(s.outputs[0].artifact.bucket, "test-bucket/")
+        self.assertTrue(t.outputs[0].artifact.name.startswith("output-oss"))
+        self.assertEqual(t.outputs[0].artifact.local_path, "/home/t1.txt")
+        self.assertEqual(t.outputs[0].artifact.endpoint, "xyz.com")
+        self.assertEqual(t.outputs[0].artifact.bucket, "test-bucket/")
 
-        self.assertEqual(s.outputs[0].artifact.access_key.key, "accessKey")
-        proto_sk = s.outputs[0].artifact.secret_key
+        self.assertEqual(t.outputs[0].artifact.access_key.key, "accessKey")
+        proto_sk = t.outputs[0].artifact.secret_key
         self.assertEqual(proto_sk.key, "secretKey")
         self.assertEqual(
             proto_sk.value, states._secrets[proto_sk.name].data[proto_sk.key]
@@ -72,11 +73,12 @@ spec:
         )
         proto_wf = get_default_proto_workflow()
         s = proto_wf.steps[0].steps[0]
+        t = proto_wf.templates[s.tmpl_name]
         self.assertEqual(s.resource_spec.manifest, manifest)
         self.assertEqual(s.resource_spec.success_condition, success_condition)
         self.assertEqual(s.resource_spec.failure_condition, failure_condition)
-        self.assertEqual(len(s.outputs), 3)
-        self.assertEqual(s.outputs[0].parameter.name, "job-name")
+        self.assertEqual(len(t.outputs), 3)
+        self.assertEqual(t.outputs[0].parameter.name, "job-name")
 
 
 if __name__ == "__main__":

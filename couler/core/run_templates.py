@@ -220,12 +220,9 @@ def run_container(
     )
 
     # TODO: need to switch to use field `output` directly
-    _output = (
-        states.workflow.get_template(func_name).to_dict().get("outputs", None)
-    )
-    _input = (
-        states.workflow.get_template(func_name).to_dict().get("inputs", None)
-    )
+    step_templ = states.workflow.get_template(func_name)
+    _output = step_templ.to_dict().get("outputs", None)
+    _input = step_templ.to_dict().get("inputs", None)
 
     rets = _container_output(step_name, func_name, _output)
     states._steps_outputs[step_name] = rets
@@ -237,6 +234,7 @@ def run_container(
         command=command,
         source=None,
         script_output=None,
+        args=args,
         input=_input,
         output=_output,
     )
