@@ -64,11 +64,14 @@ func createStepTemplate(step *pb.Step) wfv1.Template {
 	// TODO: Check mutual exclusivity of different specs.
 	if step.GetContainerSpec() != nil || step.GetScript() != "" {
 		containerSpec := step.GetContainerSpec()
+		var env []corev1.EnvVar
+		for k, v := range containerSpec.GetEnv() {
+			env = append(env, corev1.EnvVar{Name: k, Value: v.String()})
+		}
 		container := &corev1.Container{
 			Image:   containerSpec.GetImage(),
 			Command: containerSpec.GetCommand(),
-			// TODO: Convert type map[string]*any.Any) to type []EnvVar that's supported by Argo.
-			//Env: containerSpec.GetEnv(),
+			Env:     env,
 		}
 		if script := step.GetScript(); script != "" {
 			template.Script = &wfv1.ScriptTemplate{

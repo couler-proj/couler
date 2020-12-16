@@ -10,22 +10,7 @@ import (
 	pb "github.com/couler-proj/couler/go/couler/proto/couler/v1"
 )
 
-func TestArgoWorkflowConversionSequential(t *testing.T) {
-	pbWf := &pb.Workflow{}
-	containerStep := &pb.Step{
-		TmplName: "container-test",
-		ContainerSpec: &pb.ContainerSpec{
-			Image:   "docker/whalesay:latest",
-			Command: []string{"cowsay", "hello world"},
-		}}
-	scriptStep := &pb.Step{
-		TmplName: "script-test",
-		Script:   "print(3)",
-		ContainerSpec: &pb.ContainerSpec{
-			Image:   "docker/whalesay:latest",
-			Command: []string{"python"},
-		}}
-	manifest := `
+const manifest = `
         apiVersion: batch/v1
         kind: Job
         metadata:
@@ -41,7 +26,22 @@ func TestArgoWorkflowConversionSequential(t *testing.T) {
                 command: ["perl",  "-Mbignum=bpi", "-wle", "print bpi(2000)"]
               restartPolicy: Never
           backoffLimit: 4`
-	resourceStep := &pb.Step{
+
+var (
+	containerStep = &pb.Step{
+		TmplName: "container-test",
+		ContainerSpec: &pb.ContainerSpec{
+			Image:   "docker/whalesay:latest",
+			Command: []string{"cowsay", "hello world"},
+		}}
+	scriptStep = &pb.Step{
+		TmplName: "script-test",
+		Script:   "print(3)",
+		ContainerSpec: &pb.ContainerSpec{
+			Image:   "docker/whalesay:latest",
+			Command: []string{"python"},
+		}}
+	resourceStep = &pb.Step{
 		TmplName: "resource-test",
 		ResourceSpec: &pb.ResourceSpec{
 			Manifest:          manifest,
@@ -51,7 +51,10 @@ func TestArgoWorkflowConversionSequential(t *testing.T) {
 			Action:            "create",
 		},
 	}
+)
 
+func TestArgoWorkflowConversionSequential(t *testing.T) {
+	pbWf := &pb.Workflow{}
 	pbWf.Steps = []*pb.ConcurrentSteps{
 		{Steps: []*pb.Step{containerStep}},
 		{Steps: []*pb.Step{scriptStep}},
@@ -96,46 +99,8 @@ func TestArgoWorkflowConversionSequential(t *testing.T) {
 
 func TestArgoWorkflowConversionDAG(t *testing.T) {
 	pbWf := &pb.Workflow{}
-	containerStep := &pb.Step{
-		TmplName: "container-test",
-		ContainerSpec: &pb.ContainerSpec{
-			Image:   "docker/whalesay:latest",
-			Command: []string{"cowsay", "hello world"},
-		}}
-	scriptStep := &pb.Step{
-		TmplName: "script-test",
-		Script:   "print(3)", ContainerSpec: &pb.ContainerSpec{
-			Image:   "docker/whalesay:latest",
-			Command: []string{"python"},
-		},
-		Dependencies: []string{containerStep.TmplName}}
-	manifest := `
-        apiVersion: batch/v1
-        kind: Job
-        metadata:
-          generateName: pi-job-
-        spec:
-          template:
-            metadata:
-              name: pi
-            spec:
-              containers:
-              - name: pi
-                image: perl
-                command: ["perl",  "-Mbignum=bpi", "-wle", "print bpi(2000)"]
-              restartPolicy: Never
-          backoffLimit: 4`
-	resourceStep := &pb.Step{
-		TmplName: "resource-test",
-		ResourceSpec: &pb.ResourceSpec{
-			Manifest:          manifest,
-			SuccessCondition:  "status.succeeded > 0",
-			FailureCondition:  "status.failed > 3",
-			SetOwnerReference: true,
-			Action:            "create",
-		},
-		Dependencies: []string{containerStep.TmplName, scriptStep.TmplName},
-	}
+	scriptStep.Dependencies = []string{containerStep.TmplName}
+	resourceStep.Dependencies = []string{containerStep.TmplName, scriptStep.TmplName}
 
 	pbWf.Steps = []*pb.ConcurrentSteps{
 		{Steps: []*pb.Step{containerStep}},
