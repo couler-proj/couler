@@ -18,11 +18,13 @@ func TestArgoWorkflowSubmitter(t *testing.T) {
 	}
 	pbWf := &pb.Workflow{}
 	containerStep := &pb.Step{
+		Name:     "container-test-step",
 		TmplName: "container-test", ContainerSpec: &pb.ContainerSpec{
 			Image:   "docker/whalesay:latest",
 			Command: []string{"cowsay", "hello world"},
 		}}
 	scriptStep := &pb.Step{
+		Name:     "script-test-step",
 		TmplName: "script-test", Script: "print(3)", ContainerSpec: &pb.ContainerSpec{
 			Image:   "docker/whalesay:latest",
 			Command: []string{"python"},
@@ -44,6 +46,7 @@ func TestArgoWorkflowSubmitter(t *testing.T) {
               restartPolicy: Never
           backoffLimit: 4`
 	resourceStep := &pb.Step{
+		Name:     "resource-test-step",
 		TmplName: "resource-test", ResourceSpec: &pb.ResourceSpec{
 			Manifest:         manifest,
 			SuccessCondition: "status.succeeded > 0",
