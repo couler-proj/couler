@@ -40,7 +40,7 @@ var (
 		TmplName: "script-test",
 		Script:   "print(3)",
 		ContainerSpec: &pb.ContainerSpec{
-			Image:   "docker/whalesay:latest",
+			Image:   "python:alpine3.6",
 			Command: []string{"python"},
 		}}
 	resourceStep = &pb.Step{

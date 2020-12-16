@@ -26,7 +26,7 @@ func TestArgoWorkflowSubmitter(t *testing.T) {
 	scriptStep := &pb.Step{
 		Name:     "script-test-step",
 		TmplName: "script-test", Script: "print(3)", ContainerSpec: &pb.ContainerSpec{
-			Image:   "docker/whalesay:latest",
+			Image:   "python:alpine3.6",
 			Command: []string{"python"},
 		}}
 	manifest := `
