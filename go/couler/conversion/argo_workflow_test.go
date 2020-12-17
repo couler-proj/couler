@@ -42,8 +42,8 @@ var (
 		TmplName: "resource-test",
 		ResourceSpec: &pb.ResourceSpec{
 			Manifest:          manifest,
-			SuccessCondition:  "status.succeeded > 0",
-			FailureCondition:  "status.failed > 3",
+			SuccessCondition:  "status.phase == Succeeded",
+			FailureCondition:  "status.phase == Running",
 			SetOwnerReference: true,
 			Action:            "create",
 		},
