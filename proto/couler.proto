@@ -85,7 +85,7 @@ message StepTemplate {
   repeated StepIO inputs = 2;
   repeated StepIO outputs = 3;
   // TODO(typhoonzero):
-  // add timeout, retry, pool, enable_ulogfs, daemon
+  // add timeout, retry, daemon
 }
 
 message Workflow {
