@@ -43,7 +43,7 @@ var (
 		ResourceSpec: &pb.ResourceSpec{
 			Manifest:          manifest,
 			SuccessCondition:  "status.phase == Succeeded",
-			FailureCondition:  "status.phase == Running",
+			FailureCondition:  "status.phase == Failed",
 			SetOwnerReference: true,
 			Action:            "create",
 		},
