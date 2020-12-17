@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ master, conversion-dag ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -67,4 +67,4 @@ jobs:
 
         scripts/integration_tests.sh
         export E2E_TEST=true
-        go test -timeout 10m ./go/couler/submitter/... -v
+        go test -timeout 5m ./go/couler/submitter/... -v
