@@ -67,4 +67,4 @@ jobs:
 
         scripts/integration_tests.sh
         export E2E_TEST=true
-        go test -timeout 5m ./go/couler/submitter/... -v
+        go test -timeout 3m ./go/couler/submitter/... -v
