@@ -10,6 +10,9 @@ option go_package = "couler/v1";
 
 message Parameter {
   string name = 1;
+  // value can be used in templates and steps
+  // in templates: value is how the parameter can be referred to
+  // in steps: actual value to be passed to the step
   string value = 2;
 }
 
@@ -21,14 +24,17 @@ message Secret {
 
 message Artifact {
   string name = 1;
-  string type = 2;  // HTTP/GIT/...
-  string local_path = 3;
-  string remote_path = 4;
-  Secret access_key = 5;
-  Secret secret_key = 6;
-  string endpoint = 7;
-  string bucket = 8;
-  string global_name = 9;
+  // value can be only used steps as the "from" field:
+  // https://argoproj.github.io/argo/examples/#artifacts
+  string value = 2;
+  string type = 3;  // HTTP/GIT/...
+  string local_path = 4;
+  string remote_path = 5;
+  Secret access_key = 6;
+  Secret secret_key = 7;
+  string endpoint = 8;
+  string bucket = 9;
+  string global_name = 10;
 }
 
 message StdOut {
@@ -66,13 +72,20 @@ message Step {
   ContainerSpec container_spec = 4;
   ResourceSpec resource_spec = 5;
   string script = 6;
-  repeated StepIO inputs = 7;
-  repeated StepIO outputs = 8;
-  repeated int32  dependencies = 9;
+  repeated StepIO args = 7;
+  repeated int32  dependencies = 8;
 }
 
 message ConcurrentSteps {
   repeated Step steps = 1;
+}
+
+message StepTemplate {
+  string name = 1;
+  repeated StepIO inputs = 2;
+  repeated StepIO outputs = 3;
+  // TODO(typhoonzero):
+  // add timeout, retry, daemon
 }
 
 message Workflow {
@@ -81,6 +94,7 @@ message Workflow {
   // if dependencies was set, no matter what structure the
   // "steps" field stores, generate a DAG.
   repeated ConcurrentSteps steps = 1;
-  int32 parallelism = 2;
-  string secret = 3;
+  map<string, StepTemplate> templates = 2;
+  int32 parallelism = 3;
+  string secret = 4;
 }
