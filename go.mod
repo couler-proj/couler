@@ -1,6 +1,6 @@
 module github.com/couler-proj/couler
 
-go 1.15
+go 1.13
 
 require (
 	github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38
