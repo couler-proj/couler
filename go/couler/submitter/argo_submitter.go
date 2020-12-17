@@ -57,6 +57,9 @@ func (submitter *ArgoWorkflowSubmitter) Submit(wf wfv1.Workflow, watch bool) (*w
 				createdWf = wf
 				break
 			}
+			for _, node := range wf.Status.Nodes {
+				fmt.Printf("Workflow node %s %s. Message: %s\n", node.Name, node.Phase, node.Message)
+			}
 		}
 	}
 	return createdWf, nil
