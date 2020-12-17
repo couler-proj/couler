@@ -15,6 +15,7 @@ const manifest = `
         kind: Job
         metadata:
           generateName: pi-job-
+          namespace: argo
         spec:
           template:
             metadata:

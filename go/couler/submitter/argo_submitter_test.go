@@ -34,6 +34,7 @@ func TestArgoWorkflowSubmitter(t *testing.T) {
         kind: Job
         metadata:
           generateName: pi-job-
+          namespace: argo
         spec:
           template:
             metadata:
