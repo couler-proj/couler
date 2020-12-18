@@ -1,6 +1,7 @@
 package submitter
 
 import (
+	"fmt"
 	"github.com/alecthomas/assert"
 	wfv1 "github.com/argoproj/argo/pkg/apis/workflow/v1alpha1"
 	"github.com/couler-proj/couler/go/couler/conversion"
@@ -68,6 +69,13 @@ func TestArgoWorkflowSubmitter(t *testing.T) {
 		kubeConfigPath: filepath.Join(usr.HomeDir, ".kube", "config"),
 	}
 	finishedArgoWf, err := submitter.Submit(argoWf, true)
+	if err != nil && finishedArgoWf != nil {
+		fmt.Printf("Workflow %s failed due to %s. \nStatuses of each workflow nodes:\n", finishedArgoWf.Name, err)
+		for _, node := range finishedArgoWf.Status.Nodes {
+			fmt.Printf("Node %s %s. Message: %s\n", node.Name, node.Phase, node.Message)
+		}
+	}
+	assert.NotNil(t, finishedArgoWf)
 	assert.NoError(t, err)
 	assert.Equal(t, wfv1.NodeSucceeded, finishedArgoWf.Status.Phase)
 	assert.False(t, finishedArgoWf.Status.FinishedAt.IsZero())
