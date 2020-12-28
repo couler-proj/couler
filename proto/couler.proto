@@ -73,7 +73,7 @@ message Step {
   ResourceSpec resource_spec = 5;
   string script = 6;
   repeated StepIO args = 7;
-  repeated int32  dependencies = 8;
+  repeated string dependencies = 8;
 }
 
 message ConcurrentSteps {
