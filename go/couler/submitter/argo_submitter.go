@@ -2,6 +2,7 @@ package submitter
 
 import (
 	"fmt"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/tools/clientcmd"
@@ -14,6 +15,14 @@ import (
 type ArgoWorkflowSubmitter struct {
 	namespace      string
 	kubeConfigPath string
+}
+
+// New returns ArgoWorkflowSubmitter struct
+func New(namespace, kubeConfigPath string) *ArgoWorkflowSubmitter {
+	return &ArgoWorkflowSubmitter{
+		namespace:      namespace,
+		kubeConfigPath: kubeConfigPath,
+	}
 }
 
 // Submit takes an Argo Workflow object and submit it to Kubernetes cluster
