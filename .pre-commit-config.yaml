@@ -22,3 +22,5 @@ repos:
   - id: go-fmt
   - id: go-lint 
   - id: no-go-testing
+
+exclude: 'couler/proto/*'
