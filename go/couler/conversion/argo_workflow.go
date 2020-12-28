@@ -7,7 +7,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const entrypointTemplateSuffix = "main-template"
+const entryPointTemplateSuffix = "main-template"
 
 // ConvertToArgoWorkflow converts a workflow from protobuf to an Argo Workflow
 func ConvertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Workflow, error) {
@@ -19,39 +19,21 @@ func ConvertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Wor
 			break
 		}
 	}
-	templates := []wfv1.Template{{Name: namePrefix + entrypointTemplateSuffix}}
-	// Convert steps to DAG tasks.
+	entryPointName := namePrefix + entryPointTemplateSuffix
+	var templates []wfv1.Template
 	if dagMode {
-		templates[0].DAG = &wfv1.DAGTemplate{
-			Tasks: []wfv1.DAGTask{},
-		}
-		for _, step := range workflowPb.GetSteps() {
-			seqStep := step.Steps[0]
-			templates[0].DAG.Tasks = append(templates[0].DAG.Tasks,
-				wfv1.DAGTask{
-					Name:         seqStep.GetName(),
-					Template:     seqStep.GetTmplName(),
-					Dependencies: seqStep.GetDependencies(),
-				})
-			templates = append(templates, createStepTemplate(seqStep))
-		}
+		// Convert steps to DAG tasks.
+		templates = createDAGTasks(workflowPb, entryPointName)
 	} else {
 		// Convert steps to sequential/parallel steps.
-		for _, step := range workflowPb.GetSteps() {
-			seqStep := step.Steps[0]
-			templates[0].Steps = append(templates[0].Steps,
-				wfv1.ParallelSteps{
-					Steps: []wfv1.WorkflowStep{{Name: seqStep.GetName(), Template: seqStep.GetTmplName()}}})
-
-			templates = append(templates, createStepTemplate(seqStep))
-		}
+		templates = createSeqOrParallelSteps(workflowPb, entryPointName)
 	}
 	argoWorkflow := wfv1.Workflow{
 		ObjectMeta: metav1.ObjectMeta{
 			GenerateName: namePrefix,
 		},
 		Spec: wfv1.WorkflowSpec{
-			Entrypoint: namePrefix + entrypointTemplateSuffix,
+			Entrypoint: entryPointName,
 			Templates:  templates,
 		},
 	}
@@ -59,7 +41,39 @@ func ConvertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Wor
 	return argoWorkflow, nil
 }
 
-func createStepTemplate(step *pb.Step) wfv1.Template {
+func createDAGTasks(workflowPb *pb.Workflow, entryPointName string) []wfv1.Template {
+	templates := []wfv1.Template{{Name: entryPointName}}
+	// Convert steps to DAG tasks.
+	templates[0].DAG = &wfv1.DAGTemplate{
+		Tasks: []wfv1.DAGTask{},
+	}
+	for _, step := range workflowPb.GetSteps() {
+		seqStep := step.Steps[0]
+		templates[0].DAG.Tasks = append(templates[0].DAG.Tasks,
+			wfv1.DAGTask{
+				Name:         seqStep.GetName(),
+				Template:     seqStep.GetTmplName(),
+				Dependencies: seqStep.GetDependencies(),
+			})
+		templates = append(templates, createSingleStepTemplate(seqStep))
+	}
+	return templates
+}
+
+func createSeqOrParallelSteps(workflowPb *pb.Workflow, entryPointName string) []wfv1.Template {
+	templates := []wfv1.Template{{Name: entryPointName}}
+	for _, step := range workflowPb.GetSteps() {
+		seqStep := step.Steps[0]
+		templates[0].Steps = append(templates[0].Steps,
+			wfv1.ParallelSteps{
+				Steps: []wfv1.WorkflowStep{{Name: seqStep.GetName(), Template: seqStep.GetTmplName()}}})
+
+		templates = append(templates, createSingleStepTemplate(seqStep))
+	}
+	return templates
+}
+
+func createSingleStepTemplate(step *pb.Step) wfv1.Template {
 	template := wfv1.Template{Name: step.TmplName}
 	// TODO: Check mutual exclusivity of different specs.
 	if step.GetContainerSpec() != nil || step.GetScript() != "" {
