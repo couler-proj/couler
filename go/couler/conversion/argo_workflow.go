@@ -41,37 +41,50 @@ func ConvertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Wor
 	return argoWorkflow, nil
 }
 
-func getArgs(step *pb.Step) wfv1.Arguments {
+func getEntryPointTemplateArgs(step *pb.Step) wfv1.Arguments {
 	var args wfv1.Arguments
 	for _, arg := range step.GetArgs() {
 		switch stepIOType := arg.GetStepIo().(type) {
 		case *pb.StepIO_Parameter:
 			args.Parameters = append(args.Parameters, wfv1.Parameter{
-				Name:             stepIOType.Parameter.GetName(),
-				Value:			  &stepIOType.Parameter.Value,
-				// TODO: This is not in proto def yet.
-				//GlobalName: 		stepIOType.Parameter.GlobalName,
+				Name:  stepIOType.Parameter.GetName(),
+				Value: &stepIOType.Parameter.Value,
 			})
 		case *pb.StepIO_Artifact:
 			args.Artifacts = append(args.Artifacts, wfv1.Artifact{
-				Name:             stepIOType.Artifact.GetName(),
-				Path:             stepIOType.Artifact.GetLocalPath(),
-				From:             stepIOType.Artifact.GetValue(),
-				// TODO: This is not used internally yet. Implement this when needed.
-				//ArtifactLocation: wfv1.ArtifactLocation{},
-				GlobalName:       stepIOType.Artifact.GetGlobalName(),
+				Name: stepIOType.Artifact.GetName(),
+				Path: stepIOType.Artifact.GetLocalPath(),
+				From: stepIOType.Artifact.GetValue(),
 			})
-		//case *pb.StepIO_Stdout:
-		//case nil:
-		default:
-			//return fmt.Errorf("Profile.Avatar has unexpected type %T", x)
 		}
 	}
 	return args
 }
 
-func getInputsAndOutputs(step *pb.Step) (wfv1.Inputs, wfv1.Outputs) {
-	
+func getInputsAndOutputsFromTemplate(template *pb.StepTemplate) (wfv1.Inputs, wfv1.Outputs) {
+	var inputs wfv1.Inputs
+	var outputs wfv1.Outputs
+	for _, input := range template.GetInputs() {
+		switch stepIOType := input.GetStepIo().(type) {
+		case *pb.StepIO_Parameter:
+			inputs.Parameters = append(inputs.Parameters, wfv1.Parameter{
+				Name:  stepIOType.Parameter.GetName(),
+				Value: &stepIOType.Parameter.Value,
+				// TODO: This is not in proto def yet.
+				//GlobalName: 		stepIOType.Parameter.GlobalName,
+			})
+		case *pb.StepIO_Artifact:
+			inputs.Artifacts = append(inputs.Artifacts, wfv1.Artifact{
+				Name: stepIOType.Artifact.GetName(),
+				Path: stepIOType.Artifact.GetLocalPath(),
+				From: stepIOType.Artifact.GetValue(),
+				// TODO: This is not used internally yet. Implement this when needed.
+				//ArtifactLocation: wfv1.ArtifactLocation{},
+				GlobalName: stepIOType.Artifact.GetGlobalName(),
+			})
+		}
+	}
+	return inputs, outputs
 }
 
 func createDAGTasks(workflowPb *pb.Workflow, entryPointName string) []wfv1.Template {
@@ -87,9 +100,9 @@ func createDAGTasks(workflowPb *pb.Workflow, entryPointName string) []wfv1.Templ
 				Name:         seqStep.GetName(),
 				Template:     seqStep.GetTmplName(),
 				Dependencies: seqStep.GetDependencies(),
-				Arguments: getArgs(seqStep),
+				Arguments:    getEntryPointTemplateArgs(seqStep),
 			})
-		templates = append(templates, createSingleStepTemplate(seqStep))
+		templates = append(templates, createSingleStepTemplate(seqStep, workflowPb))
 	}
 	return templates
 }
@@ -101,17 +114,19 @@ func createSeqOrParallelSteps(workflowPb *pb.Workflow, entryPointName string) []
 		templates[0].Steps = append(templates[0].Steps,
 			wfv1.ParallelSteps{
 				Steps: []wfv1.WorkflowStep{
-					{Name: seqStep.GetName(), Template: seqStep.GetTmplName(), Arguments: getArgs(seqStep)}}})
+					{Name: seqStep.GetName(), Template: seqStep.GetTmplName(), Arguments: getEntryPointTemplateArgs(seqStep)}}})
 
-		templates = append(templates, createSingleStepTemplate(seqStep))
+		templates = append(templates, createSingleStepTemplate(seqStep, workflowPb))
 	}
 	return templates
 }
 
-func createSingleStepTemplate(step *pb.Step) wfv1.Template {
+func createSingleStepTemplate(step *pb.Step, workflowPb *pb.Workflow) wfv1.Template {
+	inputs, outputs := getInputsAndOutputsFromTemplate(workflowPb.GetTemplates()[step.TmplName])
 	template := wfv1.Template{
-		Name: step.TmplName,
-		Inputs: }
+		Name:    step.TmplName,
+		Inputs:  inputs,
+		Outputs: outputs}
 	// TODO: Check mutual exclusivity of different specs.
 	if step.GetContainerSpec() != nil || step.GetScript() != "" {
 		containerSpec := step.GetContainerSpec()
