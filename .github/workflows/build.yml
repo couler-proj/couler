@@ -41,9 +41,11 @@ jobs:
         pre-commit run -a --show-diff-on-failure
     - name: Python Unit tests
       run: |
+        set -e
         bash ./scripts/test_python.sh
     - name: Go Unit tests
       run: |
+        set -e
         bash ./scripts/test_go.sh
     - uses: opsgang/ga-setup-minikube@v0.1.1
       with:

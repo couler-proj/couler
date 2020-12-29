@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 pb_file=./go/couler/proto/couler/v1/couler.pb.go
 cp $pb_file /tmp/old.pb.go
 
