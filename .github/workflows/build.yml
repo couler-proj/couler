@@ -40,26 +40,11 @@ jobs:
       run: |
         pre-commit run -a --show-diff-on-failure
     - name: Python Unit tests
-      shell: bash
       run: |
-        set -x
-        pb_file=./couler/proto/couler_pb2.py
-        cp $pb_file /tmp/old_pb2.py
-        python setup.py proto
-        pb_diff=$(diff /tmp/old_pb2.py $pb_file)
-        echo $pb_diff
-        [[ ! -z "$pb_diff" ]] && {echo "should commit generated protobuf files:" $pb_file; exit 1;}
-        python setup.py install
-        python -m pytest
+        bash ./scripts/test_python.sh
     - name: Go Unit tests
       run: |
-        set -x
-        pb_file=./go/couler/proto/couler/v1/couler.pb.go
-        cp $pb_file /tmp/old.pb.go
-        go generate ./...
-        pb_diff=$(diff /tmp/old.pb.go $pb_file)
-        [[ ! -z "$pb_diff" ]] && {echo "should commit generated protobuf files:" $pb_file; exit 1;}
-        go test ./... -v
+        bash ./scripts/test_go.sh
     - uses: opsgang/ga-setup-minikube@v0.1.1
       with:
           minikube-version: 1.11.0
