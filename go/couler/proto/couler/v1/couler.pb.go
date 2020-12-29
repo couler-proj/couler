@@ -6,7 +6,7 @@ package v1
 import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
-	any "github.com/golang/protobuf/ptypes/any"
+	anypb "google.golang.org/protobuf/types/known/anypb"
 	math "math"
 )
 
@@ -390,12 +390,12 @@ func (*StepIO) XXX_OneofWrappers() []interface{} {
 }
 
 type ContainerSpec struct {
-	Image                string              `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
-	Command              []string            `protobuf:"bytes,2,rep,name=command,proto3" json:"command,omitempty"`
-	Env                  map[string]*any.Any `protobuf:"bytes,3,rep,name=env,proto3" json:"env,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
-	XXX_unrecognized     []byte              `json:"-"`
-	XXX_sizecache        int32               `json:"-"`
+	Image                string                `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
+	Command              []string              `protobuf:"bytes,2,rep,name=command,proto3" json:"command,omitempty"`
+	Env                  map[string]*anypb.Any `protobuf:"bytes,3,rep,name=env,proto3" json:"env,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
+	XXX_unrecognized     []byte                `json:"-"`
+	XXX_sizecache        int32                 `json:"-"`
 }
 
 func (m *ContainerSpec) Reset()         { *m = ContainerSpec{} }
@@ -437,7 +437,7 @@ func (m *ContainerSpec) GetCommand() []string {
 	return nil
 }
 
-func (m *ContainerSpec) GetEnv() map[string]*any.Any {
+func (m *ContainerSpec) GetEnv() map[string]*anypb.Any {
 	if m != nil {
 		return m.Env
 	}
@@ -778,7 +778,7 @@ func init() {
 	proto.RegisterType((*StdOut)(nil), "couler.v1.StdOut")
 	proto.RegisterType((*StepIO)(nil), "couler.v1.StepIO")
 	proto.RegisterType((*ContainerSpec)(nil), "couler.v1.ContainerSpec")
-	proto.RegisterMapType((map[string]*any.Any)(nil), "couler.v1.ContainerSpec.EnvEntry")
+	proto.RegisterMapType((map[string]*anypb.Any)(nil), "couler.v1.ContainerSpec.EnvEntry")
 	proto.RegisterType((*ResourceSpec)(nil), "couler.v1.ResourceSpec")
 	proto.RegisterType((*Step)(nil), "couler.v1.Step")
 	proto.RegisterType((*ConcurrentSteps)(nil), "couler.v1.ConcurrentSteps")
