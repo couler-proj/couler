@@ -41,77 +41,6 @@ func ConvertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Wor
 	return argoWorkflow, nil
 }
 
-func getEntryPointTemplateArgs(step *pb.Step) wfv1.Arguments {
-	var args wfv1.Arguments
-	for _, arg := range step.GetArgs() {
-		switch stepIOType := arg.GetStepIo().(type) {
-		case *pb.StepIO_Parameter:
-			args.Parameters = append(args.Parameters, wfv1.Parameter{
-				Name:  stepIOType.Parameter.GetName(),
-				Value: &stepIOType.Parameter.Value,
-			})
-		case *pb.StepIO_Artifact:
-			args.Artifacts = append(args.Artifacts, wfv1.Artifact{
-				Name: stepIOType.Artifact.GetName(),
-				From: stepIOType.Artifact.GetValue(),
-			})
-		}
-	}
-	return args
-}
-
-func getInputsAndOutputsFromTemplate(template *pb.StepTemplate) (wfv1.Inputs, wfv1.Outputs) {
-	var inputs wfv1.Inputs
-	var outputs wfv1.Outputs
-	for _, input := range template.GetInputs() {
-		switch stepIOType := input.GetStepIo().(type) {
-		case *pb.StepIO_Parameter:
-			inputs.Parameters = append(inputs.Parameters, wfv1.Parameter{
-				Name:       stepIOType.Parameter.GetName(),
-				Value:      &stepIOType.Parameter.Value,
-				GlobalName: stepIOType.Parameter.GlobalName,
-			})
-		case *pb.StepIO_Artifact:
-			artifactLocation := wfv1.ArtifactLocation{}
-
-			if stepIOType.Artifact.Type == "OSS" {
-				artifactLocation = wfv1.ArtifactLocation{OSS: &wfv1.OSSArtifact{
-					OSSBucket: wfv1.OSSBucket{
-						Endpoint: stepIOType.Artifact.Endpoint,
-						Bucket:   stepIOType.Artifact.Bucket,
-						AccessKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
-							Name: stepIOType.Artifact.AccessKey.Name}, Key: stepIOType.Artifact.AccessKey.Key},
-						SecretKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
-							Name: stepIOType.Artifact.SecretKey.Name}, Key: stepIOType.Artifact.SecretKey.Key},
-					},
-					Key: stepIOType.Artifact.RemotePath,
-				}}
-			} else if stepIOType.Artifact.Type == "S3" {
-				artifactLocation = wfv1.ArtifactLocation{S3: &wfv1.S3Artifact{
-					S3Bucket: wfv1.S3Bucket{
-						Endpoint: stepIOType.Artifact.Endpoint,
-						Bucket:   stepIOType.Artifact.Bucket,
-						AccessKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
-							Name: stepIOType.Artifact.AccessKey.Name}, Key: stepIOType.Artifact.AccessKey.Key},
-						SecretKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
-							Name: stepIOType.Artifact.SecretKey.Name}, Key: stepIOType.Artifact.SecretKey.Key},
-					},
-					Key: stepIOType.Artifact.RemotePath,
-				}}
-			}
-
-			inputs.Artifacts = append(inputs.Artifacts, wfv1.Artifact{
-				Name:             stepIOType.Artifact.GetName(),
-				Path:             stepIOType.Artifact.GetLocalPath(),
-				From:             stepIOType.Artifact.GetValue(),
-				ArtifactLocation: artifactLocation,
-				GlobalName:       stepIOType.Artifact.GetGlobalName(),
-			})
-		}
-	}
-	return inputs, outputs
-}
-
 func createDAGTasks(workflowPb *pb.Workflow, entryPointName string) []wfv1.Template {
 	templates := []wfv1.Template{{Name: entryPointName}}
 	// Convert steps to DAG tasks.
@@ -182,4 +111,121 @@ func createSingleStepTemplate(step *pb.Step, workflowPb *pb.Workflow) wfv1.Templ
 		}
 	}
 	return template
+}
+
+func getEntryPointTemplateArgs(step *pb.Step) wfv1.Arguments {
+	var args wfv1.Arguments
+	for _, arg := range step.GetArgs() {
+		switch stepIOType := arg.GetStepIo().(type) {
+		case *pb.StepIO_Parameter:
+			args.Parameters = append(args.Parameters, wfv1.Parameter{
+				Name:  stepIOType.Parameter.GetName(),
+				Value: &stepIOType.Parameter.Value,
+			})
+		case *pb.StepIO_Artifact:
+			args.Artifacts = append(args.Artifacts, wfv1.Artifact{
+				Name: stepIOType.Artifact.GetName(),
+				From: stepIOType.Artifact.GetValue(),
+			})
+		}
+	}
+	return args
+}
+
+func getInputsAndOutputsFromTemplate(template *pb.StepTemplate) (wfv1.Inputs, wfv1.Outputs) {
+	var inputs wfv1.Inputs
+	for _, input := range template.GetInputs() {
+		switch stepIOType := input.GetStepIo().(type) {
+		case *pb.StepIO_Parameter:
+			inputs.Parameters = append(inputs.Parameters, wfv1.Parameter{
+				Name:       stepIOType.Parameter.GetName(),
+				Value:      &stepIOType.Parameter.Value,
+				GlobalName: stepIOType.Parameter.GlobalName,
+			})
+		case *pb.StepIO_Artifact:
+			artifactLocation := wfv1.ArtifactLocation{}
+
+			if stepIOType.Artifact.Type == "OSS" {
+				artifactLocation = wfv1.ArtifactLocation{OSS: &wfv1.OSSArtifact{
+					OSSBucket: wfv1.OSSBucket{
+						Endpoint: stepIOType.Artifact.Endpoint,
+						Bucket:   stepIOType.Artifact.Bucket,
+						AccessKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
+							Name: stepIOType.Artifact.AccessKey.Name}, Key: stepIOType.Artifact.AccessKey.Key},
+						SecretKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
+							Name: stepIOType.Artifact.SecretKey.Name}, Key: stepIOType.Artifact.SecretKey.Key},
+					},
+					Key: stepIOType.Artifact.RemotePath,
+				}}
+			} else if stepIOType.Artifact.Type == "S3" {
+				artifactLocation = wfv1.ArtifactLocation{S3: &wfv1.S3Artifact{
+					S3Bucket: wfv1.S3Bucket{
+						Endpoint: stepIOType.Artifact.Endpoint,
+						Bucket:   stepIOType.Artifact.Bucket,
+						AccessKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
+							Name: stepIOType.Artifact.AccessKey.Name}, Key: stepIOType.Artifact.AccessKey.Key},
+						SecretKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
+							Name: stepIOType.Artifact.SecretKey.Name}, Key: stepIOType.Artifact.SecretKey.Key},
+					},
+					Key: stepIOType.Artifact.RemotePath,
+				}}
+			}
+
+			inputs.Artifacts = append(inputs.Artifacts, wfv1.Artifact{
+				Name:             stepIOType.Artifact.GetName(),
+				Path:             stepIOType.Artifact.GetLocalPath(),
+				From:             stepIOType.Artifact.GetValue(),
+				ArtifactLocation: artifactLocation,
+				GlobalName:       stepIOType.Artifact.GetGlobalName(),
+			})
+		}
+	}
+	var outputs wfv1.Outputs
+	for _, output := range template.GetOutputs() {
+		switch stepIOType := output.GetStepIo().(type) {
+		case *pb.StepIO_Parameter:
+			inputs.Parameters = append(inputs.Parameters, wfv1.Parameter{
+				Name:       stepIOType.Parameter.GetName(),
+				Value:      &stepIOType.Parameter.Value,
+				GlobalName: stepIOType.Parameter.GlobalName,
+			})
+		case *pb.StepIO_Artifact:
+			artifactLocation := wfv1.ArtifactLocation{}
+
+			if stepIOType.Artifact.Type == "OSS" {
+				artifactLocation = wfv1.ArtifactLocation{OSS: &wfv1.OSSArtifact{
+					OSSBucket: wfv1.OSSBucket{
+						Endpoint: stepIOType.Artifact.Endpoint,
+						Bucket:   stepIOType.Artifact.Bucket,
+						AccessKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
+							Name: stepIOType.Artifact.AccessKey.Name}, Key: stepIOType.Artifact.AccessKey.Key},
+						SecretKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
+							Name: stepIOType.Artifact.SecretKey.Name}, Key: stepIOType.Artifact.SecretKey.Key},
+					},
+					Key: stepIOType.Artifact.RemotePath,
+				}}
+			} else if stepIOType.Artifact.Type == "S3" {
+				artifactLocation = wfv1.ArtifactLocation{S3: &wfv1.S3Artifact{
+					S3Bucket: wfv1.S3Bucket{
+						Endpoint: stepIOType.Artifact.Endpoint,
+						Bucket:   stepIOType.Artifact.Bucket,
+						AccessKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
+							Name: stepIOType.Artifact.AccessKey.Name}, Key: stepIOType.Artifact.AccessKey.Key},
+						SecretKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
+							Name: stepIOType.Artifact.SecretKey.Name}, Key: stepIOType.Artifact.SecretKey.Key},
+					},
+					Key: stepIOType.Artifact.RemotePath,
+				}}
+			}
+
+			outputs.Artifacts = append(outputs.Artifacts, wfv1.Artifact{
+				Name:             stepIOType.Artifact.GetName(),
+				Path:             stepIOType.Artifact.GetLocalPath(),
+				From:             stepIOType.Artifact.GetValue(),
+				ArtifactLocation: artifactLocation,
+				GlobalName:       stepIOType.Artifact.GetGlobalName(),
+			})
+		}
+	}
+	return inputs, outputs
 }

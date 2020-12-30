@@ -95,11 +95,24 @@ func TestArgoWorkflowConversionSequential(t *testing.T) {
 }
 
 func TestArgoWorkflowConversionSequentialWithIO(t *testing.T) {
+	containerStep = &pb.Step{
+		Name:     "container-test-step",
+		TmplName: "container-test",
+		ContainerSpec: &pb.ContainerSpec{
+			Image:   "docker/whalesay:latest",
+			Command: []string{"cowsay"},
+		}}
 	pbWf := &pb.Workflow{Templates: map[string]*pb.StepTemplate{
 		containerStep.TmplName: {
-			Name:    containerStep.TmplName,
-			Inputs:  nil,
-			Outputs: nil,
+			Name: containerStep.TmplName,
+			Inputs: []*pb.StepIO{{
+				Name:   "message",
+				Source: 0,
+				StepIo: &pb.StepIO_Parameter{Parameter: &pb.Parameter{
+					Name:  "message",
+					Value: "hello world",
+				}},
+			}},
 		},
 		scriptStep.TmplName:   {Name: scriptStep.TmplName},
 		resourceStep.TmplName: {Name: resourceStep.TmplName},
@@ -114,21 +127,34 @@ func TestArgoWorkflowConversionSequentialWithIO(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, 4, len(argoWf.Spec.Templates))
-	assert.Equal(t,
-		[]wfv1.ParallelSteps{
-			{Steps: []wfv1.WorkflowStep{
-				{Name: containerStep.Name, Template: containerStep.TmplName},
+	value := "hello world"
+	//fmt.Println(argoWf.Spec.Templates[0].Steps)
+	//assert.Equal(t,
+	//	[]wfv1.ParallelSteps{
+	//		{Steps: []wfv1.WorkflowStep{
+	//			{Name: containerStep.Name, Template: containerStep.TmplName, Arguments: wfv1.Arguments{
+	//				Parameters: []wfv1.Parameter{{
+	//					Name:       "message",
+	//					Value:      &value,
+	//				}},
+	//			},
+	//		}}},
+	//		{Steps: []wfv1.WorkflowStep{
+	//			{Name: scriptStep.Name, Template: scriptStep.TmplName},
+	//		}},
+	//		{Steps: []wfv1.WorkflowStep{
+	//			{Name: resourceStep.Name, Template: resourceStep.TmplName},
+	//		}}}, argoWf.Spec.Templates[0].Steps)
+	assert.Equal(t, wfv1.Template{
+		Name:      containerStep.TmplName,
+		Container: &corev1.Container{Image: containerStep.ContainerSpec.Image, Command: containerStep.ContainerSpec.Command},
+		Inputs: wfv1.Inputs{
+			Parameters: []wfv1.Parameter{{
+				Name:  "message",
+				Value: &value,
 			}},
-			{Steps: []wfv1.WorkflowStep{
-				{Name: scriptStep.Name, Template: scriptStep.TmplName},
-			}},
-			{Steps: []wfv1.WorkflowStep{
-				{Name: resourceStep.Name, Template: resourceStep.TmplName},
-			}}}, argoWf.Spec.Templates[0].Steps)
-	assert.Equal(t, wfv1.Template{Name: containerStep.TmplName, Container: &corev1.Container{
-		Image:   containerStep.ContainerSpec.Image,
-		Command: containerStep.ContainerSpec.Command,
-	}}, argoWf.Spec.Templates[1])
+		},
+	}, argoWf.Spec.Templates[1])
 }
 
 func TestArgoWorkflowConversionDAG(t *testing.T) {
