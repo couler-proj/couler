@@ -94,6 +94,43 @@ func TestArgoWorkflowConversionSequential(t *testing.T) {
 	}}, argoWf.Spec.Templates[3])
 }
 
+func TestArgoWorkflowConversionSequentialWithIO(t *testing.T) {
+	pbWf := &pb.Workflow{Templates: map[string]*pb.StepTemplate{
+		containerStep.TmplName: {
+			Name:    containerStep.TmplName,
+			Inputs:  nil,
+			Outputs: nil,
+		},
+		scriptStep.TmplName:   {Name: scriptStep.TmplName},
+		resourceStep.TmplName: {Name: resourceStep.TmplName},
+	}}
+	pbWf.Steps = []*pb.ConcurrentSteps{
+		{Steps: []*pb.Step{containerStep}},
+		{Steps: []*pb.Step{scriptStep}},
+		{Steps: []*pb.Step{resourceStep}},
+	}
+
+	argoWf, err := ConvertToArgoWorkflow(pbWf, "hello-world-")
+	assert.NoError(t, err)
+
+	assert.Equal(t, 4, len(argoWf.Spec.Templates))
+	assert.Equal(t,
+		[]wfv1.ParallelSteps{
+			{Steps: []wfv1.WorkflowStep{
+				{Name: containerStep.Name, Template: containerStep.TmplName},
+			}},
+			{Steps: []wfv1.WorkflowStep{
+				{Name: scriptStep.Name, Template: scriptStep.TmplName},
+			}},
+			{Steps: []wfv1.WorkflowStep{
+				{Name: resourceStep.Name, Template: resourceStep.TmplName},
+			}}}, argoWf.Spec.Templates[0].Steps)
+	assert.Equal(t, wfv1.Template{Name: containerStep.TmplName, Container: &corev1.Container{
+		Image:   containerStep.ContainerSpec.Image,
+		Command: containerStep.ContainerSpec.Command,
+	}}, argoWf.Spec.Templates[1])
+}
+
 func TestArgoWorkflowConversionDAG(t *testing.T) {
 	pbWf := &pb.Workflow{}
 	scriptStep.Dependencies = []string{containerStep.TmplName}
