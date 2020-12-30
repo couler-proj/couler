@@ -53,7 +53,6 @@ func getEntryPointTemplateArgs(step *pb.Step) wfv1.Arguments {
 		case *pb.StepIO_Artifact:
 			args.Artifacts = append(args.Artifacts, wfv1.Artifact{
 				Name: stepIOType.Artifact.GetName(),
-				Path: stepIOType.Artifact.GetLocalPath(),
 				From: stepIOType.Artifact.GetValue(),
 			})
 		}
@@ -68,19 +67,45 @@ func getInputsAndOutputsFromTemplate(template *pb.StepTemplate) (wfv1.Inputs, wf
 		switch stepIOType := input.GetStepIo().(type) {
 		case *pb.StepIO_Parameter:
 			inputs.Parameters = append(inputs.Parameters, wfv1.Parameter{
-				Name:  stepIOType.Parameter.GetName(),
-				Value: &stepIOType.Parameter.Value,
-				// TODO: This is not in proto def yet.
-				//GlobalName: 		stepIOType.Parameter.GlobalName,
+				Name:       stepIOType.Parameter.GetName(),
+				Value:      &stepIOType.Parameter.Value,
+				GlobalName: stepIOType.Parameter.GlobalName,
 			})
 		case *pb.StepIO_Artifact:
+			artifactLocation := wfv1.ArtifactLocation{}
+
+			if stepIOType.Artifact.Type == "OSS" {
+				artifactLocation = wfv1.ArtifactLocation{OSS: &wfv1.OSSArtifact{
+					OSSBucket: wfv1.OSSBucket{
+						Endpoint: stepIOType.Artifact.Endpoint,
+						Bucket:   stepIOType.Artifact.Bucket,
+						AccessKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
+							Name: stepIOType.Artifact.AccessKey.Name}, Key: stepIOType.Artifact.AccessKey.Key},
+						SecretKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
+							Name: stepIOType.Artifact.SecretKey.Name}, Key: stepIOType.Artifact.SecretKey.Key},
+					},
+					Key: stepIOType.Artifact.RemotePath,
+				}}
+			} else if stepIOType.Artifact.Type == "S3" {
+				artifactLocation = wfv1.ArtifactLocation{S3: &wfv1.S3Artifact{
+					S3Bucket: wfv1.S3Bucket{
+						Endpoint: stepIOType.Artifact.Endpoint,
+						Bucket:   stepIOType.Artifact.Bucket,
+						AccessKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
+							Name: stepIOType.Artifact.AccessKey.Name}, Key: stepIOType.Artifact.AccessKey.Key},
+						SecretKeySecret: corev1.SecretKeySelector{LocalObjectReference: corev1.LocalObjectReference{
+							Name: stepIOType.Artifact.SecretKey.Name}, Key: stepIOType.Artifact.SecretKey.Key},
+					},
+					Key: stepIOType.Artifact.RemotePath,
+				}}
+			}
+
 			inputs.Artifacts = append(inputs.Artifacts, wfv1.Artifact{
-				Name: stepIOType.Artifact.GetName(),
-				Path: stepIOType.Artifact.GetLocalPath(),
-				From: stepIOType.Artifact.GetValue(),
-				// TODO: This is not used internally yet. Implement this when needed.
-				//ArtifactLocation: wfv1.ArtifactLocation{},
-				GlobalName: stepIOType.Artifact.GetGlobalName(),
+				Name:             stepIOType.Artifact.GetName(),
+				Path:             stepIOType.Artifact.GetLocalPath(),
+				From:             stepIOType.Artifact.GetValue(),
+				ArtifactLocation: artifactLocation,
+				GlobalName:       stepIOType.Artifact.GetGlobalName(),
 			})
 		}
 	}
