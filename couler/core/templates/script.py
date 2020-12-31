@@ -35,6 +35,7 @@ class Script(Template):
         timeout=None,
         pool=None,
         daemon=False,
+        node_selector=None,
     ):
         Template.__init__(
             self,
@@ -51,6 +52,7 @@ class Script(Template):
         self.secret = secret
         self.resources = resources
         self.image_pull_policy = image_pull_policy
+        self.node_selector = node_selector
 
     def to_dict(self):
         template = Template.to_dict(self)
@@ -61,6 +63,12 @@ class Script(Template):
             if self.env is None:
                 self.env = {}
             self.env.update(OVERWRITE_GPU_ENVS)
+
+        # Node selector
+        if self.node_selector is not None:
+            # TODO: Support inferring node selector values from Argo parameters
+            template["nodeSelector"] = self.node_selector
+
         template["script"] = self.script_dict()
         return template
 

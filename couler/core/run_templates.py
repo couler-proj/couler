@@ -46,6 +46,7 @@ def run_script(
     image_pull_policy=None,
     pool=None,
     daemon=False,
+    node_selector=None,
 ):
     """Generate an Argo script template.  For example,
     https://github.com/argoproj/argo/tree/master/examples#scripts--results.
@@ -73,6 +74,7 @@ def run_script(
             image_pull_policy=image_pull_policy,
             pool=pool,
             daemon=daemon,
+            node_selector=node_selector,
         )
         states.workflow.add_template(template)
 
