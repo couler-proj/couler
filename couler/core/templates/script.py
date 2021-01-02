@@ -17,16 +17,17 @@ from collections import OrderedDict
 from couler.core import states, utils
 from couler.core.constants import OVERWRITE_GPU_ENVS
 from couler.core.templates.secret import Secret
-from couler.core.templates.template import Template
+from couler.core.templates.container import Container
 
 
-class Script(Template):
+class Script(Container):
     def __init__(
         self,
         name,
         image,
         command,
         source,
+        args=None,
         env=None,
         secret=None,
         resources=None,
@@ -34,72 +35,50 @@ class Script(Template):
         retry=None,
         timeout=None,
         pool=None,
+        output=None,
+        input=None,
+        enable_ulogfs=True,
         daemon=False,
+        volume_mounts=None,
+        working_dir=None,
         node_selector=None,
+        volumes=None,
     ):
-        Template.__init__(
+        Container.__init__(
             self,
-            name=name,
-            timeout=timeout,
+            name,
+            image,
+            command,
+            args=args,
+            env=env,
+            secret=secret,
+            resources=resources,
+            image_pull_policy=image_pull_policy,
             retry=retry,
+            timeout=timeout,
             pool=pool,
+            output=output,
+            input=input,
+            enable_ulogfs=enable_ulogfs,
             daemon=daemon,
+            volume_mounts=volume_mounts,
+            working_dir=working_dir,
+            node_selector=node_selector,
+            volumes=volumes,
         )
-        self.image = image
-        self.command = "python" if command is None else command
         self.source = source
-        self.env = env
-        self.secret = secret
-        self.resources = resources
-        self.image_pull_policy = image_pull_policy
-        self.node_selector = node_selector
 
     def to_dict(self):
-        template = Template.to_dict(self)
-        if (
-            not utils.gpu_requested(self.resources)
-            and states._overwrite_nvidia_gpu_envs
-        ):
-            if self.env is None:
-                self.env = {}
-            self.env.update(OVERWRITE_GPU_ENVS)
-
-        # Node selector
-        if self.node_selector is not None:
-            # TODO: Support inferring node selector values from Argo parameters
-            template["nodeSelector"] = self.node_selector
-
+        template = Container.to_dict(self)
+        template.pop("container", None)
         template["script"] = self.script_dict()
         return template
 
     def script_dict(self):
-        script = OrderedDict({"image": self.image, "command": [self.command]})
+        script = OrderedDict({"image": self.image, "command": self.command})
         script["source"] = (
             utils.body(self.source)
-            if self.command.lower() == "python"
+            if len(self.command) > 0 and self.command[0].lower() == "python"
             else self.source
         )
-        if utils.non_empty(self.env):
-            script["env"] = utils.convert_dict_to_env_list(self.env)
-
-        if self.secret is not None:
-            if not isinstance(self.secret, Secret):
-                raise ValueError(
-                    "Parameter secret should be an instance of Secret"
-                )
-            if self.env is None:
-                script["env"] = self.secret.to_env_list()
-            else:
-                script["env"].extend(self.secret.to_env_list())
-
-        if self.resources is not None:
-            script["resources"] = {
-                "requests": self.resources,
-                # To fix the mojibake issue when dump yaml for one object
-                "limits": copy.deepcopy(self.resources),
-            }
-        if self.image_pull_policy is not None:
-            script["imagePullPolicy"] = utils.config_image_pull_policy(
-                self.image_pull_policy
-            )
         return script
