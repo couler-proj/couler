@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -v
 
 pb_file=./couler/proto/couler_pb2.py
 cp $pb_file /tmp/old_pb2.py
