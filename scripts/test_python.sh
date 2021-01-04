@@ -10,6 +10,7 @@ python setup.py proto
 pb_diff=$(diff /tmp/old_pb2.py $pb_file)
 if [[ ! -z "$pb_diff" ]]; then
   echo "should commit generated protobuf files:" $pb_file
+  echo "found the following diff: $pb_diff"
   exit 1
 fi
 
