@@ -32,6 +32,7 @@ jobs:
         python -m pip install -r requirements.txt -r requirements-dev.txt
         go get github.com/golang/protobuf/protoc-gen-go@v1.3.2
         go get golang.org/x/lint/golint
+        go get github.com/argoproj/argo@release-2.8
     - name: Install protoc
       uses: arduino/setup-protoc@v1
       with:
