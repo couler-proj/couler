@@ -96,7 +96,7 @@ func TestArgoWorkflowConversionSequential(t *testing.T) {
 
 func TestArgoWorkflowConversionSequentialWithIO(t *testing.T) {
 	paramValue := "hello world"
-	containerStep = &pb.Step{
+	containerStepWithIO := &pb.Step{
 		Name:     "container-test-step",
 		TmplName: "container-test",
 		ContainerSpec: &pb.ContainerSpec{
@@ -114,7 +114,7 @@ func TestArgoWorkflowConversionSequentialWithIO(t *testing.T) {
 	}
 	pbWf := &pb.Workflow{Templates: map[string]*pb.StepTemplate{
 		containerStep.TmplName: {
-			Name: containerStep.TmplName,
+			Name: containerStepWithIO.TmplName,
 			Inputs: []*pb.StepIO{{
 				Name:   "message",
 				Source: 0,
@@ -128,7 +128,7 @@ func TestArgoWorkflowConversionSequentialWithIO(t *testing.T) {
 		resourceStep.TmplName: {Name: resourceStep.TmplName},
 	}}
 	pbWf.Steps = []*pb.ConcurrentSteps{
-		{Steps: []*pb.Step{containerStep}},
+		{Steps: []*pb.Step{containerStepWithIO}},
 		{Steps: []*pb.Step{scriptStep}},
 		{Steps: []*pb.Step{resourceStep}},
 	}
@@ -140,7 +140,7 @@ func TestArgoWorkflowConversionSequentialWithIO(t *testing.T) {
 	assert.Equal(t,
 		[]wfv1.ParallelSteps{
 			{Steps: []wfv1.WorkflowStep{
-				{Name: containerStep.Name, Template: containerStep.TmplName, Arguments: wfv1.Arguments{
+				{Name: containerStepWithIO.Name, Template: containerStepWithIO.TmplName, Arguments: wfv1.Arguments{
 					Parameters: []wfv1.Parameter{{
 						Name:  "message",
 						Value: &paramValue,
@@ -154,8 +154,9 @@ func TestArgoWorkflowConversionSequentialWithIO(t *testing.T) {
 				{Name: resourceStep.Name, Template: resourceStep.TmplName},
 			}}}, argoWf.Spec.Templates[0].Steps)
 	assert.Equal(t, wfv1.Template{
-		Name:      containerStep.TmplName,
-		Container: &corev1.Container{Image: containerStep.ContainerSpec.Image, Command: containerStep.ContainerSpec.Command},
+		Name: containerStepWithIO.TmplName,
+		Container: &corev1.Container{Image: containerStepWithIO.ContainerSpec.Image,
+			Command: containerStepWithIO.ContainerSpec.Command},
 		Inputs: wfv1.Inputs{
 			Parameters: []wfv1.Parameter{{
 				Name:  "message",
