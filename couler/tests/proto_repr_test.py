@@ -115,6 +115,7 @@ spec:
         proto_wf = get_default_proto_workflow()
         s = proto_wf.steps[0].steps[0]
         t = proto_wf.templates[s.tmpl_name]
+        self.assertFalse(s.HasField("container_spec"))
         self.assertEqual(s.resource_spec.manifest, manifest)
         self.assertEqual(s.resource_spec.success_condition, success_condition)
         self.assertEqual(s.resource_spec.failure_condition, failure_condition)

@@ -66,10 +66,10 @@ def step_repr(
         pb_step.container_spec.image = image
     if manifest is not None:
         pb_step.resource_spec.manifest = manifest
-    if success_cond is not None:
-        pb_step.resource_spec.success_condition = success_cond
-        pb_step.resource_spec.failure_condition = failure_cond
-    if command is None:
+        if success_cond is not None and failure_cond is not None:
+            pb_step.resource_spec.success_condition = success_cond
+            pb_step.resource_spec.failure_condition = failure_cond
+    elif command is None:
         pb_step.container_spec.command.append("python")
     elif isinstance(command, list):
         pb_step.container_spec.command.extend(command)
