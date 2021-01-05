@@ -18,6 +18,47 @@ class ProtoReprTest(unittest.TestCase):
         s = proto_wf.steps[0].steps[0]
         self.assertEqual(s.script, '\nprint("echo")\n')
 
+    def test_when(self):
+        def random_code():
+            import random
+
+            res = "heads" if random.randint(0, 1) == 0 else "tails"
+            print(res)
+
+        def heads():
+            return couler.run_container(
+                image="alpine:3.6", command=["sh", "-c", 'echo "it was heads"']
+            )
+
+        def tails():
+            return couler.run_container(
+                image="alpine:3.6", command=["sh", "-c", 'echo "it was tails"']
+            )
+
+        result = couler.run_script(
+            image="python:alpine3.6", source=random_code
+        )
+        couler.when(couler.equal(result, "heads"), lambda: heads())
+        couler.when(couler.equal(result, "tails"), lambda: tails())
+        proto_wf = get_default_proto_workflow()
+        step_heads = proto_wf.steps[1].steps[0]
+        self.assertEqual(
+            step_heads.when, "{{steps.test-when-550.outputs.result}} == heads"
+        )
+
+    def test_exit_handler(self):
+        def send_mail():
+            return couler.run_container(
+                image="alpine:3.6", command=["echo", "send mail"]
+            )
+
+        couler.run_container(image="alpine:3.6", command=["exit", "1"])
+        couler.set_exit_handler(couler.WFStatus.Failed, send_mail)
+        proto_wf = get_default_proto_workflow()
+        self.assertEqual(len(proto_wf.exit_handler_steps), 1)
+        s = proto_wf.exit_handler_steps[0]
+        self.assertEqual(s.when, "{{workflow.status}} == Failed")
+
     def test_output_oss_artifact(self):
         # the content of local file would be uploaded to OSS
         output_artifact = couler.create_oss_artifact(

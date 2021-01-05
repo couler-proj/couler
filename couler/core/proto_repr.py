@@ -83,6 +83,9 @@ def step_repr(
         else:
             pb_step.script = utils.body(source)
 
+    if states._when_prefix is not None:
+        pb_step.when = states._when_prefix
+
     # add template to proto workflow
     wf = get_default_proto_workflow()
     if tmpl_name not in wf.templates:
@@ -113,10 +116,14 @@ def step_repr(
                 )
                 pb_step.args.append(pb_param)
 
-    # add step to proto workflow
-    concurrent_step = couler_pb2.ConcurrentSteps()
-    concurrent_step.steps.append(pb_step)
-    wf.steps.append(concurrent_step)
+    if states._exit_handler_enable:
+        # add exit handler steps
+        wf.exit_handler_steps.append(pb_step)
+    else:
+        # add step to proto workflow
+        concurrent_step = couler_pb2.ConcurrentSteps()
+        concurrent_step.steps.append(pb_step)
+        wf.steps.append(concurrent_step)
     return pb_step
 
 
