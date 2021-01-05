@@ -75,6 +75,7 @@ message Step {
   string script = 6;
   repeated StepIO args = 7;
   repeated string dependencies = 8;
+  string when = 9;
 }
 
 message ConcurrentSteps {
@@ -98,4 +99,5 @@ message Workflow {
   map<string, StepTemplate> templates = 2;
   int32 parallelism = 3;
   string secret = 4;
+  repeated Step exit_handler_steps = 5;
 }
