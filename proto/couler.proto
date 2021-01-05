@@ -14,6 +14,7 @@ message Parameter {
   // in templates: value is how the parameter can be referred to
   // in steps: actual value to be passed to the step
   string value = 2;
+  string global_name = 3;
 }
 
 message Secret {
