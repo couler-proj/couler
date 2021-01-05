@@ -16,6 +16,7 @@ class ProtoReprTest(unittest.TestCase):
         couler.run_script(image="docker/whalesay:latest", source=echo)
         proto_wf = get_default_proto_workflow()
         s = proto_wf.steps[0].steps[0]
+        self.assertFalse(s.HasField("resource_spec"))
         self.assertEqual(s.script, '\nprint("echo")\n')
 
     def test_when(self):
