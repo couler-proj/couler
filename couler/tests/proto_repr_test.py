@@ -42,9 +42,9 @@ class ProtoReprTest(unittest.TestCase):
         couler.when(couler.equal(result, "tails"), lambda: tails())
         proto_wf = get_default_proto_workflow()
         step_heads = proto_wf.steps[1].steps[0]
-        self.assertEqual(
-            step_heads.when, "{{steps.test-when-550.outputs.result}} == heads"
-        )
+        # condition is like: "{{steps.test-when-550.outputs.result}} == heads"
+        self.assertTrue(step_heads.when.startswith("{{steps.test-when-"))
+        self.assertTrue(step_heads.when.endswith(".outputs.result}} == heads"))
 
     def test_exit_handler(self):
         def send_mail():
