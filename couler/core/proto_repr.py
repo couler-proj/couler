@@ -53,6 +53,8 @@ def step_repr(
     manifest=None,
     success_cond=None,
     failure_cond=None,
+    canned_step_name=None,
+    canned_step_args=None,
 ):
     assert step_name is not None
     assert tmpl_name is not None
@@ -82,6 +84,13 @@ def step_repr(
             pb_step.script = source
         else:
             pb_step.script = utils.body(source)
+    if canned_step_name is not None and canned_step_args is not None:
+        pb_step.canned_step_spec.name = canned_step_name
+        if isinstance(canned_step_args, dict):
+            for k, v in canned_step_args.items():
+                pb_step.canned_step_spec.args[k] = v
+        else:
+            raise ValueError("canned_step_spec.args must be a dictionary")
 
     if states._when_prefix is not None:
         pb_step.when = states._when_prefix

@@ -18,6 +18,13 @@ class ProtoReprTest(unittest.TestCase):
         s = proto_wf.steps[0].steps[0]
         self.assertEqual(s.script, '\nprint("echo")\n')
 
+    def test_canned_step(self):
+        couler.run_canned_step(name="test", args={"k1": "v1", "k2": "v2"})
+        proto_wf = get_default_proto_workflow()
+        s = proto_wf.steps[0].steps[0]
+        self.assertEqual(s.canned_step_spec.name, "test")
+        self.assertEqual(s.canned_step_spec.args, {"k1": "v1", "k2": "v2"})
+
     def test_when(self):
         def random_code():
             import random
