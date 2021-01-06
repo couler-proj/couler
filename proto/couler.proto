@@ -66,16 +66,23 @@ message ResourceSpec {
     bool set_owner_reference = 5;
 }
 
+message CannedStepSpec{
+  string name = 1;
+  map<string, string> args = 2;
+}
+
+
 message Step {
   int32 id = 1;
   string name = 2;      // name for reference
   string tmpl_name = 3; // name for generating template
   ContainerSpec container_spec = 4;
   ResourceSpec resource_spec = 5;
-  string script = 6;
-  repeated StepIO args = 7;
-  repeated string dependencies = 8;
-  string when = 9;
+  CannedStepSpec canned_step_spec = 6;
+  string script = 7;
+  repeated StepIO args = 8;
+  repeated string dependencies = 9;
+  string when = 10;
 }
 
 message ConcurrentSteps {

@@ -25,6 +25,7 @@ from couler.core.config import config_workflow  # noqa: F401
 from couler.core.constants import *  # noqa: F401, F403
 from couler.core.constants import WorkflowCRD
 from couler.core.run_templates import (  # noqa: F401
+    run_canned_step,
     run_container,
     run_job,
     run_script,
