@@ -66,17 +66,18 @@ def step_repr(
         pb_step.container_spec.image = image
     if manifest is not None:
         pb_step.resource_spec.manifest = manifest
-    if success_cond is not None:
-        pb_step.resource_spec.success_condition = success_cond
-        pb_step.resource_spec.failure_condition = failure_cond
-    if command is None:
-        pb_step.container_spec.command.append("python")
-    elif isinstance(command, list):
-        pb_step.container_spec.command.extend(command)
-    elif isinstance(command, str):
-        pb_step.container_spec.command.append(command)
+        if success_cond is not None and failure_cond is not None:
+            pb_step.resource_spec.success_condition = success_cond
+            pb_step.resource_spec.failure_condition = failure_cond
     else:
-        raise ValueError("command must be str or list")
+        if command is None:
+            pb_step.container_spec.command.append("python")
+        elif isinstance(command, list):
+            pb_step.container_spec.command.extend(command)
+        elif isinstance(command, str):
+            pb_step.container_spec.command.append(command)
+        else:
+            raise ValueError("command must be str or list")
     if source is not None:
         if isinstance(source, str):
             pb_step.script = source
