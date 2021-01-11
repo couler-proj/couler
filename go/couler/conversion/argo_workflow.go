@@ -8,6 +8,7 @@ import (
 )
 
 const entryPointTemplateSuffix = "main-template"
+const exitHandlerTemplateSuffix = "exit-handler-template"
 
 // ConvertToArgoWorkflow converts a workflow from protobuf to an Argo Workflow
 func ConvertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Workflow, error) {
@@ -37,6 +38,11 @@ func ConvertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Wor
 			Templates:  templates,
 		},
 	}
+	if workflowPb.GetExitHandlerSteps() != nil {
+		exitHandlerTemplateName := namePrefix + exitHandlerTemplateSuffix
+		argoWorkflow.Spec.Templates = append(argoWorkflow.Spec.Templates, createExitHandlerSteps(workflowPb, exitHandlerTemplateName))
+		argoWorkflow.Spec.OnExit = exitHandlerTemplateName
+	}
 	// TODO: Handle workflow schema validation and propagate any errors.
 	return argoWorkflow, nil
 }
@@ -55,6 +61,7 @@ func createDAGTasks(workflowPb *pb.Workflow, entryPointName string) []wfv1.Templ
 				Template:     seqStep.GetTmplName(),
 				Dependencies: seqStep.GetDependencies(),
 				Arguments:    getEntryPointTemplateArgs(seqStep),
+				When:         seqStep.GetWhen(),
 			})
 		templates = append(templates, createSingleStepTemplate(seqStep, workflowPb))
 	}
@@ -68,11 +75,23 @@ func createSeqOrParallelSteps(workflowPb *pb.Workflow, entryPointName string) []
 		templates[0].Steps = append(templates[0].Steps,
 			wfv1.ParallelSteps{
 				Steps: []wfv1.WorkflowStep{
-					{Name: seqStep.GetName(), Template: seqStep.GetTmplName(), Arguments: getEntryPointTemplateArgs(seqStep)}}})
+					{Name: seqStep.GetName(), Template: seqStep.GetTmplName(),
+						Arguments: getEntryPointTemplateArgs(seqStep), When: seqStep.GetWhen()}}})
 
 		templates = append(templates, createSingleStepTemplate(seqStep, workflowPb))
 	}
 	return templates
+}
+
+func createExitHandlerSteps(workflowPb *pb.Workflow, templateName string) wfv1.Template {
+	template := wfv1.Template{Name: templateName}
+	for _, step := range workflowPb.GetExitHandlerSteps() {
+		template.Steps = append(template.Steps,
+			wfv1.ParallelSteps{
+				Steps: []wfv1.WorkflowStep{
+					{Name: step.GetName(), Template: step.GetTmplName(), When: step.GetWhen()}}})
+	}
+	return template
 }
 
 func createSingleStepTemplate(step *pb.Step, workflowPb *pb.Workflow) wfv1.Template {
