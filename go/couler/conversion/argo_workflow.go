@@ -8,7 +8,7 @@ import (
 )
 
 const entryPointTemplateSuffix = "main-template"
-const exitHandlerTemplateSuffix = "exit-handler-template"
+const exitHandlerTemplateSuffix = "exit-handler-steps"
 
 // ConvertToArgoWorkflow converts a workflow from protobuf to an Argo Workflow
 func ConvertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Workflow, error) {
@@ -40,7 +40,7 @@ func ConvertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Wor
 	}
 	if workflowPb.GetExitHandlerSteps() != nil {
 		exitHandlerTemplateName := namePrefix + exitHandlerTemplateSuffix
-		argoWorkflow.Spec.Templates = append(argoWorkflow.Spec.Templates, createExitHandlerSteps(workflowPb, exitHandlerTemplateName))
+		argoWorkflow.Spec.Templates = createExitHandlerSteps(workflowPb, argoWorkflow.Spec.Templates, exitHandlerTemplateName)
 		argoWorkflow.Spec.OnExit = exitHandlerTemplateName
 	}
 	// TODO: Handle workflow schema validation and propagate any errors.
@@ -83,15 +83,17 @@ func createSeqOrParallelSteps(workflowPb *pb.Workflow, entryPointName string) []
 	return templates
 }
 
-func createExitHandlerSteps(workflowPb *pb.Workflow, templateName string) wfv1.Template {
-	template := wfv1.Template{Name: templateName}
+func createExitHandlerSteps(workflowPb *pb.Workflow, templates []wfv1.Template, exitHandlerTemplateName string) []wfv1.Template {
+	template := wfv1.Template{Name: exitHandlerTemplateName}
 	for _, step := range workflowPb.GetExitHandlerSteps() {
 		template.Steps = append(template.Steps,
 			wfv1.ParallelSteps{
 				Steps: []wfv1.WorkflowStep{
 					{Name: step.GetName(), Template: step.GetTmplName(), When: step.GetWhen()}}})
+		templates = append(templates, createSingleStepTemplate(step, workflowPb))
 	}
-	return template
+	templates = append(templates, template)
+	return templates
 }
 
 func createSingleStepTemplate(step *pb.Step, workflowPb *pb.Workflow) wfv1.Template {
