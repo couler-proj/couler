@@ -1,3 +1,4 @@
+import unittest
 from collections import OrderedDict
 
 import couler.argo as couler
@@ -46,6 +47,12 @@ class WorkflowBasicTest(ArgoYamlTest):
         ]
 
         self.assertEqual(steps, hope_steps)
+
+    def test_string_sourcecode(self):
+        code = """print("hello world")"""
+        couler.run_script(image="python:3.6", source=code)
+        ret = couler.workflow_yaml()
+        self.assertEqual(code, ret["spec"]["templates"][1]["script"]["source"])
 
     def test_when_order_two(self):
         couler.steps = OrderedDict()
@@ -249,3 +256,7 @@ class WorkflowBasicTest(ArgoYamlTest):
             couler.set_exit_handler(couler.WFStatus.Failed, tails)
             self.check_argo_yaml("workflow_basic_golden.yaml")
             couler._cleanup()
+
+
+if __name__ == "__main__":
+    unittest.main()
