@@ -66,8 +66,17 @@ class Script(Template):
 
     def script_dict(self):
         script = OrderedDict({"image": self.image, "command": [self.command]})
+        source_code_string = None
+        if callable(self.source):
+            source_code_string = utils.body(self.source)
+        elif isinstance(self.source, str):
+            source_code_string = self.source
+        else:
+            raise ValueError(
+                "unsupported source code type: %s" % type(self.source)
+            )
         script["source"] = (
-            utils.body(self.source)
+            source_code_string
             if self.command.lower() == "python"
             else self.source
         )
