@@ -166,6 +166,74 @@ func TestArgoWorkflowConversionSequentialWithIO(t *testing.T) {
 	}, argoWf.Spec.Templates[1])
 }
 
+func TestArgoWorkflowConversionSequentialWithExitHandler(t *testing.T) {
+	pbWf := &pb.Workflow{}
+	pbWf.Steps = []*pb.ConcurrentSteps{
+		{Steps: []*pb.Step{containerStep}},
+		{Steps: []*pb.Step{scriptStep}},
+		{Steps: []*pb.Step{resourceStep}},
+	}
+
+	exitHandlerStep := &pb.Step{
+		Name:     "exit-handler-step",
+		TmplName: "exit-handler-step-template",
+		ContainerSpec: &pb.ContainerSpec{
+			Image:   "docker/whalesay:latest",
+			Command: []string{"cowsay", "exiting"},
+		},
+		When: "{{workflow.status}} == Failed",
+	}
+	pbWf.ExitHandlerSteps = append(pbWf.ExitHandlerSteps, exitHandlerStep)
+
+	argoWf, err := ConvertToArgoWorkflow(pbWf, "hello-world-")
+	assert.NoError(t, err)
+
+	assert.Equal(t, 6, len(argoWf.Spec.Templates))
+	// Check the steps in entry-point template,
+	assert.Equal(t,
+		[]wfv1.ParallelSteps{
+			{Steps: []wfv1.WorkflowStep{
+				{Name: containerStep.Name, Template: containerStep.TmplName},
+			}},
+			{Steps: []wfv1.WorkflowStep{
+				{Name: scriptStep.Name, Template: scriptStep.TmplName},
+			}},
+			{Steps: []wfv1.WorkflowStep{
+				{Name: resourceStep.Name, Template: resourceStep.TmplName},
+			}}}, argoWf.Spec.Templates[0].Steps)
+
+	// Check the templates for individual steps.
+	assert.Equal(t, wfv1.Template{Name: containerStep.TmplName, Container: &corev1.Container{
+		Image:   containerStep.ContainerSpec.Image,
+		Command: containerStep.ContainerSpec.Command,
+	}}, argoWf.Spec.Templates[1])
+	assert.Equal(t, wfv1.Template{Name: scriptStep.TmplName, Script: &wfv1.ScriptTemplate{
+		Container: corev1.Container{
+			Image:   scriptStep.ContainerSpec.Image,
+			Command: scriptStep.ContainerSpec.Command,
+		},
+		Source: scriptStep.Script,
+	}}, argoWf.Spec.Templates[2])
+	assert.Equal(t, wfv1.Template{Name: resourceStep.TmplName, Resource: &wfv1.ResourceTemplate{
+		Manifest:          resourceStep.ResourceSpec.Manifest,
+		SuccessCondition:  resourceStep.ResourceSpec.SuccessCondition,
+		FailureCondition:  resourceStep.ResourceSpec.FailureCondition,
+		SetOwnerReference: resourceStep.ResourceSpec.SetOwnerReference,
+		Action:            resourceStep.ResourceSpec.Action,
+	}}, argoWf.Spec.Templates[3])
+	// Check the templates for exit handler steps.
+	assert.Equal(t, wfv1.Template{Name: exitHandlerStep.TmplName, Container: &corev1.Container{
+		Image:   exitHandlerStep.ContainerSpec.Image,
+		Command: exitHandlerStep.ContainerSpec.Command,
+	}}, argoWf.Spec.Templates[4])
+	assert.Equal(t, []wfv1.ParallelSteps{{Steps: []wfv1.WorkflowStep{
+		{Name: exitHandlerStep.Name, Template: exitHandlerStep.TmplName, When: exitHandlerStep.When},
+	}}}, argoWf.Spec.Templates[5].Steps)
+
+	// Check the on-exit template name.
+	assert.Equal(t, "hello-world-exit-handler-steps", argoWf.Spec.OnExit)
+}
+
 func TestArgoWorkflowConversionDAG(t *testing.T) {
 	pbWf := &pb.Workflow{}
 	scriptStep.Dependencies = []string{containerStep.TmplName}
