@@ -11,6 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+
 from couler.core import states, utils  # noqa: F401
 from couler.core.templates.output import OutputArtifact, OutputJob
 from couler.proto import couler_pb2
@@ -46,6 +48,7 @@ def step_repr(
     image=None,
     command=None,
     source=None,
+    env=None,
     script_output=None,
     args=None,
     input=None,
@@ -63,6 +66,13 @@ def step_repr(
     pb_step.id = get_uniq_step_id()
     pb_step.name = step_name
     pb_step.tmpl_name = tmpl_name
+    if env is not None:
+        for k, v in env.items():
+            if isinstance(v, str):
+                pb_step.container_spec.env[k] = v
+            else:
+                pb_step.container_spec.env[k] = json.dumps(v)
+
     # image can be None if manifest specified.
     if image is not None:
         pb_step.container_spec.image = image

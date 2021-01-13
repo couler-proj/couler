@@ -90,6 +90,7 @@ def run_script(
         command=command,
         source=source,
         script_output=rets,
+        env=env,
     )
 
     return rets
