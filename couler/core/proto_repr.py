@@ -46,6 +46,7 @@ def step_repr(
     image=None,
     command=None,
     source=None,
+    env=None,
     script_output=None,
     args=None,
     input=None,
@@ -63,6 +64,10 @@ def step_repr(
     pb_step.id = get_uniq_step_id()
     pb_step.name = step_name
     pb_step.tmpl_name = tmpl_name
+    if env is not None:
+        for k, v in env.items():
+            pb_step.container_spec.env[k] = v
+
     # image can be None if manifest specified.
     if image is not None:
         pb_step.container_spec.image = image

@@ -86,7 +86,7 @@ func createSingleStepTemplate(step *pb.Step, workflowPb *pb.Workflow) wfv1.Templ
 		containerSpec := step.GetContainerSpec()
 		var env []corev1.EnvVar
 		for k, v := range containerSpec.GetEnv() {
-			env = append(env, corev1.EnvVar{Name: k, Value: v.String()})
+			env = append(env, corev1.EnvVar{Name: k, Value: v})
 		}
 		container := &corev1.Container{
 			Image:   containerSpec.GetImage(),
