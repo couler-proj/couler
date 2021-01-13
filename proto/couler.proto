@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package couler.v1;
 
-import "google/protobuf/any.proto";
-
 // declear go package name here, becuase of the generated Go package with `couler_v1` is
 // not acceptable for golint. ref: https://developers.google.com/protocol-buffers/docs/reference/go-generated
 option go_package = "couler/v1";

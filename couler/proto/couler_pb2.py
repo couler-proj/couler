@@ -11,7 +11,6 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-from google.protobuf import any_pb2 as google_dot_protobuf_dot_any__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
@@ -20,9 +19,8 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z\tcouler/v1',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x12proto/couler.proto\x12\tcouler.v1\x1a\x19google/protobuf/any.proto\"=\n\tParameter\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\x12\x13\n\x0bglobal_name\x18\x03 \x01(\t\"2\n\x06Secret\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\t\"\xe3\x01\n\x08\x41rtifact\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\x12\x0c\n\x04type\x18\x03 \x01(\t\x12\x12\n\nlocal_path\x18\x04 \x01(\t\x12\x13\n\x0bremote_path\x18\x05 \x01(\t\x12%\n\naccess_key\x18\x06 \x01(\x0b\x32\x11.couler.v1.Secret\x12%\n\nsecret_key\x18\x07 \x01(\x0b\x32\x11.couler.v1.Secret\x12\x10\n\x08\x65ndpoint\x18\x08 \x01(\t\x12\x0e\n\x06\x62ucket\x18\t \x01(\t\x12\x13\n\x0bglobal_name\x18\n \x01(\t\"\x16\n\x06StdOut\x12\x0c\n\x04name\x18\x01 \x01(\t\"\xaa\x01\n\x06StepIO\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x06source\x18\x02 \x01(\x05\x12)\n\tparameter\x18\x03 \x01(\x0b\x32\x14.couler.v1.ParameterH\x00\x12\'\n\x08\x61rtifact\x18\x04 \x01(\x0b\x32\x13.couler.v1.ArtifactH\x00\x12#\n\x06stdout\x18\x05 \x01(\x0b\x32\x11.couler.v1.StdOutH\x00\x42\t\n\x07step_io\"\xa1\x01\n\rContainerSpec\x12\r\n\x05image\x18\x01 \x01(\t\x12\x0f\n\x07\x63ommand\x18\x02 \x03(\t\x12.\n\x03\x65nv\x18\x03 \x03(\x0b\x32!.couler.v1.ContainerSpec.EnvEntry\x1a@\n\x08\x45nvEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12#\n\x05value\x18\x02 \x01(\x0b\x32\x14.google.protobuf.Any:\x02\x38\x01\"\x83\x01\n\x0cResourceSpec\x12\x10\n\x08manifest\x18\x01 \x01(\t\x12\x19\n\x11success_condition\x18\x02 \x01(\t\x12\x19\n\x11\x66\x61ilure_condition\x18\x03 \x01(\t\x12\x0e\n\x06\x61\x63tion\x18\x04 \x01(\t\x12\x1b\n\x13set_owner_reference\x18\x05 \x01(\x08\"~\n\x0e\x43\x61nnedStepSpec\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x31\n\x04\x61rgs\x18\x02 \x03(\x0b\x32#.couler.v1.CannedStepSpec.ArgsEntry\x1a+\n\tArgsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x9f\x02\n\x04Step\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\ttmpl_name\x18\x03 \x01(\t\x12\x30\n\x0e\x63ontainer_spec\x18\x04 \x01(\x0b\x32\x18.couler.v1.ContainerSpec\x12.\n\rresource_spec\x18\x05 \x01(\x0b\x32\x17.couler.v1.ResourceSpec\x12\x33\n\x10\x63\x61nned_step_spec\x18\x06 \x01(\x0b\x32\x19.couler.v1.CannedStepSpec\x12\x0e\n\x06script\x18\x07 \x01(\t\x12\x1f\n\x04\x61rgs\x18\x08 \x03(\x0b\x32\x11.couler.v1.StepIO\x12\x14\n\x0c\x64\x65pendencies\x18\t \x03(\t\x12\x0c\n\x04when\x18\n \x01(\t\"1\n\x0f\x43oncurrentSteps\x12\x1e\n\x05steps\x18\x01 \x03(\x0b\x32\x0f.couler.v1.Step\"c\n\x0cStepTemplate\x12\x0c\n\x04name\x18\x01 \x01(\t\x12!\n\x06inputs\x18\x02 \x03(\x0b\x32\x11.couler.v1.StepIO\x12\"\n\x07outputs\x18\x03 \x03(\x0b\x32\x11.couler.v1.StepIO\"\x89\x02\n\x08Workflow\x12)\n\x05steps\x18\x01 \x03(\x0b\x32\x1a.couler.v1.ConcurrentSteps\x12\x35\n\ttemplates\x18\x02 \x03(\x0b\x32\".couler.v1.Workflow.TemplatesEntry\x12\x13\n\x0bparallelism\x18\x03 \x01(\x05\x12\x0e\n\x06secret\x18\x04 \x01(\t\x12+\n\x12\x65xit_handler_steps\x18\x05 \x03(\x0b\x32\x0f.couler.v1.Step\x1aI\n\x0eTemplatesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12&\n\x05value\x18\x02 \x01(\x0b\x32\x17.couler.v1.StepTemplate:\x02\x38\x01\x42\x0bZ\tcouler/v1b\x06proto3'
-  ,
-  dependencies=[google_dot_protobuf_dot_any__pb2.DESCRIPTOR,])
+  serialized_pb=b'\n\x12proto/couler.proto\x12\tcouler.v1\"=\n\tParameter\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\x12\x13\n\x0bglobal_name\x18\x03 \x01(\t\"2\n\x06Secret\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\t\"\xe3\x01\n\x08\x41rtifact\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\x12\x0c\n\x04type\x18\x03 \x01(\t\x12\x12\n\nlocal_path\x18\x04 \x01(\t\x12\x13\n\x0bremote_path\x18\x05 \x01(\t\x12%\n\naccess_key\x18\x06 \x01(\x0b\x32\x11.couler.v1.Secret\x12%\n\nsecret_key\x18\x07 \x01(\x0b\x32\x11.couler.v1.Secret\x12\x10\n\x08\x65ndpoint\x18\x08 \x01(\t\x12\x0e\n\x06\x62ucket\x18\t \x01(\t\x12\x13\n\x0bglobal_name\x18\n \x01(\t\"\x16\n\x06StdOut\x12\x0c\n\x04name\x18\x01 \x01(\t\"\xaa\x01\n\x06StepIO\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x06source\x18\x02 \x01(\x05\x12)\n\tparameter\x18\x03 \x01(\x0b\x32\x14.couler.v1.ParameterH\x00\x12\'\n\x08\x61rtifact\x18\x04 \x01(\x0b\x32\x13.couler.v1.ArtifactH\x00\x12#\n\x06stdout\x18\x05 \x01(\x0b\x32\x11.couler.v1.StdOutH\x00\x42\t\n\x07step_io\"\x8b\x01\n\rContainerSpec\x12\r\n\x05image\x18\x01 \x01(\t\x12\x0f\n\x07\x63ommand\x18\x02 \x03(\t\x12.\n\x03\x65nv\x18\x03 \x03(\x0b\x32!.couler.v1.ContainerSpec.EnvEntry\x1a*\n\x08\x45nvEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x83\x01\n\x0cResourceSpec\x12\x10\n\x08manifest\x18\x01 \x01(\t\x12\x19\n\x11success_condition\x18\x02 \x01(\t\x12\x19\n\x11\x66\x61ilure_condition\x18\x03 \x01(\t\x12\x0e\n\x06\x61\x63tion\x18\x04 \x01(\t\x12\x1b\n\x13set_owner_reference\x18\x05 \x01(\x08\"~\n\x0e\x43\x61nnedStepSpec\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x31\n\x04\x61rgs\x18\x02 \x03(\x0b\x32#.couler.v1.CannedStepSpec.ArgsEntry\x1a+\n\tArgsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x9f\x02\n\x04Step\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\ttmpl_name\x18\x03 \x01(\t\x12\x30\n\x0e\x63ontainer_spec\x18\x04 \x01(\x0b\x32\x18.couler.v1.ContainerSpec\x12.\n\rresource_spec\x18\x05 \x01(\x0b\x32\x17.couler.v1.ResourceSpec\x12\x33\n\x10\x63\x61nned_step_spec\x18\x06 \x01(\x0b\x32\x19.couler.v1.CannedStepSpec\x12\x0e\n\x06script\x18\x07 \x01(\t\x12\x1f\n\x04\x61rgs\x18\x08 \x03(\x0b\x32\x11.couler.v1.StepIO\x12\x14\n\x0c\x64\x65pendencies\x18\t \x03(\t\x12\x0c\n\x04when\x18\n \x01(\t\"1\n\x0f\x43oncurrentSteps\x12\x1e\n\x05steps\x18\x01 \x03(\x0b\x32\x0f.couler.v1.Step\"c\n\x0cStepTemplate\x12\x0c\n\x04name\x18\x01 \x01(\t\x12!\n\x06inputs\x18\x02 \x03(\x0b\x32\x11.couler.v1.StepIO\x12\"\n\x07outputs\x18\x03 \x03(\x0b\x32\x11.couler.v1.StepIO\"\x89\x02\n\x08Workflow\x12)\n\x05steps\x18\x01 \x03(\x0b\x32\x1a.couler.v1.ConcurrentSteps\x12\x35\n\ttemplates\x18\x02 \x03(\x0b\x32\".couler.v1.Workflow.TemplatesEntry\x12\x13\n\x0bparallelism\x18\x03 \x01(\x05\x12\x0e\n\x06secret\x18\x04 \x01(\t\x12+\n\x12\x65xit_handler_steps\x18\x05 \x03(\x0b\x32\x0f.couler.v1.Step\x1aI\n\x0eTemplatesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12&\n\x05value\x18\x02 \x01(\x0b\x32\x17.couler.v1.StepTemplate:\x02\x38\x01\x42\x0bZ\tcouler/v1b\x06proto3'
+)
 
 
 
@@ -68,8 +66,8 @@ _PARAMETER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=60,
-  serialized_end=121,
+  serialized_start=33,
+  serialized_end=94,
 )
 
 
@@ -114,8 +112,8 @@ _SECRET = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=123,
-  serialized_end=173,
+  serialized_start=96,
+  serialized_end=146,
 )
 
 
@@ -209,8 +207,8 @@ _ARTIFACT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=176,
-  serialized_end=403,
+  serialized_start=149,
+  serialized_end=376,
 )
 
 
@@ -241,8 +239,8 @@ _STDOUT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=405,
-  serialized_end=427,
+  serialized_start=378,
+  serialized_end=400,
 )
 
 
@@ -306,8 +304,8 @@ _STEPIO = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=430,
-  serialized_end=600,
+  serialized_start=403,
+  serialized_end=573,
 )
 
 
@@ -328,8 +326,8 @@ _CONTAINERSPEC_ENVENTRY = _descriptor.Descriptor(
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
       name='value', full_name='couler.v1.ContainerSpec.EnvEntry.value', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -345,8 +343,8 @@ _CONTAINERSPEC_ENVENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=700,
-  serialized_end=764,
+  serialized_start=673,
+  serialized_end=715,
 )
 
 _CONTAINERSPEC = _descriptor.Descriptor(
@@ -390,8 +388,8 @@ _CONTAINERSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=603,
-  serialized_end=764,
+  serialized_start=576,
+  serialized_end=715,
 )
 
 
@@ -450,8 +448,8 @@ _RESOURCESPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=767,
-  serialized_end=898,
+  serialized_start=718,
+  serialized_end=849,
 )
 
 
@@ -489,8 +487,8 @@ _CANNEDSTEPSPEC_ARGSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=983,
-  serialized_end=1026,
+  serialized_start=934,
+  serialized_end=977,
 )
 
 _CANNEDSTEPSPEC = _descriptor.Descriptor(
@@ -527,8 +525,8 @@ _CANNEDSTEPSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=900,
-  serialized_end=1026,
+  serialized_start=851,
+  serialized_end=977,
 )
 
 
@@ -622,8 +620,8 @@ _STEP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1029,
-  serialized_end=1316,
+  serialized_start=980,
+  serialized_end=1267,
 )
 
 
@@ -654,8 +652,8 @@ _CONCURRENTSTEPS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1318,
-  serialized_end=1367,
+  serialized_start=1269,
+  serialized_end=1318,
 )
 
 
@@ -700,8 +698,8 @@ _STEPTEMPLATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1369,
-  serialized_end=1468,
+  serialized_start=1320,
+  serialized_end=1419,
 )
 
 
@@ -739,8 +737,8 @@ _WORKFLOW_TEMPLATESENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1663,
-  serialized_end=1736,
+  serialized_start=1614,
+  serialized_end=1687,
 )
 
 _WORKFLOW = _descriptor.Descriptor(
@@ -798,8 +796,8 @@ _WORKFLOW = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1471,
-  serialized_end=1736,
+  serialized_start=1422,
+  serialized_end=1687,
 )
 
 _ARTIFACT.fields_by_name['access_key'].message_type = _SECRET
@@ -816,7 +814,6 @@ _STEPIO.fields_by_name['artifact'].containing_oneof = _STEPIO.oneofs_by_name['st
 _STEPIO.oneofs_by_name['step_io'].fields.append(
   _STEPIO.fields_by_name['stdout'])
 _STEPIO.fields_by_name['stdout'].containing_oneof = _STEPIO.oneofs_by_name['step_io']
-_CONTAINERSPEC_ENVENTRY.fields_by_name['value'].message_type = google_dot_protobuf_dot_any__pb2._ANY
 _CONTAINERSPEC_ENVENTRY.containing_type = _CONTAINERSPEC
 _CONTAINERSPEC.fields_by_name['env'].message_type = _CONTAINERSPEC_ENVENTRY
 _CANNEDSTEPSPEC_ARGSENTRY.containing_type = _CANNEDSTEPSPEC
