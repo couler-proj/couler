@@ -4,6 +4,7 @@ import (
 	wfv1 "github.com/argoproj/argo/pkg/apis/workflow/v1alpha1"
 	pb "github.com/couler-proj/couler/go/couler/proto/couler/v1"
 	corev1 "k8s.io/api/core/v1"
+	resourcev1 "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -113,6 +114,18 @@ func createSingleStepTemplate(step *pb.Step, workflowPb *pb.Workflow) wfv1.Templ
 			Image:   containerSpec.GetImage(),
 			Command: containerSpec.GetCommand(),
 			Env:     env,
+		}
+		if len(containerSpec.GetResources()) > 0 {
+			resourceList := corev1.ResourceList{}
+			for k, v := range containerSpec.GetResources() {
+				resourceList[corev1.ResourceName(k)] = resourcev1.MustParse(v)
+			}
+			resourceReq := corev1.ResourceRequirements{
+				// NOTE: request for hard resource limit.
+				Requests: resourceList,
+				Limits:   resourceList,
+			}
+			container.Resources = resourceReq
 		}
 		if script := step.GetScript(); script != "" {
 			template.Script = &wfv1.ScriptTemplate{

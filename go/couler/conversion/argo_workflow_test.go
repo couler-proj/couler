@@ -5,6 +5,7 @@ import (
 
 	wfv1 "github.com/argoproj/argo/pkg/apis/workflow/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	resourcev1 "k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/alecthomas/assert"
 	pb "github.com/couler-proj/couler/go/couler/proto/couler/v1"
@@ -34,8 +35,9 @@ var (
 		TmplName: "script-test",
 		Script:   "print(3)",
 		ContainerSpec: &pb.ContainerSpec{
-			Image:   "python:alpine3.6",
-			Command: []string{"python"},
+			Image:     "python:alpine3.6",
+			Command:   []string{"python"},
+			Resources: map[string]string{"cpu": "2", "memory": "1Gi"},
 		}}
 	resourceStep = &pb.Step{
 		Name:     "resource-test-step",
@@ -56,6 +58,15 @@ func TestArgoWorkflowConversionSequential(t *testing.T) {
 		{Steps: []*pb.Step{containerStep}},
 		{Steps: []*pb.Step{scriptStep}},
 		{Steps: []*pb.Step{resourceStep}},
+	}
+
+	resourceList := corev1.ResourceList{}
+	for k, v := range scriptStep.ContainerSpec.GetResources() {
+		resourceList[corev1.ResourceName(k)] = resourcev1.MustParse(v)
+	}
+	resourceReq := corev1.ResourceRequirements{
+		Requests: resourceList,
+		Limits:   resourceList,
 	}
 
 	argoWf, err := ConvertToArgoWorkflow(pbWf, "hello-world-")
@@ -80,8 +91,9 @@ func TestArgoWorkflowConversionSequential(t *testing.T) {
 
 	assert.Equal(t, wfv1.Template{Name: scriptStep.TmplName, Script: &wfv1.ScriptTemplate{
 		Container: corev1.Container{
-			Image:   scriptStep.ContainerSpec.Image,
-			Command: scriptStep.ContainerSpec.Command,
+			Image:     scriptStep.ContainerSpec.Image,
+			Command:   scriptStep.ContainerSpec.Command,
+			Resources: resourceReq,
 		},
 		Source: scriptStep.Script,
 	}}, argoWf.Spec.Templates[2])
@@ -173,6 +185,14 @@ func TestArgoWorkflowConversionSequentialWithExitHandler(t *testing.T) {
 		{Steps: []*pb.Step{scriptStep}},
 		{Steps: []*pb.Step{resourceStep}},
 	}
+	resourceList := corev1.ResourceList{}
+	for k, v := range scriptStep.ContainerSpec.GetResources() {
+		resourceList[corev1.ResourceName(k)] = resourcev1.MustParse(v)
+	}
+	resourceReq := corev1.ResourceRequirements{
+		Requests: resourceList,
+		Limits:   resourceList,
+	}
 
 	exitHandlerStep := &pb.Step{
 		Name:     "exit-handler-step",
@@ -209,8 +229,9 @@ func TestArgoWorkflowConversionSequentialWithExitHandler(t *testing.T) {
 	}}, argoWf.Spec.Templates[1])
 	assert.Equal(t, wfv1.Template{Name: scriptStep.TmplName, Script: &wfv1.ScriptTemplate{
 		Container: corev1.Container{
-			Image:   scriptStep.ContainerSpec.Image,
-			Command: scriptStep.ContainerSpec.Command,
+			Image:     scriptStep.ContainerSpec.Image,
+			Command:   scriptStep.ContainerSpec.Command,
+			Resources: resourceReq,
 		},
 		Source: scriptStep.Script,
 	}}, argoWf.Spec.Templates[2])
@@ -245,6 +266,15 @@ func TestArgoWorkflowConversionDAG(t *testing.T) {
 		{Steps: []*pb.Step{resourceStep}},
 	}
 
+	resourceList := corev1.ResourceList{}
+	for k, v := range scriptStep.ContainerSpec.GetResources() {
+		resourceList[corev1.ResourceName(k)] = resourcev1.MustParse(v)
+	}
+	resourceReq := corev1.ResourceRequirements{
+		Requests: resourceList,
+		Limits:   resourceList,
+	}
+
 	argoWf, err := ConvertToArgoWorkflow(pbWf, "hello-world-")
 	assert.NoError(t, err)
 
@@ -262,8 +292,9 @@ func TestArgoWorkflowConversionDAG(t *testing.T) {
 
 	assert.Equal(t, wfv1.Template{Name: scriptStep.TmplName, Script: &wfv1.ScriptTemplate{
 		Container: corev1.Container{
-			Image:   scriptStep.ContainerSpec.Image,
-			Command: scriptStep.ContainerSpec.Command,
+			Image:     scriptStep.ContainerSpec.Image,
+			Command:   scriptStep.ContainerSpec.Command,
+			Resources: resourceReq,
 		},
 		Source: scriptStep.Script,
 	}}, argoWf.Spec.Templates[2])

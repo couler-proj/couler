@@ -58,6 +58,7 @@ def step_repr(
     failure_cond=None,
     canned_step_name=None,
     canned_step_args=None,
+    resources=None,
 ):
     assert step_name is not None
     assert tmpl_name is not None
@@ -102,6 +103,15 @@ def step_repr(
                 pb_step.canned_step_spec.args[k] = v
         else:
             raise ValueError("canned_step_spec.args must be a dictionary")
+
+    # setup resources
+    if resources is not None:
+        if not isinstance(resources, dict):
+            raise ValueError("resources must be type dict")
+        for k, v in resources.items():
+            # key: cpu, memory, gpu
+            # value: "1", "8", "500m", "1Gi" etc.
+            pb_step.container_spec.resources[k] = v
 
     if states._when_prefix is not None:
         pb_step.when = states._when_prefix
