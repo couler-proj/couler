@@ -13,11 +13,16 @@ class ProtoReprTest(unittest.TestCase):
         def echo():
             print("echo")
 
-        couler.run_script(image="docker/whalesay:latest", source=echo)
+        couler.run_script(
+            image="docker/whalesay:latest",
+            source=echo,
+            resources={"cpu": "2", "memory": "1Gi"},
+        )
         proto_wf = get_default_proto_workflow()
         s = proto_wf.steps[0].steps[0]
         self.assertFalse(s.HasField("resource_spec"))
         self.assertEqual(s.script, '\nprint("echo")\n')
+        self.assertEqual(s.container_spec.resources["cpu"], "2")
 
     def test_canned_step(self):
         couler.run_canned_step(name="test", args={"k1": "v1", "k2": "v2"})

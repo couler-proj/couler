@@ -91,6 +91,7 @@ def run_script(
         source=source,
         script_output=rets,
         env=env,
+        resources=resources,
     )
 
     return rets
@@ -238,6 +239,8 @@ def run_container(
         args=args,
         input=_input,
         output=_output,
+        env=env,
+        resources=resources,
     )
 
     return rets

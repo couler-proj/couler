@@ -54,6 +54,7 @@ message ContainerSpec {
     string image = 1;
     repeated string command = 2;
     map<string, string> env = 3;
+    map<string, string> resources = 6;
 }
 
 message ResourceSpec {
