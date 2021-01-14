@@ -111,7 +111,7 @@ def step_repr(
         for k, v in resources.items():
             # key: cpu, memory, gpu
             # value: "1", "8", "500m", "1Gi" etc.
-            pb_step.container_spec.resources[k] = v
+            pb_step.container_spec.resources[k] = str(v)
 
     if states._when_prefix is not None:
         pb_step.when = states._when_prefix
