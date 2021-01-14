@@ -336,7 +336,6 @@ def run_job(
         manifest=manifest,
         success_cond=success_condition,
         failure_cond=failure_condition,
-        env=env,
     )
 
     return rets
