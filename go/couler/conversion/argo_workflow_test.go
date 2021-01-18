@@ -72,6 +72,8 @@ func TestArgoWorkflowConversionSequential(t *testing.T) {
 	argoWf, err := ConvertToArgoWorkflow(pbWf, "hello-world-")
 	assert.NoError(t, err)
 
+	assert.Equal(t, argoWf.ObjectMeta.GenerateName, "hello-world-")
+
 	assert.Equal(t, 4, len(argoWf.Spec.Templates))
 	assert.Equal(t,
 		[]wfv1.ParallelSteps{
@@ -256,7 +258,7 @@ func TestArgoWorkflowConversionSequentialWithExitHandler(t *testing.T) {
 }
 
 func TestArgoWorkflowConversionDAG(t *testing.T) {
-	pbWf := &pb.Workflow{}
+	pbWf := &pb.Workflow{Name: "wf-dag"}
 	scriptStep.Dependencies = []string{containerStep.TmplName}
 	resourceStep.Dependencies = []string{containerStep.TmplName, scriptStep.TmplName}
 
@@ -275,8 +277,10 @@ func TestArgoWorkflowConversionDAG(t *testing.T) {
 		Limits:   resourceList,
 	}
 
-	argoWf, err := ConvertToArgoWorkflow(pbWf, "hello-world-")
+	argoWf, err := ConvertToArgoWorkflow(pbWf, "")
 	assert.NoError(t, err)
+
+	assert.Equal(t, argoWf.ObjectMeta.Name, pbWf.Name)
 
 	assert.Equal(t, 4, len(argoWf.Spec.Templates))
 	assert.Equal(t,

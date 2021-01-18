@@ -101,13 +101,15 @@ message StepTemplate {
 }
 
 message Workflow {
+  string name = 1;
   // sequential steps: [ [step], [step], [step], ...]
   // concurrent steps: [ [step], [step, step, step], ...]
   // if dependencies was set, no matter what structure the
   // "steps" field stores, generate a DAG.
-  repeated ConcurrentSteps steps = 1;
-  map<string, StepTemplate> templates = 2;
-  int32 parallelism = 3;
-  string secret = 4;
-  repeated Step exit_handler_steps = 5;
+  repeated ConcurrentSteps steps = 2;
+  map<string, StepTemplate> templates = 3;
+  int32 parallelism = 4;
+  string secret = 5;
+  repeated Step exit_handler_steps = 6;
+  map<string, google.protobuf.Any> attrs = 7;  // Workflow-level attributes
 }
