@@ -30,10 +30,18 @@ func ConvertToArgoWorkflow(workflowPb *pb.Workflow, namePrefix string) (wfv1.Wor
 		// Convert steps to sequential/parallel steps.
 		templates = createSeqOrParallelSteps(workflowPb, entryPointName)
 	}
-	argoWorkflow := wfv1.Workflow{
-		ObjectMeta: metav1.ObjectMeta{
+	var objectMeta metav1.ObjectMeta
+	if name := workflowPb.GetName(); name != "" && namePrefix == "" {
+		objectMeta = metav1.ObjectMeta{
+			Name: name,
+		}
+	} else {
+		objectMeta = metav1.ObjectMeta{
 			GenerateName: namePrefix,
-		},
+		}
+	}
+	argoWorkflow := wfv1.Workflow{
+		ObjectMeta: objectMeta,
 		Spec: wfv1.WorkflowSpec{
 			Entrypoint: entryPointName,
 			Templates:  templates,
