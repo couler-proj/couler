@@ -5,6 +5,7 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -32,6 +33,7 @@ jobs:
         python -m pip install -r requirements.txt -r requirements-dev.txt
         go get github.com/golang/protobuf/protoc-gen-go@v1.3.2
         go get golang.org/x/lint/golint
+        go get github.com/argoproj/argo@release-2.8
     - name: Install protoc
       uses: arduino/setup-protoc@v1
       with:
@@ -41,13 +43,12 @@ jobs:
         pre-commit run -a --show-diff-on-failure
     - name: Python Unit tests
       run: |
-        python setup.py proto
-        python setup.py install
-        python -m pytest
+        set -e
+        bash ./scripts/test_python.sh
     - name: Go Unit tests
       run: |
-        go generate ./...
-        go test ./... -v
+        set -e
+        bash ./scripts/test_go.sh
     - uses: opsgang/ga-setup-minikube@v0.1.1
       with:
           minikube-version: 1.11.0
@@ -66,3 +67,5 @@ jobs:
         kubectl apply -n argo -f manifests/mpi-operator.yaml
 
         scripts/integration_tests.sh
+        export E2E_TEST=true
+        go test -timeout 3m ./go/couler/submitter/... -v

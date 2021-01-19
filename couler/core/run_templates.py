@@ -90,6 +90,8 @@ def run_script(
         command=command,
         source=source,
         script_output=rets,
+        env=env,
+        resources=resources,
     )
 
     return rets
@@ -220,12 +222,9 @@ def run_container(
     )
 
     # TODO: need to switch to use field `output` directly
-    _output = (
-        states.workflow.get_template(func_name).to_dict().get("outputs", None)
-    )
-    _input = (
-        states.workflow.get_template(func_name).to_dict().get("inputs", None)
-    )
+    step_templ = states.workflow.get_template(func_name)
+    _output = step_templ.to_dict().get("outputs", None)
+    _input = step_templ.to_dict().get("inputs", None)
 
     rets = _container_output(step_name, func_name, _output)
     states._steps_outputs[step_name] = rets
@@ -237,8 +236,11 @@ def run_container(
         command=command,
         source=None,
         script_output=None,
+        args=args,
         input=_input,
         output=_output,
+        env=env,
+        resources=resources,
     )
 
     return rets
@@ -337,3 +339,25 @@ def run_job(
     )
 
     return rets
+
+
+def run_canned_step(name, args, inputs=None, outputs=None, step_name=None):
+    func_name, caller_line = utils.invocation_location()
+    func_name = (
+        utils.argo_safe_name(step_name) if step_name is not None else func_name
+    )
+    step_name = step_update_utils.update_step(
+        func_name, args, step_name, caller_line
+    )
+    tmpl_args = []
+    if states._outputs_tmp is not None:
+        tmpl_args.extend(states._outputs_tmp)
+    return proto_repr.step_repr(  # noqa: F841
+        input=inputs,
+        output=outputs,
+        canned_step_name=name,
+        canned_step_args=args,
+        step_name=step_name,
+        tmpl_name=step_name + "-tmpl",
+        args=tmpl_args,
+    )
