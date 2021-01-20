@@ -71,6 +71,8 @@ message ResourceSpec {
 message CannedStepSpec{
   string name = 1;
   map<string, string> args = 2;
+  repeated StepIO inputs = 3;
+  repeated StepIO outputs = 4;
 }
 
 
