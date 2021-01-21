@@ -3,3 +3,4 @@ pytest
 pytest-cov
 Deprecated
 protobuf
+argo-workflows==3.5.1
