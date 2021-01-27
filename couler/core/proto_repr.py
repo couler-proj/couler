@@ -130,30 +130,29 @@ def step_repr(
     if args is not None:
         for i, arg in enumerate(args):
             if isinstance(arg, OutputArtifact):
-                pb_art = couler_pb2.StepIO()
+                pb_art = pb_step.args.add()
                 pb_art.artifact.name = arg.artifact["name"]
                 pb_art.artifact.value = (
                     '"{{inputs.artifacts.%s}}"' % pb_art.artifact.name
                 )
-                pb_step.args.append(pb_art)
             else:
-                pb_param = couler_pb2.StepIO()
+                pb_param = pb_step.args.add()
                 pb_param.parameter.name = utils.input_parameter_name(
                     pb_step.name, i
                 )
                 pb_param.parameter.value = (
                     '"{{inputs.parameters.%s}}"' % pb_param.parameter.name
                 )
-                pb_step.args.append(pb_param)
 
     if states._exit_handler_enable:
         # add exit handler steps
-        wf.exit_handler_steps.append(pb_step)
+        eh_step = wf.exit_handler_steps.add()
+        eh_step.CopyFrom(pb_step)
     else:
         # add step to proto workflow
-        concurrent_step = couler_pb2.ConcurrentSteps()
-        concurrent_step.steps.append(pb_step)
-        wf.steps.append(concurrent_step)
+        concurrent_step = wf.steps.add()
+        inner_step = concurrent_step.steps.add()
+        inner_step.CopyFrom(pb_step)
     return pb_step
 
 
@@ -161,39 +160,38 @@ def _add_io_to_template(
     pb_tmpl, source_step_id, input=None, output=None, script_output=None
 ):
     if script_output is not None:
-        o = couler_pb2.StepIO()
+        o = pb_tmpl.outputs.add()
         o.source = source_step_id
         o.stdout.name = script_output[0].value
-        pb_tmpl.outputs.append(o)
 
     for i, io in enumerate([input, output]):
         if io is not None:
             # NOTE: run_job will pass type OutputJob here
             if isinstance(io, list) and isinstance(io[0], OutputJob):
                 for oj in io:
-                    o = couler_pb2.StepIO()
+                    o = pb_tmpl.outputs.add()
                     o.source = source_step_id
                     o.parameter.name = "job-name"
                     o.parameter.value = oj.job_name
-                    pb_tmpl.outputs.append(o)
 
-                    o = couler_pb2.StepIO()
+                    o = pb_tmpl.outputs.add()
                     o.source = source_step_id
                     o.parameter.name = "job-id"
                     o.parameter.value = oj.job_id
-                    pb_tmpl.outputs.append(o)
 
-                    o = couler_pb2.StepIO()
+                    o = pb_tmpl.outputs.add()
                     o.source = source_step_id
                     o.parameter.name = "job-obj"
                     o.parameter.value = oj.job_obj
-                    pb_tmpl.outputs.append(o)
                 break
 
             if "artifacts" in io:
                 art_list = io["artifacts"]
                 for art in art_list:
-                    o = couler_pb2.StepIO()
+                    if i == 0:
+                        o = pb_tmpl.inputs.add()
+                    elif i == 1:
+                        o = pb_tmpl.outputs.add()
                     o.source = source_step_id
                     o.artifact.name = art["name"]
                     o.artifact.local_path = art["path"]
@@ -219,19 +217,14 @@ def _add_io_to_template(
                     a.secret_key.value = s.data[a.secret_key.key]
                     if "globalName" in art:
                         a.global_name = art["globalName"]
-                    if i == 0:
-                        pb_tmpl.inputs.append(o)
-                    elif i == 1:
-                        pb_tmpl.outputs.append(o)
             elif "parameters" in io:
                 p_list = io["parameters"]
                 for p in p_list:
-                    o = couler_pb2.StepIO()
+                    if i == 0:
+                        o = pb_tmpl.inputs.add()
+                    elif i == 1:
+                        o = pb_tmpl.outputs.add()
                     o.source = source_step_id
                     o.parameter.name = p["name"]
                     if "valueFrom" in p:
                         o.parameter.value = p["valueFrom"]["path"]
-                    if i == 0:
-                        pb_tmpl.inputs.append(o)
-                    elif i == 1:
-                        pb_tmpl.outputs.append(o)
