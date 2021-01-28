@@ -265,4 +265,5 @@ any feedback and contributions from the community.
 
 ## Community Blogs and Presentations
 
-* [Argo Workflows & Events Community Meeting, September 2020](https://docs.google.com/presentation/d/11KVEkKQGeV3R_-nHdqlzQV2uOrya94ra6Ilm_k6RwE4/edit?usp=sharing)
+* [Introducing Couler: Unified Interface for Constructing and Managing Workflows, Argo Workflows Community Meeting, September 2020](https://docs.google.com/presentation/d/11KVEkKQGeV3R_-nHdqlzQV2uOrya94ra6Ilm_k6RwE4/edit?usp=sharing)
+* [Authoring and Submitting Argo Workflows using Python](https://blog.argoproj.io/authoring-and-submitting-argo-workflows-using-python-aff9a070d95f)
