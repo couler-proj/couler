@@ -19,7 +19,7 @@ from couler.core import states
 from couler.core.templates import Step, output
 
 
-def map(function, input_list):
+def map(function, input_list, *other):
     """
     map operation of Couler
     """
@@ -34,6 +34,9 @@ def map(function, input_list):
         states._update_steps_lock = True
     else:
         raise TypeError("require loop over a function to run")
+
+    if other:
+        return map(map(function, input_list), *other)
 
     inner_dict = output.extract_step_return(inner)
     template_name = inner_dict["name"]
