@@ -10,9 +10,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import logging
 import re
+import subprocess
+import tempfile
 
 import pyaml
 import yaml
@@ -33,25 +34,40 @@ class ArgoSubmitter(object):
         context=None,
         client_configuration=None,
         persist_config=True,
+        # TODO: Remove this once we are done migrating the implementation.
+        go_impl=False,
     ):
         logging.basicConfig(level=logging.INFO)
-        try:
-            config.load_kube_config(
-                config_file, context, client_configuration, persist_config
-            )
-            logging.info(
-                "Found local kubernetes config. Initialized with kube_config."
-            )
-        except Exception:
-            logging.info(
-                "Cannot find local k8s config. Trying in-cluster config."
-            )
-            config.load_incluster_config()
-            logging.info("Initialized with in-cluster config.")
-
-        self._custom_object_api_client = k8s_client.CustomObjectsApi()
-        self._core_api_client = k8s_client.CoreV1Api()
         self.namespace = namespace
+        self.go_impl = go_impl
+        if self.go_impl:
+            from couler.core.proto_repr import get_default_proto_workflow
+
+            with tempfile.NamedTemporaryFile(
+                dir="/tmp", delete=False, mode="wb"
+            ) as tmp_file:
+                self.proto_path = tmp_file.name
+                proto_wf = get_default_proto_workflow()
+                tmp_file.write(proto_wf.SerializeToString())
+        else:
+            try:
+                config.load_kube_config(
+                    config_file, context, client_configuration, persist_config
+                )
+                logging.info(
+                    "Found local kubernetes config. "
+                    "Initialized with kube_config."
+                )
+            except Exception:
+                logging.info(
+                    "Cannot find local k8s config. "
+                    "Trying in-cluster config."
+                )
+                config.load_incluster_config()
+                logging.info("Initialized with in-cluster config.")
+
+            self._custom_object_api_client = k8s_client.CustomObjectsApi()
+            self._core_api_client = k8s_client.CoreV1Api()
 
     @staticmethod
     def check_name(name):
@@ -80,18 +96,25 @@ class ArgoSubmitter(object):
         return self._core_api_client
 
     def submit(self, workflow_yaml, secrets=None):
-        if secrets:
-            for secret in secrets:
-                self._create_secret(secret.to_yaml())
-
         wf_name = (
             workflow_yaml["metadata"]["name"]
             if "name" in workflow_yaml["metadata"]
             else workflow_yaml["metadata"]["generateName"]
         )
-        logging.info("Checking workflow name/generatedName %s" % wf_name)
-        self.check_name(wf_name)
-        return self._create_workflow(workflow_yaml)
+        if self.go_impl:
+            subprocess.run(
+                "./submit -proto-path=%s -namespace=%s -name-prefix=%s"
+                % (self.proto_path, self.namespace, wf_name),
+                shell=True,
+                check=True,
+            )
+        else:
+            if secrets:
+                for secret in secrets:
+                    self._create_secret(secret.to_yaml())
+            logging.info("Checking workflow name/generatedName %s" % wf_name)
+            self.check_name(wf_name)
+            return self._create_workflow(workflow_yaml)
 
     def _create_workflow(self, workflow_yaml):
         yaml_str = pyaml.dump(workflow_yaml)

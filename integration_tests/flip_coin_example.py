@@ -39,13 +39,17 @@ def tails():
 
 
 if __name__ == "__main__":
-    couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
+    for go_impl in [True, False]:
+        print(
+            "Submitting workflow via %s implementation" % "Go"
+            if go_impl
+            else "Python"
+        )
+        couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
+        result = flip_coin()
+        couler.when(couler.equal(result, "heads"), lambda: heads())
+        couler.when(couler.equal(result, "tails"), lambda: tails())
 
-    result = flip_coin()
-    couler.when(couler.equal(result, "heads"), lambda: heads())
-    couler.when(couler.equal(result, "tails"), lambda: tails())
-
-    submitter = ArgoSubmitter(namespace="argo")
-    wf = couler.run(submitter=submitter)
-    wf_name = wf["metadata"]["name"]
-    print("Workflow %s has been submitted for flip coin example" % wf_name)
+        submitter = ArgoSubmitter(namespace="argo", go_impl=go_impl)
+        couler.run(submitter=submitter)
+        print("Workflow submitted for flip coin example")

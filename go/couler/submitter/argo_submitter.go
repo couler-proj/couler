@@ -13,28 +13,28 @@ import (
 
 // ArgoWorkflowSubmitter holds configurations used for workflow submission
 type ArgoWorkflowSubmitter struct {
-	namespace      string
-	kubeConfigPath string
+	Namespace      string
+	KubeConfigPath string
 }
 
 // New returns ArgoWorkflowSubmitter struct
 func New(namespace, kubeConfigPath string) *ArgoWorkflowSubmitter {
 	return &ArgoWorkflowSubmitter{
-		namespace:      namespace,
-		kubeConfigPath: kubeConfigPath,
+		Namespace:      namespace,
+		KubeConfigPath: kubeConfigPath,
 	}
 }
 
 // Submit takes an Argo Workflow object and submit it to Kubernetes cluster
 func (submitter *ArgoWorkflowSubmitter) Submit(wf wfv1.Workflow, watch bool) (*wfv1.Workflow, error) {
 	// Use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", submitter.kubeConfigPath)
+	config, err := clientcmd.BuildConfigFromFlags("", submitter.KubeConfigPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get the current context in the kubeconfig file %s: %s", submitter.kubeConfigPath, err)
+		return nil, fmt.Errorf("failed to get the current context in the kubeconfig file %s: %s", submitter.KubeConfigPath, err)
 	}
 
 	// Create the workflow client
-	wfClient := wfclientset.NewForConfigOrDie(config).ArgoprojV1alpha1().Workflows(submitter.namespace)
+	wfClient := wfclientset.NewForConfigOrDie(config).ArgoprojV1alpha1().Workflows(submitter.Namespace)
 
 	// Submit the workflow
 	createdWf, err := wfClient.Create(&wf)
