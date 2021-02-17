@@ -169,17 +169,21 @@ def _add_io_to_template(
                         attrs = art["s3"]
                     # NOTE: attrs["key"] stores the remote path on OSS/S3.
                     a = o.artifact
-                    a.remote_path = attrs["key"]
-                    a.endpoint = attrs["endpoint"]
-                    a.bucket = attrs["bucket"]
-                    a.access_key.name = attrs["accessKeySecret"]["name"]
-                    a.access_key.key = attrs["accessKeySecret"]["key"]
-                    s = states._secrets[a.access_key.name]
-                    a.access_key.value = s.data[a.access_key.key]
-                    a.secret_key.name = attrs["secretKeySecret"]["name"]
-                    a.secret_key.key = attrs["secretKeySecret"]["key"]
-                    s = states._secrets[a.secret_key.name]
-                    a.secret_key.value = s.data[a.secret_key.key]
+                    if "key" in art:
+                        a.remote_path = attrs["key"]
+                    if "endpoint" in art:
+                        a.endpoint = attrs["endpoint"]
+                    if "bucket" in art:
+                        a.bucket = attrs["bucket"]
+                    if "accessKeySecret" in art:
+                        a.access_key.name = attrs["accessKeySecret"]["name"]
+                        a.access_key.key = attrs["accessKeySecret"]["key"]
+                        s = states._secrets[a.access_key.name]
+                        a.access_key.value = s.data[a.access_key.key]
+                        a.secret_key.name = attrs["secretKeySecret"]["name"]
+                        a.secret_key.key = attrs["secretKeySecret"]["key"]
+                        s = states._secrets[a.secret_key.name]
+                        a.secret_key.value = s.data[a.secret_key.key]
                     if "globalName" in art:
                         a.global_name = art["globalName"]
                     if i == 0:
