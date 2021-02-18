@@ -96,7 +96,7 @@ class TypedArtifact(Artifact):
             config.update({"endpoint": self.endpoint})
         yaml_output = OrderedDict(
             {"name": self.id, "path": self.path, self.type: config}
-        )
+        ) if self.type != "io" else {"name": self.id, "path": self.path}
         if self.is_global:
             yaml_output["globalName"] = "global-" + self.id
         return yaml_output
