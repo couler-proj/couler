@@ -74,6 +74,8 @@ def run_script(
     :param daemon:
     :return:
     """
+    if source is None:
+        raise ValueError("Source must be provided")
     func_name, caller_line = utils.invocation_location()
     func_name = (
         utils.argo_safe_name(step_name) if step_name is not None else func_name
