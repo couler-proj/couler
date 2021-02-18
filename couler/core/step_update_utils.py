@@ -222,7 +222,7 @@ def _get_params_and_artifacts_from_args(args, input_param_name, prefix):
         else:
             if isinstance(values, OutputArtifact):
                 tmp = values.value.split(".")
-                if len(tmp) < 4:
+                if len(tmp) < 5:
                     raise ValueError("Incorrect step return representation")
                 step_name = tmp[1]
                 output_id = tmp[3]
@@ -233,9 +233,7 @@ def _get_params_and_artifacts_from_args(args, input_param_name, prefix):
                 else:
                     value = '"{{%s.%s.%s}}"' % (prefix, step_name, output_id)
                 artifact = {
-                        "name": utils.input_parameter_name(
-                            input_param_name, i
-                        ),
+                        "name": tmp[5:],
                         "from": value,
                     }
                 if not any([value== x['from'] for x in artifacts]):
