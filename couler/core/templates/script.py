@@ -89,7 +89,10 @@ class Script(Container):
         return template
 
     def script_dict(self):
-        script = OrderedDict({"image": self.image, "command": [self.command]})
+        if isinstance(self.command, list):
+            script = OrderedDict({"image": self.image, "command": self.command})
+        else:
+            script = OrderedDict({"image": self.image, "command": [self.command]})
         source_code_string = None
         if callable(self.source):
             source_code_string = utils.body(self.source)
