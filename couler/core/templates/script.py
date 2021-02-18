@@ -99,9 +99,10 @@ class Script(Container):
             raise ValueError(
                 "unsupported source code type: %s" % type(self.source)
             )
+        command = self.command[0] if isinstance(self.command, list) else self.command
         script["source"] = (
             source_code_string
-            if self.command.lower() == "python"
+            if command.lower() == "python"
             else self.source
         )
         if utils.non_empty(self.env):
