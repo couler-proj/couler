@@ -12,7 +12,6 @@
 # limitations under the License.
 import logging
 import re
-import subprocess
 import tempfile
 
 import pyaml
@@ -41,7 +40,12 @@ class ArgoSubmitter(object):
         self.namespace = namespace
         self.go_impl = go_impl
         if self.go_impl:
+            from ctypes import c_char_p, cdll
             from couler.core.proto_repr import get_default_proto_workflow
+
+            self.go_submitter = cdll.LoadLibrary("./submit.so")
+            self.go_submitter.Submit.argtypes = [c_char_p, c_char_p, c_char_p]
+            self.go_submitter.Submit.restype = c_char_p
 
             with tempfile.NamedTemporaryFile(
                 dir="/tmp", delete=False, mode="wb"
@@ -102,12 +106,12 @@ class ArgoSubmitter(object):
             else workflow_yaml["metadata"]["generateName"]
         )
         if self.go_impl:
-            subprocess.run(
-                "./submit -proto-path=%s -namespace=%s -name-prefix=%s"
-                % (self.proto_path, self.namespace, wf_name),
-                shell=True,
-                check=True,
+            resp = self.go_submitter.Submit(
+                self.proto_path.encode("utf-8"),
+                self.namespace.encode("utf-8"),
+                wf_name.encode("utf-8"),
             )
+            logging.info("Response: %s" % resp.decode("utf-8"))
         else:
             if secrets:
                 for secret in secrets:
