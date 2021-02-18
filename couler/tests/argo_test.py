@@ -146,11 +146,51 @@ class ArgoTest(ArgoBaseTestCase):
             step_name="A",
             volume_mounts=[volume_mount],
         )
+        volume_mount = VolumeMount("workdir", "/mnt/vol")
+        couler.run_container(
+            image="docker/whalesay:latest",
+            args=["echo -n hello world"],
+            command=["bash", "-c"],
+            step_name="A",
+            volume_mounts=[volume_mount],
+        )
 
         wf = couler.workflow_yaml()
+        self.assertEqual(len(wf["spec"]["volumeClaimTemplates"]), 1)
         self.assertEqual(wf["spec"]["volumeClaimTemplates"][0], pvc.to_dict())
         self.assertEqual(
             wf["spec"]["templates"][1]["container"]["volumeMounts"][0],
+            volume_mount.to_dict(),
+        )
+        couler._cleanup()
+
+    def test_run_script_with_workflow_volume(self):
+        pvc = VolumeClaimTemplate("workdir")
+        volume_mount = VolumeMount("workdir", "/mnt/vol")
+        couler.create_workflow_volume(pvc)
+        couler.run_script(
+            image="docker/whalesay:latest",
+            args=["echo -n hello world"],
+            command=["bash", "-c"],
+            step_name="A",
+            source='jjkad\naljsjdf',
+            volume_mounts=[volume_mount],
+        )
+        volume_mount = VolumeMount("workdir", "/mnt/vol")
+        couler.run_script(
+            image="docker/whalesay:latest",
+            args=["echo -n hello world"],
+            command=["bash", "-c"],
+            step_name="A",
+            source='jjkad\naljsjdf',
+            volume_mounts=[volume_mount],
+        )
+
+        wf = couler.workflow_yaml()
+        self.assertEqual(len(wf["spec"]["volumeClaimTemplates"]), 1)
+        self.assertEqual(wf["spec"]["volumeClaimTemplates"][0], pvc.to_dict())
+        self.assertEqual(
+            wf["spec"]["templates"][1]["script"]["volumeMounts"][0],
             volume_mount.to_dict(),
         )
         couler._cleanup()
