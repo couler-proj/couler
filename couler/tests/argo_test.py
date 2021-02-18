@@ -229,6 +229,7 @@ class ArgoTest(ArgoBaseTestCase):
         dag = wf["spec"]["templates"][0]['dag']
         self.assertEqual(len(dag['tasks'][1]['arguments']['artifacts']), 1)
         self.assertIsInstance(dag['tasks'][1]['arguments']['artifacts'][0]['from'], str)
+        self.assertIsInstance(dag['tasks'][1]['arguments']['artifacts'][0]['name'], str)
         template = wf["spec"]["templates"][1]
         self.assertEqual(len(template["outputs"]["artifacts"]), 1)
         template = wf["spec"]["templates"][2]
