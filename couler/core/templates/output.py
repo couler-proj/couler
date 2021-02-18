@@ -52,6 +52,8 @@ def _parse_single_argo_output(output, prefix):
 
     if isinstance(output, Output):
         tmp = output.value.split(".")
+        if 'artifacts' in tmp:
+            return output
         if len(tmp) < 4:
             raise ValueError("Incorrect step return representation")
         step_name = tmp[1]

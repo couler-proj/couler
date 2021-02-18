@@ -221,14 +221,14 @@ def _get_params_and_artifacts_from_args(args, input_param_name, prefix):
                 i += 1
         else:
             if isinstance(values, OutputArtifact):
-                artifacts.append(
-                    {
+                artifact = {
                         "name": utils.input_parameter_name(
                             input_param_name, i
                         ),
                         "from": values,
                     }
-                )
+                if not any([artifact['from']== x['from'] for x in artifacts]):
+                    artifacts.append(artifact)
             else:
                 parameters.append(
                     {

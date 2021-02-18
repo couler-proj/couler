@@ -1,3 +1,4 @@
+from couler.core.templates import step
 import unittest
 from collections import OrderedDict
 
@@ -164,11 +165,11 @@ class ArgoTest(ArgoBaseTestCase):
         )
         couler._cleanup()
 
-    def test_run_script_with_workflow_volume(self):
+    def test_run_container_script_with_workflow_volume(self):
         pvc = VolumeClaimTemplate("workdir")
         volume_mount = VolumeMount("workdir", "/mnt/vol")
         couler.create_workflow_volume(pvc)
-        couler.run_script(
+        couler.run_container_script(
             image="docker/whalesay:latest",
             args=["echo -n hello world"],
             command=["bash", "-c"],
@@ -177,7 +178,7 @@ class ArgoTest(ArgoBaseTestCase):
             volume_mounts=[volume_mount],
         )
         volume_mount = VolumeMount("workdir", "/mnt/vol")
-        couler.run_script(
+        couler.run_container_script(
             image="docker/whalesay:latest",
             args=["echo -n hello world"],
             command=["bash", "-c"],
@@ -194,6 +195,43 @@ class ArgoTest(ArgoBaseTestCase):
             volume_mount.to_dict(),
         )
         couler._cleanup()
+
+    def test_artifact_passing_script_container(self):
+        def producer():
+            output_artifact = couler.create_simple_io_artifact(
+                path="/mnt/t1.txt",
+            )
+
+            outputs = couler.run_container_script(
+                image="docker/whalesay:latest",
+                args=["echo -n hello world > %s" % output_artifact.path],
+                command=["bash", "-c"],
+                output=output_artifact,
+                source='sadfa\nasdf',
+                step_name='producer'
+            )
+
+            return outputs
+
+        def consumer(inputs):
+            # read the content from an OSS bucket
+            couler.run_container_script(
+                image="docker/whalesay:latest",
+                args=inputs,
+                command=[("cat %s" % inputs[0].path)],
+                source='sadfa\nasdf'
+            )
+
+        outputs = couler.set_dependencies(lambda: producer(), dependencies=None)
+        couler.set_dependencies(lambda: consumer(outputs), dependencies=['producer'])
+
+        wf = couler.workflow_yaml()
+        dag = wf["spec"]["templates"][0]['dag']
+        self.assertEqual(len(dag['tasks'][1]['arguments']['artifacts']), 1)
+        template = wf["spec"]["templates"][1]
+        self.assertEqual(len(template["outputs"]["artifacts"]), 1)
+        template = wf["spec"]["templates"][2]
+        self.assertEqual(len(template["inputs"]["artifacts"]), 1)
 
     def test_run_container_with_dependency_implicit_params_passing(self):
         output_path = "/mnt/hello_world.txt"
