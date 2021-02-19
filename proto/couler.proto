@@ -4,6 +4,7 @@ package couler.v1;
 
 import "google/protobuf/any.proto";
 
+
 // declear go package name here, becuase of the generated Go package with `couler_v1` is
 // not acceptable for golint. ref: https://developers.google.com/protocol-buffers/docs/reference/go-generated
 option go_package = "couler/v1";
@@ -14,6 +15,7 @@ message Parameter {
   // in templates: value is how the parameter can be referred to
   // in steps: actual value to be passed to the step
   string value = 2;
+  string global_name = 3;
 }
 
 message Secret {
@@ -54,7 +56,8 @@ message StepIO {
 message ContainerSpec {
     string image = 1;
     repeated string command = 2;
-    map<string, google.protobuf.Any> env = 3;
+    map<string, string> env = 3;
+    map<string, string> resources = 6;
 }
 
 message ResourceSpec {
@@ -65,15 +68,26 @@ message ResourceSpec {
     bool set_owner_reference = 5;
 }
 
+message CannedStepSpec{
+  string name = 1;
+  map<string, string> args = 2;
+  repeated StepIO inputs = 3;
+  repeated StepIO outputs = 4;
+}
+
+
 message Step {
   int32 id = 1;
   string name = 2;      // name for reference
   string tmpl_name = 3; // name for generating template
   ContainerSpec container_spec = 4;
   ResourceSpec resource_spec = 5;
-  string script = 6;
-  repeated StepIO args = 7;
-  repeated string dependencies = 8;
+  CannedStepSpec canned_step_spec = 6;
+  string script = 7;
+  repeated StepIO args = 8;
+  repeated string dependencies = 9;
+  string when = 10;
+  map<string, google.protobuf.Any> attrs = 11;  // attributes for step
 }
 
 message ConcurrentSteps {
@@ -89,12 +103,15 @@ message StepTemplate {
 }
 
 message Workflow {
+  string name = 1;
   // sequential steps: [ [step], [step], [step], ...]
   // concurrent steps: [ [step], [step, step, step], ...]
   // if dependencies was set, no matter what structure the
   // "steps" field stores, generate a DAG.
-  repeated ConcurrentSteps steps = 1;
-  map<string, StepTemplate> templates = 2;
-  int32 parallelism = 3;
-  string secret = 4;
+  repeated ConcurrentSteps steps = 2;
+  map<string, StepTemplate> templates = 3;
+  int32 parallelism = 4;
+  string secret = 5;
+  repeated Step exit_handler_steps = 6;
+  map<string, google.protobuf.Any> attrs = 7;  // Workflow-level attributes
 }

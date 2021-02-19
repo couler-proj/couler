@@ -1,4 +1,4 @@
-# Copyright 2020 The Couler Authors. All rights reserved.
+# Copyright 2021 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -104,7 +104,9 @@ class Container(Template):
                 if isinstance(o, TypedArtifact):
                     _input_list.append(o.to_yaml())
                 if isinstance(o, OutputArtifact):
-                    _input_list.append(o.artifact)
+                    name = o.artifact['name']
+                    if not any(name==x['name'] for x in _input_list):
+                        _input_list.append(o.artifact)
 
             if len(_input_list) > 0:
                 if "inputs" not in template:
@@ -192,10 +194,14 @@ class Container(Template):
             for i in range(len(args)):
                 o = args[i]
                 if isinstance(o, OutputArtifact):
+                    if o.type == 'io':
+                        continue
                     para_name = o.artifact["name"]
-                    parameters.append('"{{inputs.artifacts.%s}}"' % para_name)
+                    param_full_name = '"{{inputs.artifacts.%s}}"' % para_name
                 else:
                     para_name = utils.input_parameter_name(self.name, i)
-                    parameters.append('"{{inputs.parameters.%s}}"' % para_name)
+                    param_full_name = '"{{inputs.parameters.%s}}"' % para_name
+                if param_full_name not in parameters:
+                    parameters.append(param_full_name)
 
         return parameters

@@ -1,4 +1,4 @@
-# Copyright 2020 The Couler Authors. All rights reserved.
+# Copyright 2021 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -29,10 +29,11 @@ class OutputParameter(Output):
 
 
 class OutputArtifact(Output):
-    def __init__(self, value, path, artifact, is_global=False):
+    def __init__(self, value, path, artifact, is_global=False, type=''):
         Output.__init__(self, value=value, is_global=is_global)
         self.path = path
         self.artifact = artifact
+        self.type = type
 
 
 class OutputScript(Output):
@@ -52,6 +53,8 @@ def _parse_single_argo_output(output, prefix):
 
     if isinstance(output, Output):
         tmp = output.value.split(".")
+        if 'artifacts' in tmp:
+            return output
         if len(tmp) < 4:
             raise ValueError("Incorrect step return representation")
         step_name = tmp[1]
@@ -145,12 +148,15 @@ def _container_output(step_name, template_name, output):
                         template_name,
                         output_id,
                     )
+                out_type = 'io' if len(o) == 2 else ''
+
                 rets.append(
                     OutputArtifact(
                         value=ret,
                         path=o["path"],
                         artifact=o,
                         is_global=is_global,
+                        type=out_type,
                     )
                 )
     else:

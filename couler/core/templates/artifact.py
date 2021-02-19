@@ -1,4 +1,4 @@
-# Copyright 2020 The Couler Authors. All rights reserved.
+# Copyright 2021 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -63,13 +63,7 @@ class TypedArtifact(Artifact):
         self.path = path
         self.is_global = is_global
         self.bucket = bucket
-
-        if key is None:
-            # assume the local path is the same as the path of OSS
-            self.key = path
-        else:
-            self.key = key
-
+        self.key = key
         self.endpoint = endpoint
 
         if accesskey_id and accesskey_secret:
@@ -80,7 +74,9 @@ class TypedArtifact(Artifact):
             self.secret = None
 
     def to_yaml(self):
-        config = OrderedDict({"key": self.key})
+        config = OrderedDict()
+        if self.key is not None:
+            config.update({"key": self.key})
         if self.secret is not None:
             config.update(
                 {
@@ -100,7 +96,7 @@ class TypedArtifact(Artifact):
             config.update({"endpoint": self.endpoint})
         yaml_output = OrderedDict(
             {"name": self.id, "path": self.path, self.type: config}
-        )
+        ) if self.type != "io" else {"name": self.id, "path": self.path}
         if self.is_global:
             yaml_output["globalName"] = "global-" + self.id
         return yaml_output

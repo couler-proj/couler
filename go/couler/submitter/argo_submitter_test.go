@@ -30,6 +30,16 @@ func TestArgoWorkflowSubmitter(t *testing.T) {
 			Image:   "python:alpine3.6",
 			Command: []string{"python"},
 		}}
+	exitHandlerStep := &pb.Step{
+		Name:     "exit-handler-step",
+		TmplName: "exit-handler-step-template",
+		ContainerSpec: &pb.ContainerSpec{
+			Image:   "docker/whalesay:latest",
+			Command: []string{"cowsay", "exiting"},
+		},
+		When: "{{workflow.status}} == Failed",
+	}
+	pbWf.ExitHandlerSteps = append(pbWf.ExitHandlerSteps, exitHandlerStep)
 	// TODO (terrytangyuan): Debug why this step keeps running forever.
 	//manifest := `
 	//    apiVersion: v1
