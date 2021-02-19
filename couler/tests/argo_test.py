@@ -234,6 +234,7 @@ class ArgoTest(ArgoBaseTestCase):
         self.assertEqual(len(template["outputs"]["artifacts"]), 1)
         template = wf["spec"]["templates"][2]
         self.assertEqual(len(template["inputs"]["artifacts"]), 1)
+        self.assertNotIn('args', template)
 
     def test_run_container_with_dependency_implicit_params_passing(self):
         output_path = "/mnt/hello_world.txt"

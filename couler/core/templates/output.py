@@ -29,10 +29,11 @@ class OutputParameter(Output):
 
 
 class OutputArtifact(Output):
-    def __init__(self, value, path, artifact, is_global=False):
+    def __init__(self, value, path, artifact, is_global=False, type=''):
         Output.__init__(self, value=value, is_global=is_global)
         self.path = path
         self.artifact = artifact
+        self.type = type
 
 
 class OutputScript(Output):
@@ -147,12 +148,15 @@ def _container_output(step_name, template_name, output):
                         template_name,
                         output_id,
                     )
+                out_type = 'io' if len(o) == 2 else ''
+
                 rets.append(
                     OutputArtifact(
                         value=ret,
                         path=o["path"],
                         artifact=o,
                         is_global=is_global,
+                        type=out_type,
                     )
                 )
     else:

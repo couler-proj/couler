@@ -194,6 +194,8 @@ class Container(Template):
             for i in range(len(args)):
                 o = args[i]
                 if isinstance(o, OutputArtifact):
+                    if o.type == 'io':
+                        continue
                     para_name = o.artifact["name"]
                     param_full_name = '"{{inputs.artifacts.%s}}"' % para_name
                 else:
