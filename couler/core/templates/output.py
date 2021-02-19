@@ -165,16 +165,23 @@ def _container_output(step_name, template_name, output):
     return rets
 
 
-def _script_output(step_name, template_name):
+def _script_output(step_name, template_name, output):
     """Generate output name from an Argo script template.  For example,
     "{{steps.generate.outputs.result}}" in
     https://github.com/argoproj/argo/tree/master/examples#scripts--results
     Return of run_script is contacted by:
     couler.step_name.template_name.outputs.result
     """
-
     value = "couler.%s.%s.outputs.result" % (step_name, template_name)
-    return [OutputScript(value=value)]
+    output_script = OutputScript(value=value)
+
+    if output is None:
+        return [output_script]
+
+    rets = _container_output(step_name, template_name, output)
+    rets.append(output_script)
+
+    return rets
 
 
 def _job_output(step_name, template_name):

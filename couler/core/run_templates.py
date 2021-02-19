@@ -165,10 +165,7 @@ def run_script(
     step_templ = states.workflow.get_template(func_name)
     _output = step_templ.to_dict().get("outputs", None)
     _input = step_templ.to_dict().get("inputs", None)
-    if output is None:
-        rets = _script_output(step_name, func_name)
-    else:
-        rets = _container_output(step_name, func_name, _output)
+    rets = _script_output(step_name, func_name, _output)
     states._steps_outputs[step_name] = rets
 
     proto_repr.step_repr(  # noqa: F841
