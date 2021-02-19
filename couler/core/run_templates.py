@@ -1,4 +1,4 @@
-# Copyright 2020 The Couler Authors. All rights reserved.
+# Copyright 2021 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -181,6 +181,8 @@ def run_script(
         args=args,
         input=_input,
         output=_output,
+        env=env,
+        resources=resources,
     )
 
     return rets
@@ -327,6 +329,8 @@ def run_container(
         args=args,
         input=_input,
         output=_output,
+        env=env,
+        resources=resources,
     )
 
     return rets
@@ -425,3 +429,25 @@ def run_job(
     )
 
     return rets
+
+
+def run_canned_step(name, args, inputs=None, outputs=None, step_name=None):
+    func_name, caller_line = utils.invocation_location()
+    func_name = (
+        utils.argo_safe_name(step_name) if step_name is not None else func_name
+    )
+    step_name = step_update_utils.update_step(
+        func_name, args, step_name, caller_line
+    )
+    tmpl_args = []
+    if states._outputs_tmp is not None:
+        tmpl_args.extend(states._outputs_tmp)
+    return proto_repr.step_repr(  # noqa: F841
+        input=inputs,
+        output=outputs,
+        canned_step_name=name,
+        canned_step_args=args,
+        step_name=step_name,
+        tmpl_name=step_name + "-tmpl",
+        args=tmpl_args,
+    )

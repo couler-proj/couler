@@ -1,4 +1,4 @@
-# Copyright 2020 The Couler Authors. All rights reserved.
+# Copyright 2021 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,6 +10,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import json
 
 from couler.core import states, utils  # noqa: F401
 from couler.core.templates.output import OutputArtifact, OutputJob
@@ -46,6 +48,7 @@ def step_repr(
     image=None,
     command=None,
     source=None,
+    env=None,
     script_output=None,
     args=None,
     input=None,
@@ -53,6 +56,9 @@ def step_repr(
     manifest=None,
     success_cond=None,
     failure_cond=None,
+    canned_step_name=None,
+    canned_step_args=None,
+    resources=None,
 ):
     assert step_name is not None
     assert tmpl_name is not None
@@ -61,27 +67,54 @@ def step_repr(
     pb_step.id = get_uniq_step_id()
     pb_step.name = step_name
     pb_step.tmpl_name = tmpl_name
+    if env is not None:
+        for k, v in env.items():
+            if isinstance(v, str):
+                pb_step.container_spec.env[k] = v
+            else:
+                pb_step.container_spec.env[k] = json.dumps(v)
+
     # image can be None if manifest specified.
     if image is not None:
         pb_step.container_spec.image = image
     if manifest is not None:
         pb_step.resource_spec.manifest = manifest
-    if success_cond is not None:
-        pb_step.resource_spec.success_condition = success_cond
-        pb_step.resource_spec.failure_condition = failure_cond
-    if command is None:
-        pb_step.container_spec.command.append("python")
-    elif isinstance(command, list):
-        pb_step.container_spec.command.extend(command)
-    elif isinstance(command, str):
-        pb_step.container_spec.command.append(command)
+        if success_cond is not None and failure_cond is not None:
+            pb_step.resource_spec.success_condition = success_cond
+            pb_step.resource_spec.failure_condition = failure_cond
     else:
-        raise ValueError("command must be str or list")
+        if command is None:
+            pb_step.container_spec.command.append("python")
+        elif isinstance(command, list):
+            pb_step.container_spec.command.extend(command)
+        elif isinstance(command, str):
+            pb_step.container_spec.command.append(command)
+        else:
+            raise ValueError("command must be str or list")
     if source is not None:
         if isinstance(source, str):
             pb_step.script = source
         else:
             pb_step.script = utils.body(source)
+    if canned_step_name is not None and canned_step_args is not None:
+        pb_step.canned_step_spec.name = canned_step_name
+        if isinstance(canned_step_args, dict):
+            for k, v in canned_step_args.items():
+                pb_step.canned_step_spec.args[k] = v
+        else:
+            raise ValueError("canned_step_spec.args must be a dictionary")
+
+    # setup resources
+    if resources is not None:
+        if not isinstance(resources, dict):
+            raise ValueError("resources must be type dict")
+        for k, v in resources.items():
+            # key: cpu, memory, gpu
+            # value: "1", "8", "500m", "1Gi" etc.
+            pb_step.container_spec.resources[k] = str(v)
+
+    if states._when_prefix is not None:
+        pb_step.when = states._when_prefix
 
     # add template to proto workflow
     wf = get_default_proto_workflow()
@@ -97,26 +130,29 @@ def step_repr(
     if args is not None:
         for i, arg in enumerate(args):
             if isinstance(arg, OutputArtifact):
-                pb_art = couler_pb2.StepIO()
+                pb_art = pb_step.args.add()
                 pb_art.artifact.name = arg.artifact["name"]
                 pb_art.artifact.value = (
                     '"{{inputs.artifacts.%s}}"' % pb_art.artifact.name
                 )
-                pb_step.args.append(pb_art)
             else:
-                pb_param = couler_pb2.StepIO()
+                pb_param = pb_step.args.add()
                 pb_param.parameter.name = utils.input_parameter_name(
                     pb_step.name, i
                 )
                 pb_param.parameter.value = (
                     '"{{inputs.parameters.%s}}"' % pb_param.parameter.name
                 )
-                pb_step.args.append(pb_param)
 
-    # add step to proto workflow
-    concurrent_step = couler_pb2.ConcurrentSteps()
-    concurrent_step.steps.append(pb_step)
-    wf.steps.append(concurrent_step)
+    if states._exit_handler_enable:
+        # add exit handler steps
+        eh_step = wf.exit_handler_steps.add()
+        eh_step.CopyFrom(pb_step)
+    else:
+        # add step to proto workflow
+        concurrent_step = wf.steps.add()
+        inner_step = concurrent_step.steps.add()
+        inner_step.CopyFrom(pb_step)
     return pb_step
 
 
@@ -124,39 +160,38 @@ def _add_io_to_template(
     pb_tmpl, source_step_id, input=None, output=None, script_output=None
 ):
     if script_output is not None:
-        o = couler_pb2.StepIO()
+        o = pb_tmpl.outputs.add()
         o.source = source_step_id
         o.stdout.name = script_output[0].value
-        pb_tmpl.outputs.append(o)
 
     for i, io in enumerate([input, output]):
         if io is not None:
             # NOTE: run_job will pass type OutputJob here
             if isinstance(io, list) and isinstance(io[0], OutputJob):
                 for oj in io:
-                    o = couler_pb2.StepIO()
+                    o = pb_tmpl.outputs.add()
                     o.source = source_step_id
                     o.parameter.name = "job-name"
                     o.parameter.value = oj.job_name
-                    pb_tmpl.outputs.append(o)
 
-                    o = couler_pb2.StepIO()
+                    o = pb_tmpl.outputs.add()
                     o.source = source_step_id
                     o.parameter.name = "job-id"
                     o.parameter.value = oj.job_id
-                    pb_tmpl.outputs.append(o)
 
-                    o = couler_pb2.StepIO()
+                    o = pb_tmpl.outputs.add()
                     o.source = source_step_id
                     o.parameter.name = "job-obj"
                     o.parameter.value = oj.job_obj
-                    pb_tmpl.outputs.append(o)
                 break
 
             if "artifacts" in io:
                 art_list = io["artifacts"]
                 for art in art_list:
-                    o = couler_pb2.StepIO()
+                    if i == 0:
+                        o = pb_tmpl.inputs.add()
+                    elif i == 1:
+                        o = pb_tmpl.outputs.add()
                     o.source = source_step_id
                     o.artifact.name = art["name"]
                     o.artifact.local_path = art["path"]
@@ -186,19 +221,14 @@ def _add_io_to_template(
                         a.secret_key.value = s.data[a.secret_key.key]
                     if "globalName" in art:
                         a.global_name = art["globalName"]
-                    if i == 0:
-                        pb_tmpl.inputs.append(o)
-                    elif i == 1:
-                        pb_tmpl.outputs.append(o)
             elif "parameters" in io:
                 p_list = io["parameters"]
                 for p in p_list:
-                    o = couler_pb2.StepIO()
+                    if i == 0:
+                        o = pb_tmpl.inputs.add()
+                    elif i == 1:
+                        o = pb_tmpl.outputs.add()
                     o.source = source_step_id
                     o.parameter.name = p["name"]
                     if "valueFrom" in p:
                         o.parameter.value = p["valueFrom"]["path"]
-                    if i == 0:
-                        pb_tmpl.inputs.append(o)
-                    elif i == 1:
-                        pb_tmpl.outputs.append(o)

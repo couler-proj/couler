@@ -1,4 +1,4 @@
-# Copyright 2020 The Couler Authors. All rights reserved.
+# Copyright 2021 The Couler Authors. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -25,6 +25,7 @@ from couler.core.config import config_workflow  # noqa: F401
 from couler.core.constants import *  # noqa: F401, F403
 from couler.core.constants import WorkflowCRD
 from couler.core.run_templates import (  # noqa: F401
+    run_canned_step,
     run_container,
     run_job,
     run_script,
