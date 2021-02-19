@@ -28,7 +28,6 @@ from couler.core.run_templates import (  # noqa: F401
     run_container,
     run_job,
     run_script,
-    run_container_script,
 )
 from couler.core.states import (  # noqa: F401
     _cleanup,
