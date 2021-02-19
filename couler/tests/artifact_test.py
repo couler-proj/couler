@@ -175,9 +175,11 @@ class ArtifactTest(ArgoYamlTest):
         wf = couler.workflow_yaml()
         template = wf["spec"]["templates"][1]
         artifact = template["outputs"]["artifacts"][0]
+        self.assertEqual(len(template["outputs"]["artifacts"]), 1)
         self._oss_check_helper(artifact)
         template = wf["spec"]["templates"][2]
         artifact = template["inputs"]["artifacts"][0]
+        self.assertEqual(len(template["inputs"]["artifacts"]), 1)
         self._oss_check_helper(artifact)
         couler._cleanup()
 

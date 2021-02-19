@@ -32,70 +32,157 @@ from couler.core.templates.output import (
 )
 from couler.core.templates.volume import VolumeMount
 
-
 def run_script(
     image,
     command=None,
     source=None,
+    args=None,
+    output=None,
+    input=None,
     env=None,
-    resources=None,
     secret=None,
+    resources=None,
     timeout=None,
     retry=None,
     step_name=None,
     image_pull_policy=None,
     pool=None,
+    enable_ulogfs=True,
     daemon=False,
+    volume_mounts=None,
+    working_dir=None,
+    node_selector=None,
 ):
-    """Generate an Argo script template.  For example,
-    https://github.com/argoproj/argo/tree/master/examples#scripts--results.
-    Step_name is only used for annotating step while developing step zoo.
     """
+    Generate an Argo script template.  For example,
+    https://github.com/argoproj/argo/tree/master/examples#scripts--results.
+    :param image:
+    :param command:
+    :param source:
+    :param args:
+    :param output: output artifact for container output
+    :param input: input artifact for container input
+    :param env: environmental variable
+    :param secret:
+    :param resources: CPU or memory resource config dict
+    :param timeout: in seconds
+    :param retry: retry policy
+    :param step_name: used for annotating step .
+    :param image_pull_policy:
+    :param pool:
+    :param enable_ulogfs:
+    :param daemon:
+    :return:
+    """
+    if source is None:
+        raise ValueError("Source must be provided")
     func_name, caller_line = utils.invocation_location()
     func_name = (
         utils.argo_safe_name(step_name) if step_name is not None else func_name
     )
 
     if states.workflow.get_template(func_name) is None:
-        if source is None:
-            raise ValueError("Input script can not be null")
+        # Generate the inputs parameter for the template
+        if input is None:
+            input = []
 
+        if args is None and states._outputs_tmp is not None:
+            args = []
+
+        if args is not None:
+            if not isinstance(args, list):
+                args = [args]
+
+            # Handle case where args is a list of list type
+            # For example, [[Output, ]]
+            if (
+                isinstance(args, list)
+                and len(args) > 0
+                and isinstance(args[0], list)
+                and len(args[0]) > 0
+                and isinstance(args[0][0], Output)
+            ):
+                args = args[0]
+
+            if states._outputs_tmp is not None:
+                args.extend(states._outputs_tmp)
+
+            # In case, the args include output artifact
+            # Place output artifact into the input
+            for arg in args:
+                if isinstance(arg, (OutputArtifact, OutputJob)):
+                    input.append(arg)
+
+        # Automatically append emptyDir volume and volume mount to work with
+        # Argo k8sapi executor.
+        # More info: https://argoproj.github.io/argo/empty-dir/
+        if output is not None:
+            if not isinstance(output, list):
+                output = [output]
+            if volume_mounts is None:
+                volume_mounts = []
+            mounted_path = []
+            for i, out in enumerate(output):
+                if "/tmp" in out.path:
+                    raise ValueError("Mounting to /tmp is not supported")
+                path_to_mount = os.path.dirname(out.path)
+                # Avoid duplicate mount paths
+                if path_to_mount not in mounted_path:
+                    volume_mounts.append(
+                        VolumeMount("couler-out-dir-%s" % i, path_to_mount)
+                    )
+                    mounted_path.append(path_to_mount)
+
+        # Generate container and template
         template = Script(
             name=func_name,
             image=image,
             command=command,
             source=source,
+            args=args,
             env=env,
             secret=states.get_secret(secret),
             resources=resources,
-            timeout=timeout,
-            retry=retry,
             image_pull_policy=image_pull_policy,
+            retry=retry,
+            timeout=timeout,
+            output=output,
+            input=input,
             pool=pool,
+            enable_ulogfs=enable_ulogfs,
             daemon=daemon,
+            volume_mounts=volume_mounts,
+            working_dir=working_dir,
+            node_selector=node_selector,
         )
         states.workflow.add_template(template)
 
     step_name = step_update_utils.update_step(
-        func_name, args=None, step_name=step_name, caller_line=caller_line
+        func_name, args, step_name, caller_line
     )
-    rets = _script_output(step_name, func_name)
+
+    # TODO: need to switch to use field `output` directly
+    step_templ = states.workflow.get_template(func_name)
+    _output = step_templ.to_dict().get("outputs", None)
+    _input = step_templ.to_dict().get("inputs", None)
+    rets = _script_output(step_name, func_name, _output)
     states._steps_outputs[step_name] = rets
 
-    # TODO(typhoonzero): return pb_step when using a couler server.
-    pb_step = proto_repr.step_repr(  # noqa: F841
+    proto_repr.step_repr(  # noqa: F841
         step_name=step_name,
         tmpl_name=func_name,
         image=image,
         command=command,
         source=source,
         script_output=rets,
+        args=args,
+        input=_input,
+        output=_output,
         env=env,
         resources=resources,
     )
 
     return rets
-
 
 def run_container(
     image,

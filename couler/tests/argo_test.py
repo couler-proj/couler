@@ -159,14 +159,63 @@ class ArgoTest(ArgoBaseTestCase):
             step_name="A",
             volume_mounts=[volume_mount],
         )
+        volume_mount = VolumeMount("workdir", "/mnt/vol")
+        couler.run_container(
+            image="docker/whalesay:latest",
+            args=["echo -n hello world"],
+            command=["bash", "-c"],
+            step_name="A",
+            volume_mounts=[volume_mount],
+        )
 
         wf = couler.workflow_yaml()
+        self.assertEqual(len(wf["spec"]["volumeClaimTemplates"]), 1)
         self.assertEqual(wf["spec"]["volumeClaimTemplates"][0], pvc.to_dict())
         self.assertEqual(
             wf["spec"]["templates"][1]["container"]["volumeMounts"][0],
             volume_mount.to_dict(),
         )
         couler._cleanup()
+
+    def test_artifact_passing_script_container(self):
+        def producer():
+            output_artifact = couler.create_simple_io_artifact(
+                path="/mnt/t1.txt",
+            )
+
+            outputs = couler.run_script(
+                image="docker/whalesay:latest",
+                args=["echo -n hello world > %s" % output_artifact.path],
+                command=["bash", "-c"],
+                output=output_artifact,
+                source='sadfa\nasdf',
+                step_name='producer'
+            )
+
+            return outputs
+
+        def consumer(inputs):
+            # read the content from an OSS bucket
+            couler.run_script(
+                image="docker/whalesay:latest",
+                args=inputs,
+                command=[("cat %s" % inputs[0].path)],
+                source='sadfa\nasdf'
+            )
+
+        outputs = couler.set_dependencies(lambda: producer(), dependencies=None)
+        couler.set_dependencies(lambda: consumer(outputs), dependencies=['producer'])
+
+        wf = couler.workflow_yaml()
+        dag = wf["spec"]["templates"][0]['dag']
+        self.assertEqual(len(dag['tasks'][1]['arguments']['artifacts']), 1)
+        self.assertIsInstance(dag['tasks'][1]['arguments']['artifacts'][0]['from'], str)
+        self.assertIsInstance(dag['tasks'][1]['arguments']['artifacts'][0]['name'], str)
+        template = wf["spec"]["templates"][1]
+        self.assertEqual(len(template["outputs"]["artifacts"]), 1)
+        template = wf["spec"]["templates"][2]
+        self.assertEqual(len(template["inputs"]["artifacts"]), 1)
+        self.assertNotIn('args', template)
 
     def test_run_container_with_dependency_implicit_params_passing(self):
         output_path = "/mnt/hello_world.txt"

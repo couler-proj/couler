@@ -42,6 +42,7 @@ from couler.core.templates import (  # noqa: F401
     OssArtifact,
     S3Artifact,
     Secret,
+    TypedArtifact,
 )
 from couler.core.workflow_validation_utils import (  # noqa: F401
     validate_workflow_yaml,
@@ -150,6 +151,10 @@ def _dump_yaml():
 
     if states._enable_print_yaml:
         print(yaml_str)
+
+
+def create_artifact(path, is_global=False):
+    return TypedArtifact(artifact_type="io", path=path, is_global=is_global)
 
 
 def create_parameter_artifact(path, is_global=False):

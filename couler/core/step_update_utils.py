@@ -221,14 +221,23 @@ def _get_params_and_artifacts_from_args(args, input_param_name, prefix):
                 i += 1
         else:
             if isinstance(values, OutputArtifact):
-                artifacts.append(
-                    {
-                        "name": utils.input_parameter_name(
-                            input_param_name, i
-                        ),
-                        "from": values,
+                tmp = values.value.split(".")
+                if len(tmp) < 5:
+                    raise ValueError("Incorrect step return representation")
+                step_name = tmp[1]
+                output_id = tmp[3]
+                for item in tmp[4:]:
+                    output_id = output_id + "." + item
+                if values.is_global:
+                    value = '"{{workflow.outputs.%s}}"' % output_id
+                else:
+                    value = '"{{%s.%s.%s}}"' % (prefix, step_name, output_id)
+                artifact = {
+                        "name": '.'.join(tmp[5:]),
+                        "from": value,
                     }
-                )
+                if not any([value== x['from'] for x in artifacts]):
+                    artifacts.append(artifact)
             else:
                 parameters.append(
                     {
