@@ -104,8 +104,8 @@ class Container(Template):
                 if isinstance(o, TypedArtifact):
                     _input_list.append(o.to_yaml())
                 if isinstance(o, OutputArtifact):
-                    name = o.artifact['name']
-                    if not any(name==x['name'] for x in _input_list):
+                    name = o.artifact["name"]
+                    if not any(name == x["name"] for x in _input_list):
                         _input_list.append(o.artifact)
 
             if len(_input_list) > 0:
@@ -194,7 +194,7 @@ class Container(Template):
             for i in range(len(args)):
                 o = args[i]
                 if isinstance(o, OutputArtifact):
-                    if o.type == 'io':
+                    if o.type == "io":
                         continue
                     para_name = o.artifact["name"]
                     param_full_name = '"{{inputs.artifacts.%s}}"' % para_name

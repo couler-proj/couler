@@ -16,8 +16,8 @@ from collections import OrderedDict
 
 from couler.core import states, utils
 from couler.core.constants import OVERWRITE_GPU_ENVS
-from couler.core.templates.secret import Secret
 from couler.core.templates.container import Container
+from couler.core.templates.secret import Secret
 
 
 class Script(Container):
@@ -90,9 +90,13 @@ class Script(Container):
 
     def script_dict(self):
         if isinstance(self.command, list):
-            script = OrderedDict({"image": self.image, "command": self.command})
+            script = OrderedDict(
+                {"image": self.image, "command": self.command}
+            )
         else:
-            script = OrderedDict({"image": self.image, "command": [self.command]})
+            script = OrderedDict(
+                {"image": self.image, "command": [self.command]}
+            )
         source_code_string = None
         if callable(self.source):
             source_code_string = utils.body(self.source)
@@ -102,11 +106,11 @@ class Script(Container):
             raise ValueError(
                 "unsupported source code type: %s" % type(self.source)
             )
-        command = self.command[0] if isinstance(self.command, list) else self.command
+        command = (
+            self.command[0] if isinstance(self.command, list) else self.command
+        )
         script["source"] = (
-            source_code_string
-            if command.lower() == "python"
-            else self.source
+            source_code_string if command.lower() == "python" else self.source
         )
         if utils.non_empty(self.env):
             script["env"] = utils.convert_dict_to_env_list(self.env)

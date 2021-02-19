@@ -212,11 +212,15 @@ def _add_io_to_template(
                         if "bucket" in attrs:
                             a.bucket = attrs["bucket"]
                         if "accessKeySecret" in attrs:
-                            a.access_key.name = attrs["accessKeySecret"]["name"]
+                            a.access_key.name = attrs["accessKeySecret"][
+                                "name"
+                            ]
                             a.access_key.key = attrs["accessKeySecret"]["key"]
                             s = states._secrets[a.access_key.name]
                             a.access_key.value = s.data[a.access_key.key]
-                            a.secret_key.name = attrs["secretKeySecret"]["name"]
+                            a.secret_key.name = attrs["secretKeySecret"][
+                                "name"
+                            ]
                             a.secret_key.key = attrs["secretKeySecret"]["key"]
                             s = states._secrets[a.secret_key.name]
                             a.secret_key.value = s.data[a.secret_key.key]

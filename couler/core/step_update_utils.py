@@ -232,11 +232,8 @@ def _get_params_and_artifacts_from_args(args, input_param_name, prefix):
                     value = '"{{workflow.outputs.%s}}"' % output_id
                 else:
                     value = '"{{%s.%s.%s}}"' % (prefix, step_name, output_id)
-                artifact = {
-                        "name": '.'.join(tmp[5:]),
-                        "from": value,
-                    }
-                if not any([value== x['from'] for x in artifacts]):
+                artifact = {"name": ".".join(tmp[5:]), "from": value}
+                if not any([value == x["from"] for x in artifacts]):
                     artifacts.append(artifact)
             else:
                 parameters.append(
