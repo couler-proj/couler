@@ -64,7 +64,6 @@ def _generate_pod_spec(
         # "cpu=1,memory=1024,disk=2048,gpu=1,gpu_type=p100,shared_memory=20480"
         try:
             kvs = resources.split(",")
-            print(kvs)
             limits = {}
             for kv in kvs:
                 k, v = kv.split("=")
