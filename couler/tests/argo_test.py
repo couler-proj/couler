@@ -202,7 +202,7 @@ class ArgoTest(ArgoBaseTestCase):
                 path="/mnt/t1.txt",
             )
 
-            outputs = couler.run_container_script(
+            outputs = couler.run_script(
                 image="docker/whalesay:latest",
                 args=["echo -n hello world > %s" % output_artifact.path],
                 command=["bash", "-c"],
@@ -215,7 +215,7 @@ class ArgoTest(ArgoBaseTestCase):
 
         def consumer(inputs):
             # read the content from an OSS bucket
-            couler.run_container_script(
+            couler.run_script(
                 image="docker/whalesay:latest",
                 args=inputs,
                 command=[("cat %s" % inputs[0].path)],
