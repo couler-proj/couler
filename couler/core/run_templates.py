@@ -32,6 +32,7 @@ from couler.core.templates.output import (
 )
 from couler.core.templates.volume import VolumeMount
 
+
 def run_script(
     image,
     command=None,
@@ -183,6 +184,7 @@ def run_script(
     )
 
     return rets
+
 
 def run_container(
     image,

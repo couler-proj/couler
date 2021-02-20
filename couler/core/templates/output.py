@@ -29,7 +29,7 @@ class OutputParameter(Output):
 
 
 class OutputArtifact(Output):
-    def __init__(self, value, path, artifact, is_global=False, type=''):
+    def __init__(self, value, path, artifact, is_global=False, type=""):
         Output.__init__(self, value=value, is_global=is_global)
         self.path = path
         self.artifact = artifact
@@ -53,7 +53,7 @@ def _parse_single_argo_output(output, prefix):
 
     if isinstance(output, Output):
         tmp = output.value.split(".")
-        if 'artifacts' in tmp:
+        if "artifacts" in tmp:
             return output
         if len(tmp) < 4:
             raise ValueError("Incorrect step return representation")
@@ -148,7 +148,7 @@ def _container_output(step_name, template_name, output):
                         template_name,
                         output_id,
                     )
-                out_type = 'io' if len(o) == 2 else ''
+                out_type = "io" if len(o) == 2 else ""
 
                 rets.append(
                     OutputArtifact(
