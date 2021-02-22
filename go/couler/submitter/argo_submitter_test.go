@@ -75,8 +75,8 @@ func TestArgoWorkflowSubmitter(t *testing.T) {
 	assert.NoError(t, err)
 
 	submitter := ArgoWorkflowSubmitter{
-		Namespace:      "argo",
-		KubeConfigPath: filepath.Join(usr.HomeDir, ".kube", "config"),
+		namespace:      "argo",
+		kubeConfigPath: filepath.Join(usr.HomeDir, ".kube", "config"),
 	}
 	finishedArgoWf, err := submitter.Submit(argoWf, true)
 	if err != nil && finishedArgoWf != nil {
