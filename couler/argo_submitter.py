@@ -45,7 +45,10 @@ class ArgoSubmitter(object):
         logging.basicConfig(level=logging.INFO)
         self.namespace = namespace
         self.go_impl = (
-            os.environ[_SUBMITTER_IMPL_ENV_VAR_KEY] == _SubmitterImplTypes.GO
+            os.environ.get(
+                _SUBMITTER_IMPL_ENV_VAR_KEY, _SubmitterImplTypes.PYTHON
+            )
+            == _SubmitterImplTypes.GO
         )
         if self.go_impl:
             from ctypes import c_char_p, cdll
