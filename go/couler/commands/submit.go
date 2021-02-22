@@ -19,7 +19,6 @@ func Submit(cProtoPath, cNamespace, cNamePrefix *C.char) *C.char {
 	namespace := C.GoString(cNamespace)
 	namePrefix := C.GoString(cNamePrefix)
 
-	// Testing submitting probuf written from Python
 	in, err := ioutil.ReadFile(protoPath)
 	if err != nil {
 		return wrapError(fmt.Errorf("failed to read workflow protobuf file: %w", err))

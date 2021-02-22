@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+import os
 import re
 import tempfile
 
@@ -20,6 +21,13 @@ from kubernetes import client as k8s_client
 from kubernetes import config
 
 from couler.core.constants import CronWorkflowCRD, WorkflowCRD
+
+_SUBMITTER_IMPL_ENV_VAR_KEY = "SUBMITTER_IMPLEMENTATION"
+
+
+class _SubmitterImplTypes(object):
+    PYTHON = "Python"
+    GO = "Go"
 
 
 # TODO: some k8s common parts can move to another file later.
@@ -33,12 +41,12 @@ class ArgoSubmitter(object):
         context=None,
         client_configuration=None,
         persist_config=True,
-        # TODO: Remove this once we are done migrating the implementation.
-        go_impl=False,
     ):
         logging.basicConfig(level=logging.INFO)
         self.namespace = namespace
-        self.go_impl = go_impl
+        self.go_impl = (
+            os.environ[_SUBMITTER_IMPL_ENV_VAR_KEY] == _SubmitterImplTypes.GO
+        )
         if self.go_impl:
             from ctypes import c_char_p, cdll
             from couler.core.proto_repr import get_default_proto_workflow
