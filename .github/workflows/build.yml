@@ -66,6 +66,7 @@ jobs:
 
         kubectl apply -n argo -f manifests/mpi-operator.yaml
 
+        go build -buildmode=c-shared -o submit.so go/couler/commands/submit.go
         scripts/integration_tests.sh
         export E2E_TEST=true
         go test -timeout 3m ./go/couler/submitter/... -v

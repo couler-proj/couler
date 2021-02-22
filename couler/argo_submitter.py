@@ -10,9 +10,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import logging
+import os
 import re
+import tempfile
 
 import pyaml
 import yaml
@@ -20,6 +21,13 @@ from kubernetes import client as k8s_client
 from kubernetes import config
 
 from couler.core.constants import CronWorkflowCRD, WorkflowCRD
+
+_SUBMITTER_IMPL_ENV_VAR_KEY = "SUBMITTER_IMPLEMENTATION"
+
+
+class _SubmitterImplTypes(object):
+    PYTHON = "Python"
+    GO = "Go"
 
 
 # TODO: some k8s common parts can move to another file later.
@@ -35,23 +43,46 @@ class ArgoSubmitter(object):
         persist_config=True,
     ):
         logging.basicConfig(level=logging.INFO)
-        try:
-            config.load_kube_config(
-                config_file, context, client_configuration, persist_config
-            )
-            logging.info(
-                "Found local kubernetes config. Initialized with kube_config."
-            )
-        except Exception:
-            logging.info(
-                "Cannot find local k8s config. Trying in-cluster config."
-            )
-            config.load_incluster_config()
-            logging.info("Initialized with in-cluster config.")
-
-        self._custom_object_api_client = k8s_client.CustomObjectsApi()
-        self._core_api_client = k8s_client.CoreV1Api()
         self.namespace = namespace
+        self.go_impl = (
+            os.environ.get(
+                _SUBMITTER_IMPL_ENV_VAR_KEY, _SubmitterImplTypes.PYTHON
+            )
+            == _SubmitterImplTypes.GO
+        )
+        if self.go_impl:
+            from ctypes import c_char_p, cdll
+            from couler.core.proto_repr import get_default_proto_workflow
+
+            self.go_submitter = cdll.LoadLibrary("./submit.so")
+            self.go_submitter.Submit.argtypes = [c_char_p, c_char_p, c_char_p]
+            self.go_submitter.Submit.restype = c_char_p
+
+            with tempfile.NamedTemporaryFile(
+                dir="/tmp", delete=False, mode="wb"
+            ) as tmp_file:
+                self.proto_path = tmp_file.name
+                proto_wf = get_default_proto_workflow()
+                tmp_file.write(proto_wf.SerializeToString())
+        else:
+            try:
+                config.load_kube_config(
+                    config_file, context, client_configuration, persist_config
+                )
+                logging.info(
+                    "Found local kubernetes config. "
+                    "Initialized with kube_config."
+                )
+            except Exception:
+                logging.info(
+                    "Cannot find local k8s config. "
+                    "Trying in-cluster config."
+                )
+                config.load_incluster_config()
+                logging.info("Initialized with in-cluster config.")
+
+            self._custom_object_api_client = k8s_client.CustomObjectsApi()
+            self._core_api_client = k8s_client.CoreV1Api()
 
     @staticmethod
     def check_name(name):
@@ -80,18 +111,25 @@ class ArgoSubmitter(object):
         return self._core_api_client
 
     def submit(self, workflow_yaml, secrets=None):
-        if secrets:
-            for secret in secrets:
-                self._create_secret(secret.to_yaml())
-
         wf_name = (
             workflow_yaml["metadata"]["name"]
             if "name" in workflow_yaml["metadata"]
             else workflow_yaml["metadata"]["generateName"]
         )
-        logging.info("Checking workflow name/generatedName %s" % wf_name)
-        self.check_name(wf_name)
-        return self._create_workflow(workflow_yaml)
+        if self.go_impl:
+            resp = self.go_submitter.Submit(
+                self.proto_path.encode("utf-8"),
+                self.namespace.encode("utf-8"),
+                wf_name.encode("utf-8"),
+            )
+            logging.info("Response: %s" % resp.decode("utf-8"))
+        else:
+            if secrets:
+                for secret in secrets:
+                    self._create_secret(secret.to_yaml())
+            logging.info("Checking workflow name/generatedName %s" % wf_name)
+            self.check_name(wf_name)
+            return self._create_workflow(workflow_yaml)
 
     def _create_workflow(self, workflow_yaml):
         yaml_str = pyaml.dump(workflow_yaml)

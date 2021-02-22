@@ -11,8 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 import couler.argo as couler
-from couler.argo_submitter import ArgoSubmitter
+from couler.argo_submitter import (
+    _SUBMITTER_IMPL_ENV_VAR_KEY,
+    ArgoSubmitter,
+    _SubmitterImplTypes,
+)
 
 
 def random_code():
@@ -39,13 +45,14 @@ def tails():
 
 
 if __name__ == "__main__":
-    couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
+    for impl_type in [_SubmitterImplTypes.GO, _SubmitterImplTypes.PYTHON]:
+        os.environ[_SUBMITTER_IMPL_ENV_VAR_KEY] = impl_type
+        print("Submitting workflow via %s implementation" % impl_type)
+        couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
+        result = flip_coin()
+        couler.when(couler.equal(result, "heads"), lambda: heads())
+        couler.when(couler.equal(result, "tails"), lambda: tails())
 
-    result = flip_coin()
-    couler.when(couler.equal(result, "heads"), lambda: heads())
-    couler.when(couler.equal(result, "tails"), lambda: tails())
-
-    submitter = ArgoSubmitter(namespace="argo")
-    wf = couler.run(submitter=submitter)
-    wf_name = wf["metadata"]["name"]
-    print("Workflow %s has been submitted for flip coin example" % wf_name)
+        submitter = ArgoSubmitter(namespace="argo")
+        couler.run(submitter=submitter)
+        print("Workflow submitted for flip coin example")
