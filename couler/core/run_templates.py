@@ -87,9 +87,6 @@ def run_script(
         if input is None:
             input = []
 
-        if args is None and states._outputs_tmp is not None:
-            args = []
-
         if args is not None:
             if not isinstance(args, list):
                 args = [args]
@@ -104,9 +101,6 @@ def run_script(
                 and isinstance(args[0][0], Output)
             ):
                 args = args[0]
-
-            if states._outputs_tmp is not None:
-                args.extend(states._outputs_tmp)
 
             # In case, the args include output artifact
             # Place output artifact into the input
