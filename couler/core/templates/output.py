@@ -148,7 +148,7 @@ def _container_output(step_name, template_name, output):
                         template_name,
                         output_id,
                     )
-                out_type = "io" if len(o) == 2 else ""
+                out_type = "local" if len(o) == 2 else ""
 
                 rets.append(
                     OutputArtifact(

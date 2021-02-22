@@ -153,12 +153,12 @@ def _dump_yaml():
         print(yaml_str)
 
 
-def create_artifact(path, is_global=False):
-    return TypedArtifact(artifact_type="io", path=path, is_global=is_global)
-
-
 def create_parameter_artifact(path, is_global=False):
     return Artifact(path=path, type="parameters", is_global=is_global)
+
+
+def create_local_artifact(path, is_global=False):
+    return TypedArtifact(artifact_type="local", path=path, is_global=is_global)
 
 
 def create_oss_artifact(

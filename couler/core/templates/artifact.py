@@ -98,7 +98,7 @@ class TypedArtifact(Artifact):
             OrderedDict(
                 {"name": self.id, "path": self.path, self.type: config}
             )
-            if self.type != "io"
+            if self.type != "local"
             else {"name": self.id, "path": self.path}
         )
         if self.is_global:
