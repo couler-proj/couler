@@ -42,7 +42,7 @@ from couler.core.templates import (  # noqa: F401
     OssArtifact,
     S3Artifact,
     Secret,
-    TypedArtifact,
+    LocalArtifact,
 )
 from couler.core.workflow_validation_utils import (  # noqa: F401
     validate_workflow_yaml,
@@ -158,7 +158,7 @@ def create_parameter_artifact(path, is_global=False):
 
 
 def create_local_artifact(path, is_global=False):
-    return TypedArtifact(artifact_type="local", path=path, is_global=is_global)
+    return LocalArtifact(path=path, is_global=is_global)
 
 
 def create_oss_artifact(

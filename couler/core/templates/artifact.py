@@ -106,6 +106,19 @@ class TypedArtifact(Artifact):
         return yaml_output
 
 
+class LocalArtifact(TypedArtifact):
+    def __init__(
+        self,
+        path,
+        is_global=False,
+    ):
+        super().__init__(
+            "s3",
+            path=path,
+            is_global=is_global,
+        )
+
+
 class S3Artifact(TypedArtifact):
     def __init__(
         self,
