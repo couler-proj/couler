@@ -113,7 +113,7 @@ class LocalArtifact(TypedArtifact):
         is_global=False,
     ):
         super().__init__(
-            "s3",
+            "local",
             path=path,
             is_global=is_global,
         )
