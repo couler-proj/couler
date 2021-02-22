@@ -2,6 +2,7 @@ package submitter
 
 import (
 	"fmt"
+	"k8s.io/client-go/rest"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -13,28 +14,32 @@ import (
 
 // ArgoWorkflowSubmitter holds configurations used for workflow submission
 type ArgoWorkflowSubmitter struct {
-	Namespace      string
-	KubeConfigPath string
+	namespace      string
+	kubeConfigPath string
 }
 
 // New returns ArgoWorkflowSubmitter struct
 func New(namespace, kubeConfigPath string) *ArgoWorkflowSubmitter {
 	return &ArgoWorkflowSubmitter{
-		Namespace:      namespace,
-		KubeConfigPath: kubeConfigPath,
+		namespace:      namespace,
+		kubeConfigPath: kubeConfigPath,
 	}
 }
 
 // Submit takes an Argo Workflow object and submit it to Kubernetes cluster
 func (submitter *ArgoWorkflowSubmitter) Submit(wf wfv1.Workflow, watch bool) (*wfv1.Workflow, error) {
 	// Use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", submitter.KubeConfigPath)
+	config, err := clientcmd.BuildConfigFromFlags("", submitter.kubeConfigPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get the current context in the kubeconfig file %s: %s", submitter.KubeConfigPath, err)
+		fmt.Printf("failed to get the configuration from in the kubeconfig file %s: %s", submitter.kubeConfigPath, err)
+		config, err = rest.InClusterConfig()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get in-cluster configuration: %w", err)
+		}
 	}
 
 	// Create the workflow client
-	wfClient := wfclientset.NewForConfigOrDie(config).ArgoprojV1alpha1().Workflows(submitter.Namespace)
+	wfClient := wfclientset.NewForConfigOrDie(config).ArgoprojV1alpha1().Workflows(submitter.namespace)
 
 	// Submit the workflow
 	createdWf, err := wfClient.Create(&wf)

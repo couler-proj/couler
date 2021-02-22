@@ -38,11 +38,7 @@ func Submit(cProtoPath, cNamespace, cNamePrefix *C.char) *C.char {
 	if err != nil {
 		return wrapError(fmt.Errorf("failed to get the current user: %w", err))
 	}
-	sub := submitter.ArgoWorkflowSubmitter{
-		Namespace: namespace,
-		// TODO: Support in-cluster configuration
-		KubeConfigPath: filepath.Join(usr.HomeDir, ".kube", "config"),
-	}
+	sub := submitter.New(namespace, filepath.Join(usr.HomeDir, ".kube", "config"))
 	submittedArgoWf, err := sub.Submit(argoWf, true)
 	if err != nil && submittedArgoWf != nil {
 		var errMsg string
