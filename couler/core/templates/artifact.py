@@ -98,12 +98,25 @@ class TypedArtifact(Artifact):
             OrderedDict(
                 {"name": self.id, "path": self.path, self.type: config}
             )
-            if self.type != "io"
+            if self.type != "local"
             else {"name": self.id, "path": self.path}
         )
         if self.is_global:
             yaml_output["globalName"] = "global-" + self.id
         return yaml_output
+
+
+class LocalArtifact(TypedArtifact):
+    def __init__(
+        self,
+        path,
+        is_global=False,
+    ):
+        super().__init__(
+            "local",
+            path=path,
+            is_global=is_global,
+        )
 
 
 class S3Artifact(TypedArtifact):
