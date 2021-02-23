@@ -107,16 +107,8 @@ class TypedArtifact(Artifact):
 
 
 class LocalArtifact(TypedArtifact):
-    def __init__(
-        self,
-        path,
-        is_global=False,
-    ):
-        super().__init__(
-            "local",
-            path=path,
-            is_global=is_global,
-        )
+    def __init__(self, path, is_global=False):
+        super().__init__("local", path=path, is_global=is_global)
 
 
 class S3Artifact(TypedArtifact):

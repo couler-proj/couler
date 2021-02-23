@@ -39,10 +39,10 @@ from couler.core.states import (  # noqa: F401
 from couler.core.syntax import *  # noqa: F401, F403
 from couler.core.templates import (  # noqa: F401
     Artifact,
+    LocalArtifact,
     OssArtifact,
     S3Artifact,
     Secret,
-    LocalArtifact,
 )
 from couler.core.workflow_validation_utils import (  # noqa: F401
     validate_workflow_yaml,
