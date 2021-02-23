@@ -179,7 +179,7 @@ class ArgoTest(ArgoBaseTestCase):
 
     def test_artifact_passing_script(self):
         def producer():
-            output_artifact = couler.create_artifact(path="/mnt/t1.txt")
+            output_artifact = couler.create_local_artifact(path="/mnt/t1.txt")
             outputs = couler.run_script(
                 image="docker/whalesay:latest",
                 args=["echo -n hello world > %s" % output_artifact.path],
