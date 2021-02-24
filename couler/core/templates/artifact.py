@@ -108,7 +108,9 @@ class TypedArtifact(Artifact):
 
 class LocalArtifact(TypedArtifact):
     def __init__(self, path, is_global=False):
-        super().__init__(couler.ArtifactType.LOCAL, path=path, is_global=is_global)
+        super().__init__(
+            couler.ArtifactType.LOCAL, path=path, is_global=is_global
+        )
 
 
 class S3Artifact(TypedArtifact):
