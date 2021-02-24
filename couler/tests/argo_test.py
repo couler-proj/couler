@@ -192,7 +192,7 @@ class ArgoTest(ArgoBaseTestCase):
             return outputs
 
         def consumer(inputs):
-            # read the content from an OSS bucket
+            # read the content from local artifact
             couler.run_script(
                 image="docker/whalesay:latest",
                 args=inputs,
