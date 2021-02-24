@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import couler.argo as couler
+from couler.core.templates.artifact import ARTIFACT_TYPE_OSS, ARTIFACT_TYPE_S3
 from couler.tests.argo_yaml_test import ArgoYamlTest
 
 _test_data_dir = "test_data"
@@ -28,7 +29,7 @@ class ArtifactTest(ArgoYamlTest):
     def _oss_check_helper(self, artifact):
         self.assertIn("output-oss", artifact["name"])
         self.assertEqual("/mnt/t1.txt", artifact["path"])
-        oss_config = artifact["oss"]
+        oss_config = artifact[ARTIFACT_TYPE_OSS]
         self.assertIsNotNone(oss_config)
         self.assertEqual(oss_config["endpoint"], "xyz.com")
         self.assertEqual(oss_config["bucket"], "test-bucket/")
@@ -86,7 +87,7 @@ class ArtifactTest(ArgoYamlTest):
     def _s3_check_helper(self, artifact):
         self.assertIn("output-s3", artifact["name"])
         self.assertEqual("/mnt/t1.txt", artifact["path"])
-        s3_config = artifact["s3"]
+        s3_config = artifact[ARTIFACT_TYPE_S3]
         self.assertIsNotNone(s3_config)
         self.assertEqual(s3_config["endpoint"], "xyz.com")
         self.assertEqual(s3_config["bucket"], "test-bucket/")
