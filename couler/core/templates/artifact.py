@@ -16,10 +16,6 @@ from collections import OrderedDict
 from couler import argo as couler
 from couler.core import utils
 
-ARTIFACT_TYPE_LOCAL = "local"
-ARTIFACT_TYPE_S3 = "s3"
-ARTIFACT_TYPE_OSS = "oss"
-
 
 class Artifact(object):
     def __init__(self, path, type=None, is_global=False):
@@ -102,7 +98,7 @@ class TypedArtifact(Artifact):
             OrderedDict(
                 {"name": self.id, "path": self.path, self.type: config}
             )
-            if self.type != ARTIFACT_TYPE_LOCAL
+            if self.type != couler.ArtifactType.LOCAL
             else {"name": self.id, "path": self.path}
         )
         if self.is_global:
@@ -112,7 +108,7 @@ class TypedArtifact(Artifact):
 
 class LocalArtifact(TypedArtifact):
     def __init__(self, path, is_global=False):
-        super().__init__(ARTIFACT_TYPE_LOCAL, path=path, is_global=is_global)
+        super().__init__(couler.ArtifactType.LOCAL, path=path, is_global=is_global)
 
 
 class S3Artifact(TypedArtifact):
@@ -127,7 +123,7 @@ class S3Artifact(TypedArtifact):
         is_global=False,
     ):
         super().__init__(
-            ARTIFACT_TYPE_S3,
+            couler.ArtifactType.S3,
             path,
             accesskey_id,
             accesskey_secret,
@@ -150,7 +146,7 @@ class OssArtifact(TypedArtifact):
         is_global=False,
     ):
         super().__init__(
-            ARTIFACT_TYPE_OSS,
+            couler.ArtifactType.OSS,
             path,
             accesskey_id,
             accesskey_secret,
