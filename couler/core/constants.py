@@ -52,3 +52,9 @@ class WFStatus(Enum):
     Succeeded = "Succeeded"
     Failed = "Failed"
     Error = "Error"
+
+
+class ArtifactType(object):
+    LOCAL = "local"
+    S3 = "s3"
+    OSS = "oss"

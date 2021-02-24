@@ -13,8 +13,10 @@
 
 from couler.core.templates.artifact import (  # noqa: F401
     Artifact,
+    LocalArtifact,
     OssArtifact,
     S3Artifact,
+    TypedArtifact,
 )
 from couler.core.templates.container import Container  # noqa: F401
 from couler.core.templates.job import Job  # noqa: F401

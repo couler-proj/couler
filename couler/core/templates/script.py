@@ -16,17 +16,18 @@ from collections import OrderedDict
 
 from couler.core import states, utils
 from couler.core.constants import OVERWRITE_GPU_ENVS
+from couler.core.templates.container import Container
 from couler.core.templates.secret import Secret
-from couler.core.templates.template import Template
 
 
-class Script(Template):
+class Script(Container):
     def __init__(
         self,
         name,
         image,
         command,
         source,
+        args=None,
         env=None,
         secret=None,
         resources=None,
@@ -34,15 +35,36 @@ class Script(Template):
         retry=None,
         timeout=None,
         pool=None,
+        output=None,
+        input=None,
+        enable_ulogfs=True,
         daemon=False,
+        volume_mounts=None,
+        working_dir=None,
+        node_selector=None,
+        volumes=None,
     ):
-        Template.__init__(
+        Container.__init__(
             self,
-            name=name,
-            timeout=timeout,
+            name,
+            image,
+            command,
+            args=args,
+            env=env,
+            secret=secret,
+            resources=resources,
+            image_pull_policy=image_pull_policy,
             retry=retry,
+            timeout=timeout,
             pool=pool,
+            output=output,
+            input=input,
+            enable_ulogfs=enable_ulogfs,
             daemon=daemon,
+            volume_mounts=volume_mounts,
+            working_dir=working_dir,
+            node_selector=node_selector,
+            volumes=volumes,
         )
         self.image = image
         self.command = "python" if command is None else command
@@ -53,7 +75,7 @@ class Script(Template):
         self.image_pull_policy = image_pull_policy
 
     def to_dict(self):
-        template = Template.to_dict(self)
+        template = Container.to_dict(self)
         if (
             not utils.gpu_requested(self.resources)
             and states._overwrite_nvidia_gpu_envs
@@ -61,11 +83,20 @@ class Script(Template):
             if self.env is None:
                 self.env = {}
             self.env.update(OVERWRITE_GPU_ENVS)
-        template["script"] = self.script_dict()
+        if "container" in template:
+            template["script"] = template.pop("container")
+        template["script"].update(self.script_dict())
         return template
 
     def script_dict(self):
-        script = OrderedDict({"image": self.image, "command": [self.command]})
+        if isinstance(self.command, list):
+            script = OrderedDict(
+                {"image": self.image, "command": self.command}
+            )
+        else:
+            script = OrderedDict(
+                {"image": self.image, "command": [self.command]}
+            )
         source_code_string = None
         if callable(self.source):
             source_code_string = utils.body(self.source)
@@ -75,10 +106,11 @@ class Script(Template):
             raise ValueError(
                 "unsupported source code type: %s" % type(self.source)
             )
+        command = (
+            self.command[0] if isinstance(self.command, list) else self.command
+        )
         script["source"] = (
-            source_code_string
-            if self.command.lower() == "python"
-            else self.source
+            source_code_string if command.lower() == "python" else self.source
         )
         if utils.non_empty(self.env):
             script["env"] = utils.convert_dict_to_env_list(self.env)

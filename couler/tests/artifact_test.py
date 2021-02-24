@@ -28,7 +28,7 @@ class ArtifactTest(ArgoYamlTest):
     def _oss_check_helper(self, artifact):
         self.assertIn("output-oss", artifact["name"])
         self.assertEqual("/mnt/t1.txt", artifact["path"])
-        oss_config = artifact["oss"]
+        oss_config = artifact[couler.ArtifactType.OSS]
         self.assertIsNotNone(oss_config)
         self.assertEqual(oss_config["endpoint"], "xyz.com")
         self.assertEqual(oss_config["bucket"], "test-bucket/")
@@ -86,7 +86,7 @@ class ArtifactTest(ArgoYamlTest):
     def _s3_check_helper(self, artifact):
         self.assertIn("output-s3", artifact["name"])
         self.assertEqual("/mnt/t1.txt", artifact["path"])
-        s3_config = artifact["s3"]
+        s3_config = artifact[couler.ArtifactType.S3]
         self.assertIsNotNone(s3_config)
         self.assertEqual(s3_config["endpoint"], "xyz.com")
         self.assertEqual(s3_config["bucket"], "test-bucket/")
@@ -175,9 +175,11 @@ class ArtifactTest(ArgoYamlTest):
         wf = couler.workflow_yaml()
         template = wf["spec"]["templates"][1]
         artifact = template["outputs"]["artifacts"][0]
+        self.assertEqual(len(template["outputs"]["artifacts"]), 1)
         self._oss_check_helper(artifact)
         template = wf["spec"]["templates"][2]
         artifact = template["inputs"]["artifacts"][0]
+        self.assertEqual(len(template["inputs"]["artifacts"]), 1)
         self._oss_check_helper(artifact)
         couler._cleanup()
 

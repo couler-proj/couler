@@ -29,10 +29,11 @@ class OutputParameter(Output):
 
 
 class OutputArtifact(Output):
-    def __init__(self, value, path, artifact, is_global=False):
+    def __init__(self, value, path, artifact, is_global=False, type=""):
         Output.__init__(self, value=value, is_global=is_global)
         self.path = path
         self.artifact = artifact
+        self.type = type
 
 
 class OutputScript(Output):
@@ -52,6 +53,8 @@ def _parse_single_argo_output(output, prefix):
 
     if isinstance(output, Output):
         tmp = output.value.split(".")
+        if "artifacts" in tmp:
+            return output
         if len(tmp) < 4:
             raise ValueError("Incorrect step return representation")
         step_name = tmp[1]
@@ -145,6 +148,7 @@ def _container_output(step_name, template_name, output):
                         template_name,
                         output_id,
                     )
+
                 rets.append(
                     OutputArtifact(
                         value=ret,
@@ -159,16 +163,23 @@ def _container_output(step_name, template_name, output):
     return rets
 
 
-def _script_output(step_name, template_name):
+def _script_output(step_name, template_name, output):
     """Generate output name from an Argo script template.  For example,
     "{{steps.generate.outputs.result}}" in
     https://github.com/argoproj/argo/tree/master/examples#scripts--results
     Return of run_script is contacted by:
     couler.step_name.template_name.outputs.result
     """
-
     value = "couler.%s.%s.outputs.result" % (step_name, template_name)
-    return [OutputScript(value=value)]
+    output_script = OutputScript(value=value)
+
+    if output is None:
+        return [output_script]
+
+    rets = _container_output(step_name, template_name, output)
+    rets.append(output_script)
+
+    return rets
 
 
 def _job_output(step_name, template_name):

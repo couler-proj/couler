@@ -39,6 +39,7 @@ from couler.core.states import (  # noqa: F401
 from couler.core.syntax import *  # noqa: F401, F403
 from couler.core.templates import (  # noqa: F401
     Artifact,
+    LocalArtifact,
     OssArtifact,
     S3Artifact,
     Secret,
@@ -154,6 +155,10 @@ def _dump_yaml():
 
 def create_parameter_artifact(path, is_global=False):
     return Artifact(path=path, type="parameters", is_global=is_global)
+
+
+def create_local_artifact(path, is_global=False):
+    return LocalArtifact(path=path, is_global=is_global)
 
 
 def create_oss_artifact(
