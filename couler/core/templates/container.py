@@ -193,13 +193,10 @@ class Container(Template):
         if args is not None:
             for i in range(len(args)):
                 o = args[i]
-                if isinstance(o, OutputArtifact):
-                    para_name = o.artifact["name"]
-                    param_full_name = '"{{inputs.artifacts.%s}}"' % para_name
-                else:
+                if not isinstance(o, OutputArtifact):
                     para_name = utils.input_parameter_name(self.name, i)
                     param_full_name = '"{{inputs.parameters.%s}}"' % para_name
-                if param_full_name not in parameters:
-                    parameters.append(param_full_name)
+                    if param_full_name not in parameters:
+                        parameters.append(param_full_name)
 
         return parameters
