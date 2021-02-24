@@ -69,7 +69,7 @@ def run_script(
     :param timeout: in seconds
     :param retry: retry policy
     :param step_name: used for annotating step .
-    :param image_pull_policy: one of ImagePullPolicy.[Always|Never|IfNotPresent]
+    :param image_pull_policy: one of ImagePullPolicy.[Always|Never|IfNotPresent] # noqa: E501
     :param pool:
     :param enable_ulogfs:
     :param daemon:
@@ -220,7 +220,7 @@ def run_container(
     :param timeout: in seconds
     :param retry: retry policy
     :param step_name: used for annotating step .
-    :param image_pull_policy: one of ImagePullPolicy.[Always|Never|IfNotPresent]
+    :param image_pull_policy: one of ImagePullPolicy.[Always|Never|IfNotPresent] # noqa: E501
     :param pool:
     :param enable_ulogfs:
     :param daemon:
