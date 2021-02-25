@@ -79,4 +79,3 @@ spec:
           - 'cat /mnt/t1.txt'
         args:
           - "{{inputs.parameters.para-B-0}}"
-          - "{{inputs.artifacts.output-oss-1c392c25}}"
