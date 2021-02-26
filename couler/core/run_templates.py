@@ -182,7 +182,7 @@ def run_script(
         env=env,
         resources=resources,
     )
-
+    proto_repr.add_deps_to_step(step_name)
     return rets
 
 
@@ -331,7 +331,7 @@ def run_container(
         env=env,
         resources=resources,
     )
-
+    proto_repr.add_deps_to_step(step_name)
     return rets
 
 
@@ -426,7 +426,7 @@ def run_job(
         success_cond=success_condition,
         failure_cond=failure_condition,
     )
-
+    proto_repr.add_deps_to_step(step_name)
     return rets
 
 
@@ -441,7 +441,7 @@ def run_canned_step(name, args, inputs=None, outputs=None, step_name=None):
     tmpl_args = []
     if states._outputs_tmp is not None:
         tmpl_args.extend(states._outputs_tmp)
-    return proto_repr.step_repr(  # noqa: F841
+    pb_step = proto_repr.step_repr(  # noqa: F841
         input=inputs,
         output=outputs,
         canned_step_name=name,
@@ -450,3 +450,5 @@ def run_canned_step(name, args, inputs=None, outputs=None, step_name=None):
         tmpl_name=step_name + "-tmpl",
         args=tmpl_args,
     )
+    proto_repr.add_deps_to_step(step_name)
+    return pb_step

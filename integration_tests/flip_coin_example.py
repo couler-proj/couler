@@ -47,12 +47,18 @@ def tails():
 if __name__ == "__main__":
     for impl_type in [_SubmitterImplTypes.GO, _SubmitterImplTypes.PYTHON]:
         os.environ[_SUBMITTER_IMPL_ENV_VAR_KEY] = impl_type
-        print("Submitting workflow via %s implementation" % impl_type)
-        couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
+        print(
+            "Submitting flip coin example workflow via %s implementation"
+            % impl_type
+        )
+        couler.config_workflow(
+            name="flip-coin-%s" % impl_type.lower(),
+            timeout=3600,
+            time_to_clean=3600 * 1.5,
+        )
         result = flip_coin()
         couler.when(couler.equal(result, "heads"), lambda: heads())
         couler.when(couler.equal(result, "tails"), lambda: tails())
 
         submitter = ArgoSubmitter(namespace="argo")
         couler.run(submitter=submitter)
-        print("Workflow submitted for flip coin example")

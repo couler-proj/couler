@@ -11,8 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 import couler.argo as couler
-from couler.argo_submitter import ArgoSubmitter
+from couler.argo_submitter import (
+    _SUBMITTER_IMPL_ENV_VAR_KEY,
+    ArgoSubmitter,
+    _SubmitterImplTypes,
+)
 
 
 def job_a(message):
@@ -118,26 +124,34 @@ def diamond():
 
 
 if __name__ == "__main__":
-    couler.config_workflow(timeout=3600, time_to_clean=3600 * 1.5)
+    for impl_type in [_SubmitterImplTypes.GO, _SubmitterImplTypes.PYTHON]:
+        os.environ[_SUBMITTER_IMPL_ENV_VAR_KEY] = impl_type
+        print(
+            "Submitting DAG example workflow via %s implementation" % impl_type
+        )
+        couler.config_workflow(
+            name="dag-%s" % impl_type.lower(),
+            timeout=3600,
+            time_to_clean=3600 * 1.5,
+        )
 
-    # 1) Add a linear DAG.
-    linear()
-    # 2) Add another step that depends on D and flips a coin.
-    # 3) If the result is "heads", another child step is also
-    # added to the entire workflow.
-    couler.set_dependencies(
-        lambda: couler.when(
-            couler.equal(conditional_parent(), "heads"),
-            lambda: conditional_child(),
-        ),
-        dependencies=["D"],
-    )
-    # 4) Add an exit handler that runs when the workflow succeeds.
-    couler.set_exit_handler(couler.WFStatus.Succeeded, exit_handler_succeeded)
-    # 5) Add an exit handler that runs when the workflow failed.
-    couler.set_exit_handler(couler.WFStatus.Failed, exit_handler_failed)
-
-    submitter = ArgoSubmitter(namespace="argo")
-    wf = couler.run(submitter=submitter)
-    wf_name = wf["metadata"]["name"]
-    print("Workflow %s has been submitted for DAG example" % wf_name)
+        # 1) Add a linear DAG.
+        linear()
+        # 2) Add another step that depends on D and flips a coin.
+        # 3) If the result is "heads", another child step is also
+        # added to the entire workflow.
+        couler.set_dependencies(
+            lambda: couler.when(
+                couler.equal(conditional_parent(), "heads"),
+                lambda: conditional_child(),
+            ),
+            dependencies=["D"],
+        )
+        # 4) Add an exit handler that runs when the workflow succeeds.
+        couler.set_exit_handler(
+            couler.WFStatus.Succeeded, exit_handler_succeeded
+        )
+        # 5) Add an exit handler that runs when the workflow failed.
+        couler.set_exit_handler(couler.WFStatus.Failed, exit_handler_failed)
+        submitter = ArgoSubmitter(namespace="argo")
+        couler.run(submitter=submitter)
