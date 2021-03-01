@@ -132,16 +132,18 @@ def step_repr(
             if isinstance(arg, OutputArtifact):
                 pb_art = pb_step.args.add()
                 pb_art.artifact.name = arg.artifact["name"]
-                pb_art.artifact.value = (
-                    '"{{inputs.artifacts.%s}}"' % pb_art.artifact.name
-                )
+                pb_art.artifact.value = arg.value
             else:
                 pb_param = pb_step.args.add()
                 pb_param.parameter.name = utils.input_parameter_name(
                     pb_step.name, i
                 )
                 pb_param.parameter.value = (
-                    '"{{inputs.parameters.%s}}"' % pb_param.parameter.name
+                    # This is casted to string for protobuf and Argo
+                    # will automatically convert it to a correct type.
+                    str(arg)
+                    if isinstance(arg, (str, float, bool, int))
+                    else arg.value
                 )
 
     if states._exit_handler_enable:
@@ -154,6 +156,20 @@ def step_repr(
         inner_step = concurrent_step.steps.add()
         inner_step.CopyFrom(pb_step)
     return pb_step
+
+
+def add_deps_to_step(step_name):
+    dag_task = states.workflow.get_dag_task(step_name)
+    deps = dag_task.get("dependencies") if dag_task is not None else None
+    if deps is not None:
+        proto_wf = get_default_proto_workflow()
+        step_id = None
+        for i, step in enumerate(proto_wf.steps):
+            if step.steps[0].name == step_name:
+                step_id = i
+                break
+        if step_id is not None:
+            proto_wf.steps[step_id].steps[0].dependencies.extend(deps)
 
 
 def _add_io_to_template(
