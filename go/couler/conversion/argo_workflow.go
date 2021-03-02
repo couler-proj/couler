@@ -141,10 +141,15 @@ func createSingleStepTemplate(step *pb.Step, workflowPb *pb.Workflow) wfv1.Templ
 			env = append(env, corev1.EnvVar{Name: k, Value: v})
 		}
 		env = append(env, stepSecretToEnvs(step)...)
+		var volumeMounts []corev1.VolumeMount
+		for _, volMount := range containerSpec.GetVolumeMounts() {
+			volumeMounts = append(volumeMounts, corev1.VolumeMount{Name: volMount.Name, MountPath: volMount.Path})
+		}
 		container := &corev1.Container{
-			Image:   containerSpec.GetImage(),
-			Command: containerSpec.GetCommand(),
-			Env:     env,
+			Image:        containerSpec.GetImage(),
+			Command:      containerSpec.GetCommand(),
+			Env:          env,
+			VolumeMounts: volumeMounts,
 		}
 		if len(containerSpec.GetResources()) > 0 {
 			resourceList := corev1.ResourceList{}

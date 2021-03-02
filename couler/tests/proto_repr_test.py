@@ -105,6 +105,7 @@ class ProtoReprTest(unittest.TestCase):
         s = proto_wf.steps[0].steps[0]
         t = proto_wf.templates[s.tmpl_name]
         self.assertEqual(s.container_spec.image, "docker/whalesay:latest")
+        self.assertEqual(len(s.container_spec.volume_mounts), 1)
         self.assertTrue(t.outputs[0].artifact.name.startswith("output-oss"))
         self.assertEqual(t.outputs[0].artifact.local_path, "/home/t1.txt")
         self.assertEqual(t.outputs[0].artifact.endpoint, "xyz.com")
