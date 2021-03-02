@@ -141,9 +141,12 @@ func createSingleStepTemplate(step *pb.Step, workflowPb *pb.Workflow) wfv1.Templ
 			env = append(env, corev1.EnvVar{Name: k, Value: v})
 		}
 		env = append(env, stepSecretToEnvs(step)...)
+		// Append volume mounts to container and volumes to template
 		var volumeMounts []corev1.VolumeMount
 		for _, volMount := range containerSpec.GetVolumeMounts() {
 			volumeMounts = append(volumeMounts, corev1.VolumeMount{Name: volMount.Name, MountPath: volMount.Path})
+			// Note that currently we only support empty dir in order to work with k8sapi executor.
+			template.Volumes = append(template.Volumes, corev1.Volume{Name: volMount.Name, VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}}})
 		}
 		container := &corev1.Container{
 			Image:        containerSpec.GetImage(),

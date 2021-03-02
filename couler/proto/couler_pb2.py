@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z\tcouler/v1',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x12proto/couler.proto\x12\tcouler.v1\x1a\x19google/protobuf/any.proto\"=\n\tParameter\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\x12\x13\n\x0bglobal_name\x18\x03 \x01(\t\"2\n\x06Secret\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\t\"\xe3\x01\n\x08\x41rtifact\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\x12\x0c\n\x04type\x18\x03 \x01(\t\x12\x12\n\nlocal_path\x18\x04 \x01(\t\x12\x13\n\x0bremote_path\x18\x05 \x01(\t\x12%\n\naccess_key\x18\x06 \x01(\x0b\x32\x11.couler.v1.Secret\x12%\n\nsecret_key\x18\x07 \x01(\x0b\x32\x11.couler.v1.Secret\x12\x10\n\x08\x65ndpoint\x18\x08 \x01(\t\x12\x0e\n\x06\x62ucket\x18\t \x01(\t\x12\x13\n\x0bglobal_name\x18\n \x01(\t\"\x16\n\x06StdOut\x12\x0c\n\x04name\x18\x01 \x01(\t\"\xaa\x01\n\x06StepIO\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x06source\x18\x02 \x01(\x05\x12)\n\tparameter\x18\x03 \x01(\x0b\x32\x14.couler.v1.ParameterH\x00\x12\'\n\x08\x61rtifact\x18\x04 \x01(\x0b\x32\x13.couler.v1.ArtifactH\x00\x12#\n\x06stdout\x18\x05 \x01(\x0b\x32\x11.couler.v1.StdOutH\x00\x42\t\n\x07step_io\")\n\x0bVolumeMount\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"\x1c\n\x0cVolumeSource\x12\x0c\n\x04name\x18\x01 \x01(\t\"?\n\x06Volume\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\'\n\x06source\x18\x02 \x01(\x0b\x32\x17.couler.v1.VolumeSource\"\xa8\x02\n\rContainerSpec\x12\r\n\x05image\x18\x01 \x01(\t\x12\x0f\n\x07\x63ommand\x18\x02 \x03(\t\x12.\n\x03\x65nv\x18\x03 \x03(\x0b\x32!.couler.v1.ContainerSpec.EnvEntry\x12:\n\tresources\x18\x06 \x03(\x0b\x32\'.couler.v1.ContainerSpec.ResourcesEntry\x12-\n\rvolume_mounts\x18\x07 \x03(\x0b\x32\x16.couler.v1.VolumeMount\x1a*\n\x08\x45nvEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x30\n\x0eResourcesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x83\x01\n\x0cResourceSpec\x12\x10\n\x08manifest\x18\x01 \x01(\t\x12\x19\n\x11success_condition\x18\x02 \x01(\t\x12\x19\n\x11\x66\x61ilure_condition\x18\x03 \x01(\t\x12\x0e\n\x06\x61\x63tion\x18\x04 \x01(\t\x12\x1b\n\x13set_owner_reference\x18\x05 \x01(\x08\"\xc5\x01\n\x0e\x43\x61nnedStepSpec\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x31\n\x04\x61rgs\x18\x02 \x03(\x0b\x32#.couler.v1.CannedStepSpec.ArgsEntry\x12!\n\x06inputs\x18\x03 \x03(\x0b\x32\x11.couler.v1.StepIO\x12\"\n\x07outputs\x18\x04 \x03(\x0b\x32\x11.couler.v1.StepIO\x1a+\n\tArgsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\xd6\x03\n\x04Step\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\ttmpl_name\x18\x03 \x01(\t\x12\x30\n\x0e\x63ontainer_spec\x18\x04 \x01(\x0b\x32\x18.couler.v1.ContainerSpec\x12.\n\rresource_spec\x18\x05 \x01(\x0b\x32\x17.couler.v1.ResourceSpec\x12\x33\n\x10\x63\x61nned_step_spec\x18\x06 \x01(\x0b\x32\x19.couler.v1.CannedStepSpec\x12\x0e\n\x06script\x18\x07 \x01(\t\x12\x1f\n\x04\x61rgs\x18\x08 \x03(\x0b\x32\x11.couler.v1.StepIO\x12\x14\n\x0c\x64\x65pendencies\x18\t \x03(\t\x12\x0c\n\x04when\x18\n \x01(\t\x12)\n\x05\x61ttrs\x18\x0b \x03(\x0b\x32\x1a.couler.v1.Step.AttrsEntry\x12\"\n\x07secrets\x18\x0c \x03(\x0b\x32\x11.couler.v1.Secret\x12\"\n\x07volumes\x18\r \x03(\x0b\x32\x11.couler.v1.Volume\x1a\x42\n\nAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12#\n\x05value\x18\x02 \x01(\x0b\x32\x14.google.protobuf.Any:\x02\x38\x01\"1\n\x0f\x43oncurrentSteps\x12\x1e\n\x05steps\x18\x01 \x03(\x0b\x32\x0f.couler.v1.Step\"c\n\x0cStepTemplate\x12\x0c\n\x04name\x18\x01 \x01(\t\x12!\n\x06inputs\x18\x02 \x03(\x0b\x32\x11.couler.v1.StepIO\x12\"\n\x07outputs\x18\x03 \x03(\x0b\x32\x11.couler.v1.StepIO\"\x8a\x03\n\x08Workflow\x12\x0c\n\x04name\x18\x01 \x01(\t\x12)\n\x05steps\x18\x02 \x03(\x0b\x32\x1a.couler.v1.ConcurrentSteps\x12\x35\n\ttemplates\x18\x03 \x03(\x0b\x32\".couler.v1.Workflow.TemplatesEntry\x12\x13\n\x0bparallelism\x18\x04 \x01(\x05\x12\x0e\n\x06secret\x18\x05 \x01(\t\x12+\n\x12\x65xit_handler_steps\x18\x06 \x03(\x0b\x32\x0f.couler.v1.Step\x12-\n\x05\x61ttrs\x18\x07 \x03(\x0b\x32\x1e.couler.v1.Workflow.AttrsEntry\x1aI\n\x0eTemplatesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12&\n\x05value\x18\x02 \x01(\x0b\x32\x17.couler.v1.StepTemplate:\x02\x38\x01\x1a\x42\n\nAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12#\n\x05value\x18\x02 \x01(\x0b\x32\x14.google.protobuf.Any:\x02\x38\x01\x42\x0bZ\tcouler/v1b\x06proto3'
+  serialized_pb=b'\n\x12proto/couler.proto\x12\tcouler.v1\x1a\x19google/protobuf/any.proto\"=\n\tParameter\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\x12\x13\n\x0bglobal_name\x18\x03 \x01(\t\"2\n\x06Secret\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0b\n\x03key\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\t\"\xe3\x01\n\x08\x41rtifact\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\x12\x0c\n\x04type\x18\x03 \x01(\t\x12\x12\n\nlocal_path\x18\x04 \x01(\t\x12\x13\n\x0bremote_path\x18\x05 \x01(\t\x12%\n\naccess_key\x18\x06 \x01(\x0b\x32\x11.couler.v1.Secret\x12%\n\nsecret_key\x18\x07 \x01(\x0b\x32\x11.couler.v1.Secret\x12\x10\n\x08\x65ndpoint\x18\x08 \x01(\t\x12\x0e\n\x06\x62ucket\x18\t \x01(\t\x12\x13\n\x0bglobal_name\x18\n \x01(\t\"\x16\n\x06StdOut\x12\x0c\n\x04name\x18\x01 \x01(\t\"\xaa\x01\n\x06StepIO\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x06source\x18\x02 \x01(\x05\x12)\n\tparameter\x18\x03 \x01(\x0b\x32\x14.couler.v1.ParameterH\x00\x12\'\n\x08\x61rtifact\x18\x04 \x01(\x0b\x32\x13.couler.v1.ArtifactH\x00\x12#\n\x06stdout\x18\x05 \x01(\x0b\x32\x11.couler.v1.StdOutH\x00\x42\t\n\x07step_io\")\n\x0bVolumeMount\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"\xa8\x02\n\rContainerSpec\x12\r\n\x05image\x18\x01 \x01(\t\x12\x0f\n\x07\x63ommand\x18\x02 \x03(\t\x12.\n\x03\x65nv\x18\x03 \x03(\x0b\x32!.couler.v1.ContainerSpec.EnvEntry\x12:\n\tresources\x18\x06 \x03(\x0b\x32\'.couler.v1.ContainerSpec.ResourcesEntry\x12-\n\rvolume_mounts\x18\x07 \x03(\x0b\x32\x16.couler.v1.VolumeMount\x1a*\n\x08\x45nvEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x30\n\x0eResourcesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x83\x01\n\x0cResourceSpec\x12\x10\n\x08manifest\x18\x01 \x01(\t\x12\x19\n\x11success_condition\x18\x02 \x01(\t\x12\x19\n\x11\x66\x61ilure_condition\x18\x03 \x01(\t\x12\x0e\n\x06\x61\x63tion\x18\x04 \x01(\t\x12\x1b\n\x13set_owner_reference\x18\x05 \x01(\x08\"\xc5\x01\n\x0e\x43\x61nnedStepSpec\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x31\n\x04\x61rgs\x18\x02 \x03(\x0b\x32#.couler.v1.CannedStepSpec.ArgsEntry\x12!\n\x06inputs\x18\x03 \x03(\x0b\x32\x11.couler.v1.StepIO\x12\"\n\x07outputs\x18\x04 \x03(\x0b\x32\x11.couler.v1.StepIO\x1a+\n\tArgsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\xb2\x03\n\x04Step\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\ttmpl_name\x18\x03 \x01(\t\x12\x30\n\x0e\x63ontainer_spec\x18\x04 \x01(\x0b\x32\x18.couler.v1.ContainerSpec\x12.\n\rresource_spec\x18\x05 \x01(\x0b\x32\x17.couler.v1.ResourceSpec\x12\x33\n\x10\x63\x61nned_step_spec\x18\x06 \x01(\x0b\x32\x19.couler.v1.CannedStepSpec\x12\x0e\n\x06script\x18\x07 \x01(\t\x12\x1f\n\x04\x61rgs\x18\x08 \x03(\x0b\x32\x11.couler.v1.StepIO\x12\x14\n\x0c\x64\x65pendencies\x18\t \x03(\t\x12\x0c\n\x04when\x18\n \x01(\t\x12)\n\x05\x61ttrs\x18\x0b \x03(\x0b\x32\x1a.couler.v1.Step.AttrsEntry\x12\"\n\x07secrets\x18\x0c \x03(\x0b\x32\x11.couler.v1.Secret\x1a\x42\n\nAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12#\n\x05value\x18\x02 \x01(\x0b\x32\x14.google.protobuf.Any:\x02\x38\x01\"1\n\x0f\x43oncurrentSteps\x12\x1e\n\x05steps\x18\x01 \x03(\x0b\x32\x0f.couler.v1.Step\"c\n\x0cStepTemplate\x12\x0c\n\x04name\x18\x01 \x01(\t\x12!\n\x06inputs\x18\x02 \x03(\x0b\x32\x11.couler.v1.StepIO\x12\"\n\x07outputs\x18\x03 \x03(\x0b\x32\x11.couler.v1.StepIO\"\x8a\x03\n\x08Workflow\x12\x0c\n\x04name\x18\x01 \x01(\t\x12)\n\x05steps\x18\x02 \x03(\x0b\x32\x1a.couler.v1.ConcurrentSteps\x12\x35\n\ttemplates\x18\x03 \x03(\x0b\x32\".couler.v1.Workflow.TemplatesEntry\x12\x13\n\x0bparallelism\x18\x04 \x01(\x05\x12\x0e\n\x06secret\x18\x05 \x01(\t\x12+\n\x12\x65xit_handler_steps\x18\x06 \x03(\x0b\x32\x0f.couler.v1.Step\x12-\n\x05\x61ttrs\x18\x07 \x03(\x0b\x32\x1e.couler.v1.Workflow.AttrsEntry\x1aI\n\x0eTemplatesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12&\n\x05value\x18\x02 \x01(\x0b\x32\x17.couler.v1.StepTemplate:\x02\x38\x01\x1a\x42\n\nAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12#\n\x05value\x18\x02 \x01(\x0b\x32\x14.google.protobuf.Any:\x02\x38\x01\x42\x0bZ\tcouler/v1b\x06proto3'
   ,
   dependencies=[google_dot_protobuf_dot_any__pb2.DESCRIPTOR,])
 
@@ -350,77 +350,6 @@ _VOLUMEMOUNT = _descriptor.Descriptor(
 )
 
 
-_VOLUMESOURCE = _descriptor.Descriptor(
-  name='VolumeSource',
-  full_name='couler.v1.VolumeSource',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='name', full_name='couler.v1.VolumeSource.name', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=645,
-  serialized_end=673,
-)
-
-
-_VOLUME = _descriptor.Descriptor(
-  name='Volume',
-  full_name='couler.v1.Volume',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='name', full_name='couler.v1.Volume.name', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='source', full_name='couler.v1.Volume.source', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=675,
-  serialized_end=738,
-)
-
-
 _CONTAINERSPEC_ENVENTRY = _descriptor.Descriptor(
   name='EnvEntry',
   full_name='couler.v1.ContainerSpec.EnvEntry',
@@ -455,8 +384,8 @@ _CONTAINERSPEC_ENVENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=945,
-  serialized_end=987,
+  serialized_start=850,
+  serialized_end=892,
 )
 
 _CONTAINERSPEC_RESOURCESENTRY = _descriptor.Descriptor(
@@ -493,8 +422,8 @@ _CONTAINERSPEC_RESOURCESENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=989,
-  serialized_end=1037,
+  serialized_start=894,
+  serialized_end=942,
 )
 
 _CONTAINERSPEC = _descriptor.Descriptor(
@@ -552,8 +481,8 @@ _CONTAINERSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=741,
-  serialized_end=1037,
+  serialized_start=646,
+  serialized_end=942,
 )
 
 
@@ -612,8 +541,8 @@ _RESOURCESPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1040,
-  serialized_end=1171,
+  serialized_start=945,
+  serialized_end=1076,
 )
 
 
@@ -651,8 +580,8 @@ _CANNEDSTEPSPEC_ARGSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1328,
-  serialized_end=1371,
+  serialized_start=1233,
+  serialized_end=1276,
 )
 
 _CANNEDSTEPSPEC = _descriptor.Descriptor(
@@ -703,8 +632,8 @@ _CANNEDSTEPSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1174,
-  serialized_end=1371,
+  serialized_start=1079,
+  serialized_end=1276,
 )
 
 
@@ -742,8 +671,8 @@ _STEP_ATTRSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1778,
-  serialized_end=1844,
+  serialized_start=1647,
+  serialized_end=1713,
 )
 
 _STEP = _descriptor.Descriptor(
@@ -838,13 +767,6 @@ _STEP = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='volumes', full_name='couler.v1.Step.volumes', index=12,
-      number=13, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -857,8 +779,8 @@ _STEP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1374,
-  serialized_end=1844,
+  serialized_start=1279,
+  serialized_end=1713,
 )
 
 
@@ -889,8 +811,8 @@ _CONCURRENTSTEPS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1846,
-  serialized_end=1895,
+  serialized_start=1715,
+  serialized_end=1764,
 )
 
 
@@ -935,8 +857,8 @@ _STEPTEMPLATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1897,
-  serialized_end=1996,
+  serialized_start=1766,
+  serialized_end=1865,
 )
 
 
@@ -974,8 +896,8 @@ _WORKFLOW_TEMPLATESENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2252,
-  serialized_end=2325,
+  serialized_start=2121,
+  serialized_end=2194,
 )
 
 _WORKFLOW_ATTRSENTRY = _descriptor.Descriptor(
@@ -1012,8 +934,8 @@ _WORKFLOW_ATTRSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1778,
-  serialized_end=1844,
+  serialized_start=1647,
+  serialized_end=1713,
 )
 
 _WORKFLOW = _descriptor.Descriptor(
@@ -1085,8 +1007,8 @@ _WORKFLOW = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1999,
-  serialized_end=2393,
+  serialized_start=1868,
+  serialized_end=2262,
 )
 
 _ARTIFACT.fields_by_name['access_key'].message_type = _SECRET
@@ -1103,7 +1025,6 @@ _STEPIO.fields_by_name['artifact'].containing_oneof = _STEPIO.oneofs_by_name['st
 _STEPIO.oneofs_by_name['step_io'].fields.append(
   _STEPIO.fields_by_name['stdout'])
 _STEPIO.fields_by_name['stdout'].containing_oneof = _STEPIO.oneofs_by_name['step_io']
-_VOLUME.fields_by_name['source'].message_type = _VOLUMESOURCE
 _CONTAINERSPEC_ENVENTRY.containing_type = _CONTAINERSPEC
 _CONTAINERSPEC_RESOURCESENTRY.containing_type = _CONTAINERSPEC
 _CONTAINERSPEC.fields_by_name['env'].message_type = _CONTAINERSPEC_ENVENTRY
@@ -1121,7 +1042,6 @@ _STEP.fields_by_name['canned_step_spec'].message_type = _CANNEDSTEPSPEC
 _STEP.fields_by_name['args'].message_type = _STEPIO
 _STEP.fields_by_name['attrs'].message_type = _STEP_ATTRSENTRY
 _STEP.fields_by_name['secrets'].message_type = _SECRET
-_STEP.fields_by_name['volumes'].message_type = _VOLUME
 _CONCURRENTSTEPS.fields_by_name['steps'].message_type = _STEP
 _STEPTEMPLATE.fields_by_name['inputs'].message_type = _STEPIO
 _STEPTEMPLATE.fields_by_name['outputs'].message_type = _STEPIO
@@ -1139,8 +1059,6 @@ DESCRIPTOR.message_types_by_name['Artifact'] = _ARTIFACT
 DESCRIPTOR.message_types_by_name['StdOut'] = _STDOUT
 DESCRIPTOR.message_types_by_name['StepIO'] = _STEPIO
 DESCRIPTOR.message_types_by_name['VolumeMount'] = _VOLUMEMOUNT
-DESCRIPTOR.message_types_by_name['VolumeSource'] = _VOLUMESOURCE
-DESCRIPTOR.message_types_by_name['Volume'] = _VOLUME
 DESCRIPTOR.message_types_by_name['ContainerSpec'] = _CONTAINERSPEC
 DESCRIPTOR.message_types_by_name['ResourceSpec'] = _RESOURCESPEC
 DESCRIPTOR.message_types_by_name['CannedStepSpec'] = _CANNEDSTEPSPEC
@@ -1191,20 +1109,6 @@ VolumeMount = _reflection.GeneratedProtocolMessageType('VolumeMount', (_message.
   # @@protoc_insertion_point(class_scope:couler.v1.VolumeMount)
   })
 _sym_db.RegisterMessage(VolumeMount)
-
-VolumeSource = _reflection.GeneratedProtocolMessageType('VolumeSource', (_message.Message,), {
-  'DESCRIPTOR' : _VOLUMESOURCE,
-  '__module__' : 'proto.couler_pb2'
-  # @@protoc_insertion_point(class_scope:couler.v1.VolumeSource)
-  })
-_sym_db.RegisterMessage(VolumeSource)
-
-Volume = _reflection.GeneratedProtocolMessageType('Volume', (_message.Message,), {
-  'DESCRIPTOR' : _VOLUME,
-  '__module__' : 'proto.couler_pb2'
-  # @@protoc_insertion_point(class_scope:couler.v1.Volume)
-  })
-_sym_db.RegisterMessage(Volume)
 
 ContainerSpec = _reflection.GeneratedProtocolMessageType('ContainerSpec', (_message.Message,), {
 
