@@ -344,17 +344,19 @@ def run_job(
     step_name=None,
     pool=None,
     env=None,
+    action="create",
     set_owner_reference=True,
 ):
     """
     Create a k8s job. For example, the pi-tmpl template in
     https://github.com/argoproj/argo/blob/master/examples/k8s-jobs.yaml
     :param manifest: YAML specification of the job to be created.
-    :param success_condition: expression for verifying job success.
-    :param failure_condition: expression for verifying job failure.
-    :param timeout: To limit the elapsed time for a workflow in seconds.
-    :param step_name: is only used while developing functions of step zoo.
-    :param env: environmental parameter with a dict types, e.g., {"OS_ENV_1": "OS_ENV_value"}  # noqa: E501
+    :param success_condition: Expression for verifying job success.
+    :param failure_condition: Expression for verifying job failure.
+    :param timeout: The timeout in seconds to limit the elapsed time for a workflow.
+    :param step_name: The step name.
+    :param env: Environmental variables for this step, e.g., {"OS_ENV_1": "OS_ENV_value"}  # noqa: E501
+    :param action: The action to run the manifest. One of: get, create, apply, delete, replace, patch.
     :param set_owner_reference: Whether to set the workflow as the job's owner reference.
         If `True`, the job will be deleted once the workflow is deleted.
     :return: output
@@ -423,6 +425,7 @@ def run_job(
         input=None,
         output=rets,
         manifest=manifest,
+        action=action,
         success_cond=success_condition,
         failure_cond=failure_condition,
     )
