@@ -143,6 +143,7 @@ spec:
         t = proto_wf.templates[s.tmpl_name]
         self.assertFalse(s.HasField("container_spec"))
         self.assertEqual(s.resource_spec.manifest, manifest)
+        self.assertEqual(s.resource_spec.action, "create")
         self.assertEqual(s.resource_spec.success_condition, success_condition)
         self.assertEqual(s.resource_spec.failure_condition, failure_condition)
         self.assertEqual(len(t.outputs), 3)
