@@ -76,10 +76,9 @@ def step_repr(
 
     if secret is not None:
         for k, _ in secret.data.items():
-            pb_secret = couler_pb2.Secret()
+            pb_secret = pb_step.secrets.add()
             pb_secret.key = k
             pb_secret.name = secret.name
-            pb_step.secrets.append(pb_secret)
 
     # image can be None if manifest specified.
     if image is not None:
