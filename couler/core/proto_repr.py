@@ -59,6 +59,7 @@ def step_repr(
     canned_step_name=None,
     canned_step_args=None,
     resources=None,
+    action=None,
 ):
     assert step_name is not None
     assert tmpl_name is not None
@@ -82,6 +83,8 @@ def step_repr(
         if success_cond is not None and failure_cond is not None:
             pb_step.resource_spec.success_condition = success_cond
             pb_step.resource_spec.failure_condition = failure_cond
+        if action is not None:
+            pb_step.resource_spec.action = action
     else:
         if command is None:
             pb_step.container_spec.command.append("python")
