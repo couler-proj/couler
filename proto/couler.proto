@@ -5,8 +5,8 @@ package couler.v1;
 import "google/protobuf/any.proto";
 
 
-// declear go package name here, becuase of the generated Go package with `couler_v1` is
-// not acceptable for golint. ref: https://developers.google.com/protocol-buffers/docs/reference/go-generated
+// Declare the Go package name here since the generated Go package with `couler_v1` is
+// not acceptable for `golint`. Reference: https://developers.google.com/protocol-buffers/docs/reference/go-generated
 option go_package = "couler/v1";
 
 message Parameter {
@@ -53,11 +53,17 @@ message StepIO {
   }
 }
 
+message VolumeMount {
+  string name = 1;
+  string path = 2;
+}
+
 message ContainerSpec {
     string image = 1;
     repeated string command = 2;
     map<string, string> env = 3;
     map<string, string> resources = 6;
+    repeated VolumeMount volume_mounts = 7;
 }
 
 message ResourceSpec {

@@ -61,6 +61,7 @@ def step_repr(
     resources=None,
     secret=None,
     action=None,
+    volume_mounts=None,
 ):
     assert step_name is not None
     assert tmpl_name is not None
@@ -120,6 +121,13 @@ def step_repr(
             # key: cpu, memory, gpu
             # value: "1", "8", "500m", "1Gi" etc.
             pb_step.container_spec.resources[k] = str(v)
+
+    # Attach volume mounts
+    if volume_mounts is not None:
+        for vm in volume_mounts:
+            vol_mount = pb_step.container_spec.volume_mounts.add()
+            vol_mount.name = vm.name
+            vol_mount.path = vm.mount_path
 
     if states._when_prefix is not None:
         pb_step.when = states._when_prefix
