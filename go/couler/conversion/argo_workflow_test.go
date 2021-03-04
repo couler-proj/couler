@@ -1,7 +1,6 @@
 package conversion
 
 import (
-	"fmt"
 	"testing"
 
 	wfv1 "github.com/argoproj/argo/pkg/apis/workflow/v1alpha1"
@@ -325,7 +324,7 @@ func TestArgoWorkflowConversionSecret(t *testing.T) {
 	pbWf.Steps[0].Steps[0].Secrets = append(pbWf.Steps[0].Steps[0].Secrets, secret)
 	argoWf, err := ConvertToArgoWorkflow(pbWf, "")
 	a.NoError(err)
-	fmt.Println(argoWf.Spec.Templates[1].Container.Env[0].Name, "couler-secret-key")
-	fmt.Println(argoWf.Spec.Templates[1].Container.Env[0].ValueFrom.SecretKeyRef.Key, "couler-secret-key")
-	fmt.Println(argoWf.Spec.Templates[1].Container.Env[0].ValueFrom.SecretKeyRef.Name, "couler-secret")
+	a.Equal(argoWf.Spec.Templates[1].Container.Env[0].Name, "couler-secret-key")
+	a.Equal(argoWf.Spec.Templates[1].Container.Env[0].ValueFrom.SecretKeyRef.Key, "couler-secret-key")
+	a.Equal(argoWf.Spec.Templates[1].Container.Env[0].ValueFrom.SecretKeyRef.Name, "couler-secret")
 }
