@@ -88,6 +88,7 @@ message Step {
   repeated string dependencies = 9;
   string when = 10;
   map<string, google.protobuf.Any> attrs = 11;  // attributes for step
+  repeated Secret secrets = 12;
 }
 
 message ConcurrentSteps {

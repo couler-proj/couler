@@ -330,6 +330,7 @@ def run_container(
         output=_output,
         env=env,
         resources=resources,
+        secret=states.get_secret(secret),
     )
     proto_repr.add_deps_to_step(step_name)
     return rets

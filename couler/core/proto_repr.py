@@ -59,6 +59,7 @@ def step_repr(
     canned_step_name=None,
     canned_step_args=None,
     resources=None,
+    secret=None,
 ):
     assert step_name is not None
     assert tmpl_name is not None
@@ -67,12 +68,16 @@ def step_repr(
     pb_step.id = get_uniq_step_id()
     pb_step.name = step_name
     pb_step.tmpl_name = tmpl_name
+
     if env is not None:
-        for k, v in env.items():
-            if isinstance(v, str):
-                pb_step.container_spec.env[k] = v
-            else:
-                pb_step.container_spec.env[k] = json.dumps(v)
+        _add_env_to_step(pb_step, env)
+
+    if secret is not None:
+        for k, _ in secret.data.items():
+            pb_secret = couler_pb2.Secret()
+            pb_secret.key = k
+            pb_secret.name = secret.name
+            pb_step.secrets.append(pb_secret)
 
     # image can be None if manifest specified.
     if image is not None:
@@ -156,6 +161,15 @@ def step_repr(
         inner_step = concurrent_step.steps.add()
         inner_step.CopyFrom(pb_step)
     return pb_step
+
+
+# append env to step spec
+def _add_env_to_step(pb_step, env):
+    for k, v in env.items():
+        if isinstance(v, str):
+            pb_step.container_spec.env[k] = v
+        else:
+            pb_step.container_spec.env[k] = json.dumps(v)
 
 
 def add_deps_to_step(step_name):

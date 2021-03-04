@@ -1,12 +1,13 @@
 package conversion
 
 import (
+	"strings"
+
 	wfv1 "github.com/argoproj/argo/pkg/apis/workflow/v1alpha1"
 	pb "github.com/couler-proj/couler/go/couler/proto/couler/v1"
 	corev1 "k8s.io/api/core/v1"
 	resourcev1 "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"strings"
 )
 
 const entryPointTemplateSuffix = "main-template"
@@ -109,6 +110,23 @@ func createExitHandlerSteps(workflowPb *pb.Workflow, templates []wfv1.Template, 
 	return templates
 }
 
+func stepSecretToEnvs(step *pb.Step) []corev1.EnvVar {
+	var envs []corev1.EnvVar
+	for _, secret := range step.Secrets {
+		env := corev1.EnvVar{
+			Name: secret.Key,
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secret.Name},
+					Key:                  secret.Key,
+				},
+			},
+		}
+		envs = append(envs, env)
+	}
+	return envs
+}
+
 func createSingleStepTemplate(step *pb.Step, workflowPb *pb.Workflow) wfv1.Template {
 	inputs, outputs := getInputsAndOutputsFromTemplate(workflowPb.GetTemplates()[step.TmplName])
 	template := wfv1.Template{
@@ -122,6 +140,7 @@ func createSingleStepTemplate(step *pb.Step, workflowPb *pb.Workflow) wfv1.Templ
 		for k, v := range containerSpec.GetEnv() {
 			env = append(env, corev1.EnvVar{Name: k, Value: v})
 		}
+		env = append(env, stepSecretToEnvs(step)...)
 		container := &corev1.Container{
 			Image:   containerSpec.GetImage(),
 			Command: containerSpec.GetCommand(),

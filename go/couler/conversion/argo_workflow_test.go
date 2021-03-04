@@ -1,6 +1,7 @@
 package conversion
 
 import (
+	"fmt"
 	"testing"
 
 	wfv1 "github.com/argoproj/argo/pkg/apis/workflow/v1alpha1"
@@ -49,6 +50,10 @@ var (
 			SetOwnerReference: true,
 			Action:            "create",
 		},
+	}
+	secret = &pb.Secret{
+		Name: "couler-secret",
+		Key:  "couler-secret-key",
 	}
 )
 
@@ -309,4 +314,18 @@ func TestArgoWorkflowConversionDAG(t *testing.T) {
 		SetOwnerReference: resourceStep.ResourceSpec.SetOwnerReference,
 		Action:            resourceStep.ResourceSpec.Action,
 	}}, argoWf.Spec.Templates[3])
+}
+
+func TestArgoWorkflowConversionSecret(t *testing.T) {
+	a := assert.New(t)
+	pbWf := &pb.Workflow{}
+	pbWf.Steps = []*pb.ConcurrentSteps{
+		{Steps: []*pb.Step{containerStep}},
+	}
+	pbWf.Steps[0].Steps[0].Secrets = append(pbWf.Steps[0].Steps[0].Secrets, secret)
+	argoWf, err := ConvertToArgoWorkflow(pbWf, "")
+	a.NoError(err)
+	fmt.Println(argoWf.Spec.Templates[1].Container.Env[0].Name, "couler-secret-key")
+	fmt.Println(argoWf.Spec.Templates[1].Container.Env[0].ValueFrom.SecretKeyRef.Key, "couler-secret-key")
+	fmt.Println(argoWf.Spec.Templates[1].Container.Env[0].ValueFrom.SecretKeyRef.Name, "couler-secret")
 }
