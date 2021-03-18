@@ -230,6 +230,57 @@ class ArtifactTest(ArgoYamlTest):
         self._oss_check_helper(artifact)
         couler._cleanup()
 
+    def test_artifact_passing_multiple_consumers(self):
+        a = couler.create_parameter_artifact(path="/mnt/a.txt")
+        b = couler.create_parameter_artifact(path="/mnt/b.txt")
+
+        def producer(step_name):
+            return couler.run_container(
+                image="reg.docker.alibaba-inc.com/couler/python:3.6",
+                args=["echo -n 1 > %s; echo -n 2 > %s" % (a.path, b.path)],
+                command=["bash", "-c"],
+                output=[a, b],
+                step_name=step_name,
+            )
+
+        def consumer_0(step_name, parent_step_name):
+            output_params = couler.get_step_output(step_name=parent_step_name)
+            print("consumer-0:\n")
+            print(output_params)
+            return couler.run_container(
+                image="reg.docker.alibaba-inc.com/couler/python:3.6",
+                args=output_params,
+                command=["echo consumer"],
+                step_name=step_name,
+            )
+
+        def consumer_1(step_name, parent_step_name):
+            output_params = couler.get_step_output(step_name=parent_step_name)
+            print("consumer-1:\n")
+            print(output_params)
+            return couler.run_container(
+                image="reg.docker.alibaba-inc.com/couler/python:3.6",
+                args=output_params,
+                command=["echo consumer"],
+                step_name=step_name,
+            )
+
+        couler.set_dependencies(
+            lambda: producer(step_name="A"), dependencies=None
+        )
+        couler.set_dependencies(
+            lambda: consumer_0(step_name="B", parent_step_name="A"),
+            dependencies=["A"],
+        )
+
+        couler.set_dependencies(
+            lambda: consumer_1(step_name="C", parent_step_name="A"),
+            dependencies=["A"],
+        )
+        couler.init_yaml_dump()
+        print(couler.workflow_yaml())
+        self.assertEqual(couler.workflow_yaml(), [])
+
     def test_set_dependencies_with_passing_artifact_implicitly(self):
 
         default_path = "/mnt/t1.txt"
