@@ -20,3 +20,9 @@ require (
 	k8s.io/client-go v0.18.2
 	k8s.io/kube-openapi v0.0.0-20201113171705-d219536bb9fd // indirect
 )
+
+replace (
+	k8s.io/api => k8s.io/api v0.17.8
+	k8s.io/apimachinery => k8s.io/apimachinery v0.17.8
+	k8s.io/client-go => k8s.io/client-go v0.17.8
+)
