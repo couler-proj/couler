@@ -161,7 +161,7 @@ func TestArgoWorkflowConversionSequentialWithIO(t *testing.T) {
 				{Name: containerStepWithIO.Name, Template: containerStepWithIO.TmplName, Arguments: wfv1.Arguments{
 					Parameters: []wfv1.Parameter{{
 						Name:  "message",
-						Value: &paramValue,
+						Value: wfv1.AnyStringPtr(paramValue),
 					}},
 				},
 				}}},
@@ -178,7 +178,7 @@ func TestArgoWorkflowConversionSequentialWithIO(t *testing.T) {
 		Inputs: wfv1.Inputs{
 			Parameters: []wfv1.Parameter{{
 				Name:  "message",
-				Value: &paramValue,
+				Value: wfv1.AnyStringPtr(paramValue),
 			}},
 		},
 	}, argoWf.Spec.Templates[1])
