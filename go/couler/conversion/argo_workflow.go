@@ -193,7 +193,7 @@ func getEntryPointTemplateArgs(step *pb.Step) wfv1.Arguments {
 		case *pb.StepIO_Parameter:
 			args.Parameters = append(args.Parameters, wfv1.Parameter{
 				Name:  stepIOType.Parameter.GetName(),
-				Value: &stepIOType.Parameter.Value,
+				Value: wfv1.AnyStringPtr(stepIOType.Parameter.Value),
 			})
 		case *pb.StepIO_Artifact:
 			args.Artifacts = append(args.Artifacts, wfv1.Artifact{
@@ -212,7 +212,7 @@ func getInputsAndOutputsFromTemplate(template *pb.StepTemplate) (wfv1.Inputs, wf
 		case *pb.StepIO_Parameter:
 			inputs.Parameters = append(inputs.Parameters, wfv1.Parameter{
 				Name:       stepIOType.Parameter.GetName(),
-				Value:      &stepIOType.Parameter.Value,
+				Value:      wfv1.AnyStringPtr(stepIOType.Parameter.Value),
 				GlobalName: stepIOType.Parameter.GlobalName,
 			})
 		case *pb.StepIO_Artifact:
@@ -259,7 +259,7 @@ func getInputsAndOutputsFromTemplate(template *pb.StepTemplate) (wfv1.Inputs, wf
 		case *pb.StepIO_Parameter:
 			inputs.Parameters = append(inputs.Parameters, wfv1.Parameter{
 				Name:       stepIOType.Parameter.GetName(),
-				Value:      &stepIOType.Parameter.Value,
+				Value:      wfv1.AnyStringPtr(stepIOType.Parameter.Value),
 				GlobalName: stepIOType.Parameter.GlobalName,
 			})
 		case *pb.StepIO_Artifact:
