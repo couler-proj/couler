@@ -14,8 +14,13 @@
 from collections import OrderedDict
 
 from couler.core import utils
-from couler.core.proto_repr import cleanup_proto_workflow
 from couler.core.templates import Workflow
+
+try:
+    from couler.core.proto_repr import cleanup_proto_workflow
+except Exception:
+    # set cleanup_proto_workflow to an empty function for compatibility
+    cleanup_proto_workflow = lambda: None  # noqa: E731
 
 _sub_steps = None
 # Argo DAG task
