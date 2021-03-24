@@ -15,7 +15,12 @@ import unittest
 
 import couler.argo as couler
 from couler.core import states
-from couler.core.proto_repr import get_default_proto_workflow
+
+try:
+    from couler.core.proto_repr import get_default_proto_workflow
+except Exception:
+    # set cleanup_proto_workflow to an empty function for compatibility
+    cleanup_proto_workflow = lambda: None  # noqa: E731
 
 
 class ProtoReprTest(unittest.TestCase):
