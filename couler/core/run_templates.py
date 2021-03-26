@@ -16,7 +16,7 @@ import os
 import pyaml
 import yaml
 
-from couler.core import proto_repr, states, step_update_utils, utils
+from couler.core import states, step_update_utils, utils
 from couler.core.templates import (
     Container,
     Job,
@@ -31,6 +31,11 @@ from couler.core.templates.output import (
     _script_output,
 )
 from couler.core.templates.volume import VolumeMount
+
+try:
+    from couler.core import proto_repr
+except Exception:
+    proto_repr = None
 
 
 def run_script(
@@ -169,21 +174,22 @@ def run_script(
     rets = _script_output(step_name, func_name, _output)
     states._steps_outputs[step_name] = rets
 
-    proto_repr.step_repr(  # noqa: F841
-        step_name=step_name,
-        tmpl_name=func_name,
-        image=image,
-        command=command,
-        source=source,
-        script_output=rets,
-        args=args,
-        input=_input,
-        output=_output,
-        env=env,
-        resources=resources,
-        volume_mounts=volume_mounts,
-    )
-    proto_repr.add_deps_to_step(step_name)
+    if proto_repr:
+        proto_repr.step_repr(  # noqa: F841
+            step_name=step_name,
+            tmpl_name=func_name,
+            image=image,
+            command=command,
+            source=source,
+            script_output=rets,
+            args=args,
+            input=_input,
+            output=_output,
+            env=env,
+            resources=resources,
+            volume_mounts=volume_mounts,
+        )
+        proto_repr.add_deps_to_step(step_name)
     return rets
 
 
@@ -319,22 +325,23 @@ def run_container(
     rets = _container_output(step_name, func_name, _output)
     states._steps_outputs[step_name] = rets
 
-    pb_step = proto_repr.step_repr(  # noqa: F841
-        step_name=step_name,
-        tmpl_name=func_name,
-        image=image,
-        command=command,
-        source=None,
-        script_output=None,
-        args=args,
-        input=_input,
-        output=_output,
-        env=env,
-        resources=resources,
-        secret=states.get_secret(secret),
-        volume_mounts=volume_mounts,
-    )
-    proto_repr.add_deps_to_step(step_name)
+    if proto_repr:
+        pb_step = proto_repr.step_repr(  # noqa: F841
+            step_name=step_name,
+            tmpl_name=func_name,
+            image=image,
+            command=command,
+            source=None,
+            script_output=None,
+            args=args,
+            input=_input,
+            output=_output,
+            env=env,
+            resources=resources,
+            secret=states.get_secret(secret),
+            volume_mounts=volume_mounts,
+        )
+        proto_repr.add_deps_to_step(step_name)
     return rets
 
 
@@ -419,20 +426,21 @@ def run_job(
     rets = _job_output(step_name, func_name)
     states._steps_outputs[step_name] = rets
 
-    pb_step = proto_repr.step_repr(  # noqa: F841
-        step_name=step_name,
-        tmpl_name=func_name,
-        image=None,
-        source=None,
-        script_output=None,
-        input=None,
-        output=rets,
-        manifest=manifest,
-        action=action,
-        success_cond=success_condition,
-        failure_cond=failure_condition,
-    )
-    proto_repr.add_deps_to_step(step_name)
+    if proto_repr:
+        pb_step = proto_repr.step_repr(  # noqa: F841
+            step_name=step_name,
+            tmpl_name=func_name,
+            image=None,
+            source=None,
+            script_output=None,
+            input=None,
+            output=rets,
+            manifest=manifest,
+            action=action,
+            success_cond=success_condition,
+            failure_cond=failure_condition,
+        )
+        proto_repr.add_deps_to_step(step_name)
     return rets
 
 
@@ -447,14 +455,15 @@ def run_canned_step(name, args, inputs=None, outputs=None, step_name=None):
     tmpl_args = []
     if states._outputs_tmp is not None:
         tmpl_args.extend(states._outputs_tmp)
-    pb_step = proto_repr.step_repr(  # noqa: F841
-        input=inputs,
-        output=outputs,
-        canned_step_name=name,
-        canned_step_args=args,
-        step_name=step_name,
-        tmpl_name=step_name + "-tmpl",
-        args=tmpl_args,
-    )
-    proto_repr.add_deps_to_step(step_name)
+    if proto_repr:
+        pb_step = proto_repr.step_repr(  # noqa: F841
+            input=inputs,
+            output=outputs,
+            canned_step_name=name,
+            canned_step_args=args,
+            step_name=step_name,
+            tmpl_name=step_name + "-tmpl",
+            args=tmpl_args,
+        )
+        proto_repr.add_deps_to_step(step_name)
     return pb_step
