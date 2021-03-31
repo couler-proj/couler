@@ -39,6 +39,7 @@ from couler.core.states import (  # noqa: F401
 from couler.core.syntax import *  # noqa: F401, F403
 from couler.core.templates import (  # noqa: F401
     Artifact,
+    Cache,
     LocalArtifact,
     OssArtifact,
     S3Artifact,

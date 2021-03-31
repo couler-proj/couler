@@ -18,6 +18,7 @@ from couler.core.templates.artifact import (  # noqa: F401
     S3Artifact,
     TypedArtifact,
 )
+from couler.core.templates.cache import Cache  # noqa: F401
 from couler.core.templates.container import Container  # noqa: F401
 from couler.core.templates.job import Job  # noqa: F401
 from couler.core.templates.output import (  # noqa: F401

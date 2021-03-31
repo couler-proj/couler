@@ -44,6 +44,7 @@ class Container(Template):
         working_dir=None,
         node_selector=None,
         volumes=None,
+        cache=None,
     ):
         Template.__init__(
             self,
@@ -55,6 +56,7 @@ class Container(Template):
             pool=pool,
             enable_ulogfs=enable_ulogfs,
             daemon=daemon,
+            cache=cache,
         )
         self.image = image
         self.command = utils.make_list_if_not(command)
