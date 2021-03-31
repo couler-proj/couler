@@ -58,6 +58,7 @@ def run_script(
     volume_mounts=None,
     working_dir=None,
     node_selector=None,
+    cache=None,
 ):
     """
     Generate an Argo script template.  For example,
@@ -160,6 +161,7 @@ def run_script(
             volume_mounts=volume_mounts,
             working_dir=working_dir,
             node_selector=node_selector,
+            cache=cache,
         )
         states.workflow.add_template(template)
 
@@ -212,6 +214,7 @@ def run_container(
     volume_mounts=None,
     working_dir=None,
     node_selector=None,
+    cache=None,
 ):
     """
     Generate an Argo container template.  For example, the template whalesay
@@ -310,6 +313,7 @@ def run_container(
             volume_mounts=volume_mounts,
             working_dir=working_dir,
             node_selector=node_selector,
+            cache=cache,
         )
         states.workflow.add_template(template)
 

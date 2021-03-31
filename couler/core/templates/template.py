@@ -27,6 +27,7 @@ class Template(object):
         pool=None,
         enable_ulogfs=True,
         daemon=False,
+        cache=None,
     ):
         self.name = name
         self.output = output
@@ -36,6 +37,7 @@ class Template(object):
         self.pool = pool
         self.enable_ulogfs = enable_ulogfs
         self.daemon = daemon
+        self.cache = cache
 
     def to_dict(self):
         template = OrderedDict({"name": self.name})
@@ -45,4 +47,6 @@ class Template(object):
             template["activeDeadlineSeconds"] = self.timeout
         if self.retry is not None:
             template["retryStrategy"] = utils.config_retry_strategy(self.retry)
+        if self.cache is not None:
+            template["memoize"] = self.cache.to_dict()
         return template

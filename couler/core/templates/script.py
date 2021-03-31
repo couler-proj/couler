@@ -43,6 +43,7 @@ class Script(Container):
         working_dir=None,
         node_selector=None,
         volumes=None,
+        cache=None,
     ):
         Container.__init__(
             self,
@@ -65,6 +66,7 @@ class Script(Container):
             working_dir=working_dir,
             node_selector=node_selector,
             volumes=volumes,
+            cache=cache,
         )
         self.image = image
         self.command = "python" if command is None else command
