@@ -183,6 +183,17 @@ func createSingleStepTemplate(step *pb.Step, workflowPb *pb.Workflow) wfv1.Templ
 			FailureCondition:  resourceSpec.GetFailureCondition(),
 		}
 	}
+	if cache := step.GetCache(); cache != nil {
+		template.Memoize = &wfv1.Memoize{
+			Key: cache.GetKey(),
+			Cache: &wfv1.Cache{ConfigMap: &corev1.ConfigMapKeySelector{
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: cache.GetName(),
+				},
+			}},
+			MaxAge: cache.GetMaxAge(),
+		}
+	}
 	return template
 }
 

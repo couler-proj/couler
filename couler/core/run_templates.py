@@ -360,6 +360,7 @@ def run_job(
     env=None,
     action="create",
     set_owner_reference=True,
+    cache=None,
 ):
     """
     Create a k8s job. For example, the pi-tmpl template in
@@ -419,6 +420,7 @@ def run_job(
             timeout=timeout,
             retry=retry,
             pool=pool,
+            cache=cache,
         )
         states.workflow.add_template(template)
 
