@@ -58,6 +58,12 @@ message VolumeMount {
   string path = 2;
 }
 
+message Cache {
+  string name = 1;
+  string key = 2;
+  string max_age = 3;
+}
+
 message ContainerSpec {
     string image = 1;
     repeated string command = 2;
@@ -95,6 +101,7 @@ message Step {
   string when = 10;
   map<string, google.protobuf.Any> attrs = 11;  // attributes for step
   repeated Secret secrets = 12;
+  Cache cache = 13;
 }
 
 message ConcurrentSteps {

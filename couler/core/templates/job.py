@@ -30,9 +30,15 @@ class Job(Template):
         timeout=None,
         retry=None,
         pool=None,
+        cache=None,
     ):
         Template.__init__(
-            self, name=name, timeout=timeout, retry=retry, pool=pool
+            self,
+            name=name,
+            timeout=timeout,
+            retry=retry,
+            pool=pool,
+            cache=cache,
         )
         self.args = args
         self.action = action

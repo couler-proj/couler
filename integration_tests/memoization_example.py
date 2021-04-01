@@ -21,7 +21,7 @@ from couler.argo_submitter import (
 )
 
 if __name__ == "__main__":
-    for impl_type in [_SubmitterImplTypes.PYTHON]:
+    for impl_type in [_SubmitterImplTypes.GO, _SubmitterImplTypes.PYTHON]:
         os.environ[_SUBMITTER_IMPL_ENV_VAR_KEY] = impl_type
         print(
             "Submitting memoization example workflow via %s implementation"
