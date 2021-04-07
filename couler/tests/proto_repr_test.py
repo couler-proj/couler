@@ -35,12 +35,18 @@ class ProtoReprTest(unittest.TestCase):
             image="docker/whalesay:latest",
             source=echo,
             resources={"cpu": "2", "memory": "1Gi"},
+            cache=couler.Cache(
+                name="cache-name", key="cache-key", max_age="60s"
+            ),
         )
         proto_wf = get_default_proto_workflow()
         s = proto_wf.steps[0].steps[0]
         self.assertFalse(s.HasField("resource_spec"))
         self.assertEqual(s.script, '\nprint("echo")\n')
         self.assertEqual(s.container_spec.resources["cpu"], "2")
+        self.assertEqual(s.cache.name, "cache-name")
+        self.assertEqual(s.cache.key, "cache-key")
+        self.assertEqual(s.cache.max_age, "60s")
 
     def test_canned_step(self):
         couler.run_canned_step(name="test", args={"k1": "v1", "k2": "v2"})
