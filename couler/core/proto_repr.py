@@ -62,6 +62,7 @@ def step_repr(
     secret=None,
     action=None,
     volume_mounts=None,
+    cache=None,
 ):
     assert step_name is not None
     assert tmpl_name is not None
@@ -79,6 +80,11 @@ def step_repr(
             pb_secret = pb_step.secrets.add()
             pb_secret.key = k
             pb_secret.name = secret.name
+
+    if cache is not None:
+        pb_step.cache.name = cache.name
+        pb_step.cache.key = cache.key
+        pb_step.cache.max_age = cache.max_age
 
     # image can be None if manifest specified.
     if image is not None:
