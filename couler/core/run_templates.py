@@ -130,8 +130,6 @@ def run_script(
                 volume_mounts = []
             mounted_path = []
             for i, out in enumerate(output):
-                if "/tmp" in out.path:
-                    raise ValueError("Mounting to /tmp is not supported")
                 path_to_mount = os.path.dirname(out.path)
                 # Avoid duplicate mount paths
                 if path_to_mount not in mounted_path:
@@ -283,8 +281,6 @@ def run_container(
                 volume_mounts = []
             mounted_path = []
             for i, out in enumerate(output):
-                if "/tmp" in out.path:
-                    raise ValueError("Mounting to /tmp is not supported")
                 path_to_mount = os.path.dirname(out.path)
                 # Avoid duplicate mount paths
                 if path_to_mount not in mounted_path:
