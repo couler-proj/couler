@@ -53,8 +53,20 @@ class Workflow(object):
     def add_pvc_template(self, pvc: VolumeClaimTemplate):
         self.pvcs.append(pvc.to_dict())
 
+    def has_pvc_template(self, name):
+        for pvc in self.pvcs:
+            if pvc['metadata']['name'] == name:
+                return True
+        return False
+
     def add_volume(self, volume: Volume):
         self.volumes.append(volume.to_dict())
+
+    def has_volume(self, name):
+        for volume in self.volumes:
+            if volume['name'] == name:
+                return True
+        return False
 
     def get_step(self, name):
         return self.steps.get(name, None)
@@ -114,10 +126,6 @@ class Workflow(object):
         #     d["metadata"]["labels"] = {"couler_job_user": self.user_id}
 
         workflow_spec = {"entrypoint": entrypoint}
-        if self.volumes:
-            workflow_spec.update({"volumes": self.volumes})
-        if self.pvcs:
-            workflow_spec.update({"volumeClaimTemplates": self.pvcs})
         if self.dag_mode_enabled():
             dag = {"tasks": list(self.dag_tasks.values())}
             ts = [OrderedDict({"name": entrypoint, "dag": dag})]
@@ -158,6 +166,22 @@ class Workflow(object):
                             "Unsupported signature for cluster spec: %s" % sig
                         )
             ts.append(template_dict)
+            #check volumes
+            volumeMountsName = template.get_volumeMounts_name()
+            for vmName in volumeMountsName:
+                if self.has_pvc_template(vmName) or self.has_volume(vmName):
+                    print("has volume definition")
+                else:
+                    #autogenerate emptydir volume
+                    self.volumes.append(OrderedDict({
+                        "name": vmName, "emptyDir": {}
+                        }))
+
+        if self.volumes:
+            print(self.volumes)
+            workflow_spec.update({"volumes": self.volumes})
+        if self.pvcs:
+            workflow_spec.update({"volumeClaimTemplates": self.pvcs})
         if len(self.exit_handler_step) > 0:
             workflow_spec["onExit"] = "exit-handler"
             ts.extend(
@@ -201,6 +225,7 @@ class Workflow(object):
         else:
             d["spec"] = workflow_spec
 
+        print(d)
         return d
 
     def config_cron_workflow(self, cron_config):
