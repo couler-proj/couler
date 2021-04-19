@@ -226,6 +226,23 @@ class WorkflowBasicTest(ArgoYamlTest):
         ]
         self.assertEqual(steps, expected)
 
+    def test_workflow_service_account(self):
+        self.assertIsNone(couler.workflow.service_account)
+        flip_coin()
+        self.assertNotIn("serviceAccountName", couler.workflow_yaml()["spec"])
+
+        couler.config_workflow(service_account="test-serviceaccount")
+        self.assertEqual(
+            couler.workflow.service_account, "test-serviceaccount"
+        )
+        self.assertEqual(
+            couler.workflow_yaml()["spec"]["serviceAccountName"],
+            "test-serviceaccount",
+        )
+
+        couler._cleanup()
+        self.assertIsNone(couler.workflow.service_account)
+
     def test_workflow_config(self):
         flip_coin()
         tails()
