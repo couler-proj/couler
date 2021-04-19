@@ -38,6 +38,7 @@ class Workflow(object):
         self.cron_config = None
         self.volumes = []
         self.pvcs = []
+        self.service_account = None
 
     def add_template(self, template: Template):
         self.templates.update({template.name: template})
@@ -177,6 +178,9 @@ class Workflow(object):
         if self.clean_ttl is not None:
             workflow_spec["ttlSecondsAfterFinished"] = self.clean_ttl
 
+        if self.service_account is not None:
+            workflow_spec["serviceAccountName"] = self.service_account
+
         # Spec part
         if self.cluster_config is not None and hasattr(
             self.cluster_config, "config_workflow"
@@ -220,3 +224,4 @@ class Workflow(object):
         self.cron_config = None
         self.volumes = []
         self.pvcs = []
+        self.service_account = None
