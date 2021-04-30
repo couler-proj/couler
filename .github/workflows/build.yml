@@ -44,6 +44,9 @@ jobs:
       run: |
         set -e
         bash ./scripts/test_python.sh
+    - name: Build docs
+      run: |
+        mkdocs build
     - name: Go Unit tests
       run: |
         set -e
