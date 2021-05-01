@@ -167,15 +167,16 @@ class Workflow(object):
                         )
             ts.append(template_dict)
             #check volumes
-            volumeMountsName = template.get_volumeMounts_name()
-            for vmName in volumeMountsName:
-                if self.has_pvc_template(vmName) or self.has_volume(vmName):
-                    print("has volume definition")
-                else:
-                    #autogenerate emptydir volume
-                    self.volumes.append(OrderedDict({
-                        "name": vmName, "emptyDir": {}
-                        }))
+            volume_mounts = template.get_volume_mounts()
+            if volume_mounts is not None:
+                for volume_mount in volume_mounts:
+                    if self.has_pvc_template(volume_mount.name) or self.has_volume(volume_mount.name):
+                        print("volume exists")
+                    else:
+                        #autogenerate emptydir volume
+                        self.volumes.append(
+                            {"name": volume_mount.name, "emptyDir": {}}
+                        )
 
         if self.volumes:
             print(self.volumes)
@@ -225,7 +226,6 @@ class Workflow(object):
         else:
             d["spec"] = workflow_spec
 
-        print(d)
         return d
 
     def config_cron_workflow(self, cron_config):
