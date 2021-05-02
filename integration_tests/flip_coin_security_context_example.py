@@ -45,14 +45,14 @@ def tails():
 
 
 if __name__ == "__main__":
-    for impl_type in [_SubmitterImplTypes.GO, _SubmitterImplTypes.PYTHON]:
+    for impl_type in [_SubmitterImplTypes.PYTHON]:
         os.environ[_SUBMITTER_IMPL_ENV_VAR_KEY] = impl_type
         print(
             "Submitting flip coin example workflow via %s implementation"
             % impl_type
         )
         couler.config_workflow(
-            name="flip-coin-%s" % impl_type.lower(),
+            name="flip-coin-sc-%s" % impl_type.lower(),
             timeout=3600,
             time_to_clean=3600 * 1.5,
         )
