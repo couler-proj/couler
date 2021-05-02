@@ -17,6 +17,7 @@ python -m integration_tests.mpi_example
 python -m integration_tests.dag_example
 python -m integration_tests.dag_depends_example
 python -m integration_tests.flip_coin_example
+python -m integration_tests.flip_coin_security_context_example
 python -m integration_tests.memoization_example
 
 # Validate workflow statuses

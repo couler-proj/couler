@@ -243,6 +243,76 @@ class WorkflowBasicTest(ArgoYamlTest):
         couler._cleanup()
         self.assertIsNone(couler.workflow.service_account)
 
+    def test_workflow_security_context(self):
+        """
+        The securityContext configuration mostly taken from
+        https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+        """
+        self.assertIsNone(couler.workflow.security_context)
+        flip_coin()
+        self.assertNotIn("securityContext", couler.workflow_yaml()["spec"])
+
+        couler.states.workflow.set_security_context(
+            security_context={
+                "fsGroup": 2000,
+                "runAsNonRoot": True,
+                "runAsUser": 1000,
+                "fsGroupChangePolicy": "OnRootMismatch",
+                "runAsGroup": 3000,
+                "supplementalGroups": [1000, 4000, 4500],
+                "seLinuxOptions": {"level": "s0:c123,c456"},
+                "seccompProfile": {
+                    "localhostProfile": "my-profiles/profile-allow.json",
+                    "type": "Localhost",
+                },
+                "sysctls": [
+                    {"name": "kernel.shm_rmid_forced", "value": "0"},
+                    {"name": "net.core.somaxconn", "value": "1024"},
+                ],
+            }
+        )
+
+        self.assertTrue(couler.workflow.security_context is not None)
+
+        actual_wf = couler.workflow_yaml()
+        self.assertIn("securityContext", actual_wf["spec"])
+        actual_security_context = actual_wf["spec"]["securityContext"]
+
+        self.assertEqual(actual_security_context["fsGroup"], 2000)
+        self.assertEqual(actual_security_context["runAsNonRoot"], True)
+        self.assertEqual(actual_security_context["runAsUser"], 1000)
+        self.assertEqual(
+            actual_security_context["fsGroupChangePolicy"], "OnRootMismatch"
+        )
+        self.assertEqual(actual_security_context["runAsGroup"], 3000)
+        self.assertEqual(
+            actual_security_context["supplementalGroups"], [1000, 4000, 4500]
+        )
+        self.assertEqual(
+            actual_security_context["seLinuxOptions"]["level"], "s0:c123,c456"
+        )
+        self.assertEqual(
+            actual_security_context["seccompProfile"]["localhostProfile"],
+            "my-profiles/profile-allow.json",
+        )
+        self.assertEqual(
+            actual_security_context["seccompProfile"]["type"], "Localhost"
+        )
+        self.assertEqual(
+            actual_security_context["sysctls"][0]["name"],
+            "kernel.shm_rmid_forced",
+        )
+        self.assertEqual(actual_security_context["sysctls"][0]["value"], "0")
+        self.assertEqual(
+            actual_security_context["sysctls"][1]["name"], "net.core.somaxconn"
+        )
+        self.assertEqual(
+            actual_security_context["sysctls"][1]["value"], "1024"
+        )
+
+        couler._cleanup()
+        self.assertFalse(couler.workflow.security_context is not None)
+
     def test_workflow_config(self):
         flip_coin()
         tails()

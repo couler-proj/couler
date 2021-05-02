@@ -39,6 +39,7 @@ class Workflow(object):
         self.volumes = []
         self.pvcs = []
         self.service_account = None
+        self.security_context = None
 
     def add_template(self, template: Template):
         self.templates.update({template.name: template})
@@ -115,6 +116,12 @@ class Workflow(object):
         #     d["metadata"]["labels"] = {"couler_job_user": self.user_id}
 
         workflow_spec = {"entrypoint": entrypoint}
+
+        if self.security_context:
+            workflow_spec["securityContext"] = dict()
+            for key, value in self.security_context.items():
+                workflow_spec["securityContext"][key] = value
+
         if self.volumes:
             workflow_spec.update({"volumes": self.volumes})
         if self.pvcs:
@@ -210,6 +217,11 @@ class Workflow(object):
     def config_cron_workflow(self, cron_config):
         self.cron_config = cron_config
 
+    def set_security_context(self, security_context: dict):
+        if not isinstance(security_context, dict):
+            raise TypeError("security_context should be a dict")
+        self.security_context = security_context
+
     def cleanup(self):
         self.name = None
         self.timeout = None
@@ -225,3 +237,4 @@ class Workflow(object):
         self.volumes = []
         self.pvcs = []
         self.service_account = None
+        self.security_context = None
