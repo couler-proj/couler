@@ -129,6 +129,10 @@ Alternatively, you can clone this repository and then run the following to insta
 python setup.py install
 ```
 
+## Try Couler with Argo Workflows
+
+Click [here](https://katacoda.com/argoproj/courses/argo-workflows/python) to launch the interactive Katacoda environment and learn how to write and submit your first Argo workflow using Couler Python SDK in your browser!
+
 ## Examples
 
 ### Coin Flip
@@ -265,5 +269,5 @@ any feedback and contributions from the community.
 
 ## Community Blogs and Presentations
 
-* [Introducing Couler: Unified Interface for Constructing and Managing Workflows, Argo Workflows Community Meeting, September 2020](https://docs.google.com/presentation/d/11KVEkKQGeV3R_-nHdqlzQV2uOrya94ra6Ilm_k6RwE4/edit?usp=sharing)
+* [Introducing Couler: Unified Interface for Constructing and Managing Workflows, Argo Workflows Community Meeting](https://docs.google.com/presentation/d/11KVEkKQGeV3R_-nHdqlzQV2uOrya94ra6Ilm_k6RwE4/edit?usp=sharing)
 * [Authoring and Submitting Argo Workflows using Python](https://blog.argoproj.io/authoring-and-submitting-argo-workflows-using-python-aff9a070d95f)
