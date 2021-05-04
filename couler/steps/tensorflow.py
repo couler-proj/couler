@@ -35,7 +35,7 @@ manifest_template = {
     "spec": {"cleanPodPolicy": "", "tfReplicaSpecs": {}},
 }
 
-pod_types = {"Chief", "PS", "Worker"}
+pod_types = {"Chief", "PS", "Worker", "Evaluator"}
 
 
 def train(
@@ -57,6 +57,11 @@ def train(
     worker_resources=None,
     worker_restart_policy="Never",
     worker_command=None,
+    num_evaluators=0,
+    evaluator_image=None,
+    evaluator_resources=None,
+    evaluator_restart_policy="Never",
+    evaluator_command=None,
     clean_pod_policy="Running",
     timeout=None,
 ):
@@ -126,6 +131,25 @@ def train(
         )
 
         manifest["spec"]["tfReplicaSpecs"].update({"Worker": worker_pod})
+
+    if num_evaluators > 0:
+        evaluator_image = evaluator_image if evaluator_image else image
+        evaluator_command = evaluator_command if evaluator_command else command
+
+        evaluator_pod = _generate_pod_spec(
+            pod_template,
+            container_template,
+            allowed_pod_types=pod_types,
+            pod_type="Evaluator",
+            image=evaluator_image,
+            replicas=num_evaluators,
+            secret=secret,
+            command=evaluator_command,
+            resources=evaluator_resources,
+            restart_policy=evaluator_restart_policy,
+        )
+
+        manifest["spec"]["tfReplicaSpecs"]["Evaluator"] = evaluator_pod
 
     step_name, _ = utils.invocation_location()
 
