@@ -7,7 +7,7 @@
 ## What is Couler?
 
 Couler aims to provide a unified interface for constructing and managing workflows on
-different workflow engines, such as [Argo Workflows](https://github.com/argoproj/argo), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/).
+different workflow engines, such as [Argo Workflows](https://github.com/argoproj/argo-workflows), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/).
 
 Couler is included in [CNCF Cloud Native Landscape](https://landscape.cncf.io/) and [LF AI Landscape](https://landscape.lfai.foundation).
 
@@ -17,7 +17,7 @@ You can find a list of organizations who are using Couler in [ADOPTERS.md](ADOPT
 
 ## Why use Couler?
 
-Many workflow engines exist nowadays, e.g. [Argo Workflows](https://github.com/argoproj/argo), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/).
+Many workflow engines exist nowadays, e.g. [Argo Workflows](https://github.com/argoproj/argo-workflows), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/).
 However, their programming experience varies and they have different level of abstractions
 that are often obscure and complex. The code snippets below are some examples for constructing workflows
 using Apache Airflow and [Kubeflow Pipelines](https://github.com/kubeflow/pipelines/).
@@ -115,7 +115,7 @@ Please see the following sections for installation guide and examples.
 
 ## Installation
 
-* Couler currently only supports Argo Workflows. Please see instructions [here](https://argoproj.github.io/argo/quick-start/#install-argo-workflows)
+* Couler currently only supports Argo Workflows. Please see instructions [here](https://argoproj.github.io/argo-workflows/quick-start/#install-argo-workflows)
 to install Argo Workflows on your Kubernetes cluster.
 * Install Python 3.6+
 * Install Couler Python SDK via the following `pip` command:
