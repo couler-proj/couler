@@ -1,0 +1,11 @@
+:root {
+  --md-primary-fg-color: #4185F1;
+}
+
+.md-header__topic {
+  display: none;
+}
+
+.md-header__button.md-logo img {
+    width: 3.3rem;
+}
