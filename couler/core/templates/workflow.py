@@ -171,7 +171,7 @@ class Workflow(object):
             if volume_mounts is not None:
                 for volume_mount in volume_mounts:
                     if self.has_pvc_template(volume_mount.name) is False and self.has_volume(volume_mount.name) is False:
-                        #autogenerate emptydir volume
+                        # Auto-generate emptyDir volume
                         self.volumes.append(
                             {"name": volume_mount.name, "emptyDir": {}}
                         )
