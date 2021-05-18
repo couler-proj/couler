@@ -29,12 +29,14 @@ class TensorflowTestCase(ArgoYamlTest):
         tf.train(
             num_ps=2,
             num_workers=3,
+            num_evaluators=1,
             image="tensorflow:1.13",
             command="python tf.py",
             no_chief=False,
             worker_resources="cpu=0.5,memory=1024",
             ps_restart_policy="Never",
             worker_restart_policy="OnFailure",
+            evaluator_resources="cpu=2,memory=4096",
             clean_pod_policy="Running",
             secret=secret,
         )
@@ -105,4 +107,14 @@ class TensorflowTestCase(ArgoYamlTest):
         self.assertEqual(worker_container["resources"]["limits"]["cpu"], 0.5)
         self.assertEqual(
             worker_container["resources"]["limits"]["memory"], 1024
+        )
+
+        evaluator = tfjob["spec"]["tfReplicaSpecs"]["Evaluator"]
+        self.assertEqual(evaluator["replicas"], 1)
+        self.assertEqual(len(evaluator["template"]["spec"]["containers"]), 1)
+        evaluator_container = evaluator["template"]["spec"]["containers"][0]
+        self.assertEqual(evaluator_container["image"], "tensorflow:1.13")
+        self.assertEqual(evaluator_container["resources"]["limits"]["cpu"], 2)
+        self.assertEqual(
+            evaluator_container["resources"]["limits"]["memory"], 4096
         )

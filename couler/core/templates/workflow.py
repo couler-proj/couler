@@ -38,6 +38,8 @@ class Workflow(object):
         self.cron_config = None
         self.volumes = []
         self.pvcs = []
+        self.service_account = None
+        self.security_context = None
 
     def add_template(self, template: Template):
         self.templates.update({template.name: template})
@@ -126,6 +128,16 @@ class Workflow(object):
         #     d["metadata"]["labels"] = {"couler_job_user": self.user_id}
 
         workflow_spec = {"entrypoint": entrypoint}
+
+        if self.security_context:
+            workflow_spec["securityContext"] = dict()
+            for key, value in self.security_context.items():
+                workflow_spec["securityContext"][key] = value
+
+        if self.volumes:
+            workflow_spec.update({"volumes": self.volumes})
+        if self.pvcs:
+            workflow_spec.update({"volumeClaimTemplates": self.pvcs})
         if self.dag_mode_enabled():
             dag = {"tasks": list(self.dag_tasks.values())}
             ts = [OrderedDict({"name": entrypoint, "dag": dag})]
@@ -200,6 +212,9 @@ class Workflow(object):
         if self.clean_ttl is not None:
             workflow_spec["ttlSecondsAfterFinished"] = self.clean_ttl
 
+        if self.service_account is not None:
+            workflow_spec["serviceAccountName"] = self.service_account
+
         # Spec part
         if self.cluster_config is not None and hasattr(
             self.cluster_config, "config_workflow"
@@ -229,6 +244,11 @@ class Workflow(object):
     def config_cron_workflow(self, cron_config):
         self.cron_config = cron_config
 
+    def set_security_context(self, security_context: dict):
+        if not isinstance(security_context, dict):
+            raise TypeError("security_context should be a dict")
+        self.security_context = security_context
+
     def cleanup(self):
         self.name = None
         self.timeout = None
@@ -243,3 +263,5 @@ class Workflow(object):
         self.cron_config = None
         self.volumes = []
         self.pvcs = []
+        self.service_account = None
+        self.security_context = None

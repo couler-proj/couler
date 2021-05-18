@@ -7,7 +7,7 @@
 ## What is Couler?
 
 Couler aims to provide a unified interface for constructing and managing workflows on
-different workflow engines, such as [Argo Workflows](https://github.com/argoproj/argo), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/).
+different workflow engines, such as [Argo Workflows](https://github.com/argoproj/argo-workflows), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/).
 
 Couler is included in [CNCF Cloud Native Landscape](https://landscape.cncf.io/) and [LF AI Landscape](https://landscape.lfai.foundation).
 
@@ -17,7 +17,7 @@ You can find a list of organizations who are using Couler in [ADOPTERS.md](ADOPT
 
 ## Why use Couler?
 
-Many workflow engines exist nowadays, e.g. [Argo Workflows](https://github.com/argoproj/argo), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/).
+Many workflow engines exist nowadays, e.g. [Argo Workflows](https://github.com/argoproj/argo-workflows), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/).
 However, their programming experience varies and they have different level of abstractions
 that are often obscure and complex. The code snippets below are some examples for constructing workflows
 using Apache Airflow and [Kubeflow Pipelines](https://github.com/kubeflow/pipelines/).
@@ -115,7 +115,7 @@ Please see the following sections for installation guide and examples.
 
 ## Installation
 
-* Couler currently only supports Argo Workflows. Please see instructions [here](https://argoproj.github.io/argo/quick-start/#install-argo-workflows)
+* Couler currently only supports Argo Workflows. Please see instructions [here](https://argoproj.github.io/argo-workflows/quick-start/#install-argo-workflows)
 to install Argo Workflows on your Kubernetes cluster.
 * Install Python 3.6+
 * Install Couler Python SDK via the following `pip` command:
@@ -128,6 +128,10 @@ Alternatively, you can clone this repository and then run the following to insta
 ```bash
 python setup.py install
 ```
+
+## Try Couler with Argo Workflows
+
+Click [here](https://katacoda.com/argoproj/courses/argo-workflows/python) to launch the interactive Katacoda environment and learn how to write and submit your first Argo workflow using Couler Python SDK in your browser!
 
 ## Examples
 
@@ -190,40 +194,14 @@ import couler.argo as couler
 from couler.argo_submitter import ArgoSubmitter
 
 
-def job_a(message):
+def job(name):
     couler.run_container(
         image="docker/whalesay:latest",
         command=["cowsay"],
-        args=[message],
-        step_name="A",
+        args=[name],
+        step_name=name,
     )
 
-
-def job_b(message):
-    couler.run_container(
-        image="docker/whalesay:latest",
-        command=["cowsay"],
-        args=[message],
-        step_name="B",
-    )
-
-
-def job_c(message):
-    couler.run_container(
-        image="docker/whalesay:latest",
-        command=["cowsay"],
-        args=[message],
-        step_name="C",
-    )
-
-
-def job_d(message):
-    couler.run_container(
-        image="docker/whalesay:latest",
-        command=["cowsay"],
-        args=[message],
-        step_name="D",
-    )
 
 #     A
 #    / \
@@ -231,11 +209,10 @@ def job_d(message):
 #  /
 # D
 def linear():
-    couler.set_dependencies(lambda: job_a(message="A"), dependencies=None)
-    couler.set_dependencies(lambda: job_b(message="B"), dependencies=["A"])
-    couler.set_dependencies(lambda: job_c(message="C"), dependencies=["A"])
-    couler.set_dependencies(lambda: job_d(message="D"), dependencies=["B"])
-
+    couler.set_dependencies(lambda: job(name="A"), dependencies=None)
+    couler.set_dependencies(lambda: job(name="B"), dependencies=["A"])
+    couler.set_dependencies(lambda: job(name="C"), dependencies=["A"])
+    couler.set_dependencies(lambda: job(name="D"), dependencies=["B"])
 
 #   A
 #  / \
@@ -245,11 +222,11 @@ def linear():
 def diamond():
     couler.dag(
         [
-            [lambda: job_a(message="A")],
-            [lambda: job_a(message="A"), lambda: job_b(message="B")],  # A -> B
-            [lambda: job_a(message="A"), lambda: job_c(message="C")],  # A -> C
-            [lambda: job_b(message="B"), lambda: job_d(message="D")],  # B -> D
-            [lambda: job_c(message="C"), lambda: job_d(message="D")],  # C -> D
+            [lambda: job(name="A")],
+            [lambda: job(name="A"), lambda: job(name="B")],  # A -> B
+            [lambda: job(name="A"), lambda: job(name="C")],  # A -> C
+            [lambda: job(name="B"), lambda: job(name="D")],  # B -> D
+            [lambda: job(name="C"), lambda: job(name="D")],  # C -> D
         ]
     )
 
@@ -265,5 +242,5 @@ any feedback and contributions from the community.
 
 ## Community Blogs and Presentations
 
-* [Introducing Couler: Unified Interface for Constructing and Managing Workflows, Argo Workflows Community Meeting, September 2020](https://docs.google.com/presentation/d/11KVEkKQGeV3R_-nHdqlzQV2uOrya94ra6Ilm_k6RwE4/edit?usp=sharing)
+* [Introducing Couler: Unified Interface for Constructing and Managing Workflows, Argo Workflows Community Meeting](https://docs.google.com/presentation/d/11KVEkKQGeV3R_-nHdqlzQV2uOrya94ra6Ilm_k6RwE4/edit?usp=sharing)
 * [Authoring and Submitting Argo Workflows using Python](https://blog.argoproj.io/authoring-and-submitting-argo-workflows-using-python-aff9a070d95f)

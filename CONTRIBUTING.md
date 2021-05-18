@@ -1,4 +1,4 @@
-# Contributing Guide
+ # Contributing Guide
 
 Welcome to Couler's contributing guide!
 
@@ -56,6 +56,19 @@ You can execute the following command to run all the sanity checks:
 ```bash
 pre-commit run --all
 ```
+
+## Run the Documentation Server
+
+If you have modified the documentation, you may want to run the documentation server
+locally to preview the changes. 
+Couler uses [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) to build the documentation.
+You can run the following command to start a local documentation server:
+
+```sh
+mkdocs serve
+```
+
+This will start the documentation server on the port 8000 by default.
 
 ## Sign the Contributor License Agreement (CLA)
 

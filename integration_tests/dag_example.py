@@ -21,39 +21,12 @@ from couler.argo_submitter import (
 )
 
 
-def job_a(message):
+def job(name):
     couler.run_container(
         image="docker/whalesay:latest",
         command=["cowsay"],
-        args=[message],
-        step_name="A",
-    )
-
-
-def job_b(message):
-    couler.run_container(
-        image="docker/whalesay:latest",
-        command=["cowsay"],
-        args=[message],
-        step_name="B",
-    )
-
-
-def job_c(message):
-    couler.run_container(
-        image="docker/whalesay:latest",
-        command=["cowsay"],
-        args=[message],
-        step_name="C",
-    )
-
-
-def job_d(message):
-    couler.run_container(
-        image="docker/whalesay:latest",
-        command=["cowsay"],
-        args=[message],
-        step_name="D",
+        args=[name],
+        step_name=name,
     )
 
 
@@ -100,10 +73,10 @@ def conditional_child():
 #  /
 # D
 def linear():
-    couler.set_dependencies(lambda: job_a(message="A"), dependencies=None)
-    couler.set_dependencies(lambda: job_b(message="B"), dependencies=["A"])
-    couler.set_dependencies(lambda: job_c(message="C"), dependencies=["A"])
-    couler.set_dependencies(lambda: job_d(message="D"), dependencies=["B"])
+    couler.set_dependencies(lambda: job(name="A"), dependencies=None)
+    couler.set_dependencies(lambda: job(name="B"), dependencies=["A"])
+    couler.set_dependencies(lambda: job(name="C"), dependencies=["A"])
+    couler.set_dependencies(lambda: job(name="D"), dependencies=["B"])
 
 
 #   A
@@ -114,11 +87,11 @@ def linear():
 def diamond():
     couler.dag(
         [
-            [lambda: job_a(message="A")],
-            [lambda: job_a(message="A"), lambda: job_b(message="B")],  # A -> B
-            [lambda: job_a(message="A"), lambda: job_c(message="C")],  # A -> C
-            [lambda: job_b(message="B"), lambda: job_d(message="D")],  # B -> D
-            [lambda: job_c(message="C"), lambda: job_d(message="D")],  # C -> D
+            [lambda: job(name="A")],
+            [lambda: job(name="A"), lambda: job(name="B")],  # A -> B
+            [lambda: job(name="A"), lambda: job(name="C")],  # A -> C
+            [lambda: job(name="B"), lambda: job(name="D")],  # B -> D
+            [lambda: job(name="C"), lambda: job(name="D")],  # C -> D
         ]
     )
 

@@ -1,0 +1,60 @@
+site_name: Couler
+strict: true
+copyright: Copyright &copy; 2021 The Couler Authors
+site_url: https://couler-proj.github.io/
+site_description: >-
+  Couler aims to provide a unified interface for constructing and managing workflows on different workflow engines,
+  such as Argo Workflows, Tekton Pipelines, and Apache Airflow.
+
+repo_name: couler-proj/couler
+repo_url: https://github.com/couler-proj/couler
+
+nav:
+  - Overview: README.md
+  - Getting Started: getting-started.md
+  - Examples: examples.md
+  - Developer Guide:
+    - Contributing: contributing.md
+    - API Design: couler-api-design.md
+    - Step Zoo: couler-step-zoo.md
+    - Tekton Design: couler-tekton-design.md
+    - Template: TEMPLATE.md
+  - Adopters: adopters.md
+
+theme:
+  logo: assets/logo-white.svg
+  favicon: assets/logo.svg
+  name: material
+  font:
+    text: Work Sans
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/couler-proj/couler
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/CoulerProject
+    - icon: fontawesome/brands/slack
+      link: https://join.slack.com/t/couler/shared_invite/zt-i0m7ziol-1gz4_p_aXmWM7KVpxJ4k9Q
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+markdown_extensions:
+  - codehilite
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.details
+  - pymdownx.snippets
+  - toc:
+      permalink: true
