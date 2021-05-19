@@ -44,9 +44,6 @@ spec:
           - name: output-id-30
             valueFrom:
               path: /mnt/place_two.txt
-      volumes:
-        - emptyDir: {}
-          name: couler-out-dir-0
     - name: consume-two
       inputs:
         parameters:
@@ -59,3 +56,6 @@ spec:
         args:
           - "{{inputs.parameters.para-consume-two-0}}"
           - "{{inputs.parameters.para-consume-two-1}}"
+  volumes:
+    - emptyDir: {}
+      name: couler-out-dir-0

@@ -252,6 +252,11 @@ class ArgoTest(ArgoBaseTestCase):
         )
 
         wf = couler.workflow_yaml()
+        # Check automatically created emptyDir volume and volume mount
+        self.assertEqual(
+            wf["spec"]["volumes"],
+            [{"emptyDir": {}, "name": "couler-out-dir-0"}],
+        )
         template = wf["spec"]["templates"][1]
         # Check input parameters for step A
         self.assertEqual(
@@ -272,10 +277,6 @@ class ArgoTest(ArgoBaseTestCase):
         self.assertEqual(params["name"], "para-B-0")
         self.assertTrue(
             '"{{workflow.outputs.parameters.output-id-' in params["value"]
-        )
-        # Check automatically created emptyDir volume and volume mount
-        self.assertEqual(
-            template["volumes"], [{"emptyDir": {}, "name": "couler-out-dir-0"}]
         )
         self.assertEqual(
             template["container"]["volumeMounts"],

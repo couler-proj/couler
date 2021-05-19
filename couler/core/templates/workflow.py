@@ -193,7 +193,6 @@ class Workflow(object):
                             )
 
         if self.volumes:
-            print(self.volumes)
             workflow_spec.update({"volumes": self.volumes})
         if self.pvcs:
             workflow_spec.update({"volumeClaimTemplates": self.pvcs})
