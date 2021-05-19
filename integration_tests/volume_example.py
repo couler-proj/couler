@@ -19,8 +19,6 @@ from couler.argo_submitter import (
     ArgoSubmitter,
     _SubmitterImplTypes,
 )
-
-# from couler.core.templates.volume import VolumeMount, Volume
 from couler.core.templates.volume import VolumeMount
 
 
@@ -52,24 +50,17 @@ if __name__ == "__main__":
             timeout=3600,
             time_to_clean=3600 * 1.5,
         )
-
-        # 1) Add an exists volume to the workflow.
-        #    (This test will need the volume in k8s first, now we can only test emptydir{})
-        # couler.add_volume(Volume("apppath", "data"))
-
         # 2) Add a container to the workflow.
-        mount = VolumeMount("apppath", "/tmp")
-        command = ["/bin/bash", "-c"]
-        args = [
-            ' vol_found=`mount | grep /tmp` && \
-            if [[ -n $vol_found ]]; then echo "Volume mounted and found"; else echo "Not found"; fi '
-        ]
-
         couler.run_container(
             image="debian:latest",
-            command=command,
-            args=args,
-            volume_mounts=[mount],
+            command=["/bin/bash", "-c"],
+            args=[
+                ' vol_found=`mount | grep /tmp` && \
+            if [[ -n $vol_found ]]; \
+            then echo "Volume mounted and found"; \
+            else echo "Not found"; fi '
+            ],
+            volume_mounts=[VolumeMount("apppath", "/tmp")],
         )
         # 3) Add an exit handler that runs when the workflow succeeds.
         couler.set_exit_handler(
