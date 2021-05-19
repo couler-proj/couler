@@ -57,7 +57,7 @@ class Workflow(object):
 
     def has_pvc_template(self, name):
         for pvc in self.pvcs:
-            if pvc['metadata']['name'] == name:
+            if pvc["metadata"]["name"] == name:
                 return True
         return False
 
@@ -66,7 +66,7 @@ class Workflow(object):
 
     def has_volume(self, name):
         for volume in self.volumes:
-            if volume['name'] == name:
+            if volume["name"] == name:
                 return True
         return False
 
@@ -178,15 +178,19 @@ class Workflow(object):
                             "Unsupported signature for cluster spec: %s" % sig
                         )
             ts.append(template_dict)
-            #check volumes
-            volume_mounts = template.get_volume_mounts()
-            if volume_mounts is not None:
-                for volume_mount in volume_mounts:
-                    if self.has_pvc_template(volume_mount.name) is False and self.has_volume(volume_mount.name) is False:
-                        # Auto-generate emptyDir volume
-                        self.volumes.append(
-                            {"name": volume_mount.name, "emptyDir": {}}
-                        )
+            # check volumes
+            if isinstance(template, Container) or isinstance(template, Script):
+                volume_mounts = template.get_volume_mounts()
+                if volume_mounts is not None:
+                    for volume_mount in volume_mounts:
+                        if (
+                            self.has_pvc_template(volume_mount.name) is False
+                            and self.has_volume(volume_mount.name) is False
+                        ):
+                            # Auto-generate emptyDir volume
+                            self.volumes.append(
+                                {"name": volume_mount.name, "emptyDir": {}}
+                            )
 
         if self.volumes:
             print(self.volumes)
