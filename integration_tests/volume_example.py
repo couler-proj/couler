@@ -21,23 +21,6 @@ from couler.argo_submitter import (
 )
 from couler.core.templates.volume import VolumeMount
 
-
-def exit_handler_succeeded():
-    return couler.run_container(
-        image="alpine:3.6",
-        command=["sh", "-c", 'echo "succeeded"'],
-        step_name="success-exit",
-    )
-
-
-def exit_handler_failed():
-    return couler.run_container(
-        image="alpine:3.6",
-        command=["sh", "-c", 'echo "failed"'],
-        step_name="failure-exit",
-    )
-
-
 if __name__ == "__main__":
     for impl_type in [_SubmitterImplTypes.PYTHON]:
         os.environ[_SUBMITTER_IMPL_ENV_VAR_KEY] = impl_type
@@ -58,15 +41,9 @@ if __name__ == "__main__":
                 ' vol_found=`mount | grep /tmp` && \
             if [[ -n $vol_found ]]; \
             then echo "Volume mounted and found"; \
-            else echo "Not found"; fi '
+            else exit -1; fi '
             ],
             volume_mounts=[VolumeMount("apppath", "/tmp")],
         )
-        # 3) Add an exit handler that runs when the workflow succeeds.
-        couler.set_exit_handler(
-            couler.WFStatus.Succeeded, exit_handler_succeeded
-        )
-        # 4) Add an exit handler that runs when the workflow failed.
-        couler.set_exit_handler(couler.WFStatus.Failed, exit_handler_failed)
         submitter = ArgoSubmitter(namespace="argo")
         couler.run(submitter=submitter)

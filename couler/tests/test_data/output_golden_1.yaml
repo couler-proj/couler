@@ -50,4 +50,4 @@ spec:
           - "{{inputs.parameters.para-consumer-0}}"
   volumes:
     - emptyDir: {}
-      name: couler-out-dir-
+      name: couler-out-dir-0
