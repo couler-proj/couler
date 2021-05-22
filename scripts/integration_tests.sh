@@ -19,6 +19,7 @@ python -m integration_tests.dag_depends_example
 python -m integration_tests.flip_coin_example
 python -m integration_tests.flip_coin_security_context_example
 python -m integration_tests.memoization_example
+python -m integration_tests.volume_example
 
 # Validate workflow statuses
 kubectl -n argo get workflows

@@ -38,9 +38,6 @@ spec:
           - name: output-id-6
             valueFrom:
               path: /mnt/hello_world.txt
-      volumes:
-        - emptyDir: {}
-          name: couler-out-dir-0
     - name: consumer
       inputs:
         parameters:
@@ -51,3 +48,6 @@ spec:
           - cowsay
         args:
           - "{{inputs.parameters.para-consumer-0}}"
+  volumes:
+    - emptyDir: {}
+      name: couler-out-dir-0

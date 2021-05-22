@@ -55,8 +55,20 @@ class Workflow(object):
     def add_pvc_template(self, pvc: VolumeClaimTemplate):
         self.pvcs.append(pvc.to_dict())
 
+    def has_pvc_template(self, name):
+        for pvc in self.pvcs:
+            if pvc["metadata"]["name"] == name:
+                return True
+        return False
+
     def add_volume(self, volume: Volume):
         self.volumes.append(volume.to_dict())
+
+    def has_volume(self, name):
+        for volume in self.volumes:
+            if volume["name"] == name:
+                return True
+        return False
 
     def get_step(self, name):
         return self.steps.get(name, None)
@@ -166,6 +178,24 @@ class Workflow(object):
                             "Unsupported signature for cluster spec: %s" % sig
                         )
             ts.append(template_dict)
+            # check volumes
+            if isinstance(template, Container) or isinstance(template, Script):
+                volume_mounts = template.get_volume_mounts()
+                if volume_mounts is not None:
+                    for volume_mount in volume_mounts:
+                        if (
+                            self.has_pvc_template(volume_mount.name) is False
+                            and self.has_volume(volume_mount.name) is False
+                        ):
+                            # Auto-generate emptyDir volume
+                            self.volumes.append(
+                                {"name": volume_mount.name, "emptyDir": {}}
+                            )
+
+        if self.volumes:
+            workflow_spec.update({"volumes": self.volumes})
+        if self.pvcs:
+            workflow_spec.update({"volumeClaimTemplates": self.pvcs})
         if len(self.exit_handler_step) > 0:
             workflow_spec["onExit"] = "exit-handler"
             ts.extend(

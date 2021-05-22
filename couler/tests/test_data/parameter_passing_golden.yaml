@@ -48,9 +48,6 @@ spec:
           - name: output-id-211
             valueFrom:
               path: /mnt/t2.txt
-      volumes:
-        - emptyDir: {}
-          name: couler-out-dir-0
     - name: B
       inputs:
         parameters:
@@ -65,3 +62,6 @@ spec:
           - "{{inputs.parameters.para-B-0}}"
           - "{{inputs.parameters.para-B-1}}"
           - "{{inputs.parameters.para-B-2}}"
+  volumes:
+    - emptyDir: {}
+      name: couler-out-dir-0
