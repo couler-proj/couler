@@ -75,6 +75,7 @@ class ArgoSubmitter(object):
                 )
                 if client_configuration is not None:
                     k8s_client.Configuration.set_default(client_configuration)
+                    logging.info("Default k8s client config set.")
             except Exception:
                 logging.info(
                     "Cannot find local k8s config. "
