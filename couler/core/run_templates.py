@@ -201,6 +201,7 @@ def run_container(
     output=None,
     input=None,
     env=None,
+    env_from=None,
     secret=None,
     resources=None,
     timeout=None,
@@ -213,8 +214,7 @@ def run_container(
     volume_mounts=None,
     working_dir=None,
     node_selector=None,
-    cache=None,
-):
+    cache=None):
     """
     Generate an Argo container template.  For example, the template whalesay
     in https://github.com/argoproj/argo/tree/master/examples#hello-world.
@@ -297,6 +297,7 @@ def run_container(
             command=command,
             args=args,
             env=env,
+            env_from=env_from,
             secret=states.get_secret(secret),
             resources=resources,
             image_pull_policy=image_pull_policy,

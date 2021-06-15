@@ -24,27 +24,28 @@ from couler.core.templates.template import Template
 
 class Container(Template):
     def __init__(
-        self,
-        name,
-        image,
-        command,
-        args=None,
-        env=None,
-        secret=None,
-        resources=None,
-        image_pull_policy=None,
-        retry=None,
-        timeout=None,
-        pool=None,
-        output=None,
-        input=None,
-        enable_ulogfs=True,
-        daemon=False,
-        volume_mounts=None,
-        working_dir=None,
-        node_selector=None,
-        volumes=None,
-        cache=None,
+            self,
+            name,
+            image,
+            command,
+            args=None,
+            env=None,
+            env_from=None,
+            secret=None,
+            resources=None,
+            image_pull_policy=None,
+            retry=None,
+            timeout=None,
+            pool=None,
+            output=None,
+            input=None,
+            enable_ulogfs=True,
+            daemon=False,
+            volume_mounts=None,
+            working_dir=None,
+            node_selector=None,
+            volumes=None,
+            cache=None,
     ):
         Template.__init__(
             self,
@@ -62,6 +63,7 @@ class Container(Template):
         self.command = utils.make_list_if_not(command)
         self.args = args
         self.env = env
+        self.env_from = env_from
         self.secret = secret
         self.resources = resources
         self.image_pull_policy = image_pull_policy
@@ -126,8 +128,8 @@ class Container(Template):
 
         # Container
         if (
-            not utils.gpu_requested(self.resources)
-            and states._overwrite_nvidia_gpu_envs
+                not utils.gpu_requested(self.resources)
+                and states._overwrite_nvidia_gpu_envs
         ):
             if self.env is None:
                 self.env = {}
@@ -166,6 +168,8 @@ class Container(Template):
                 container["env"] = self.secret.to_env_list()
             else:
                 container["env"].extend(self.secret.to_env_list())
+        if self.env_from is not None:
+            container["envFrom"] = self.env_from
         if self.resources is not None:
             container["resources"] = {
                 "requests": self.resources,
