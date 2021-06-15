@@ -18,6 +18,7 @@ from couler.core import states, utils
 
 def config_workflow(
     name=None,
+    name_salter=None,
     user_id=None,
     timeout=None,
     time_to_clean=None,
@@ -28,6 +29,7 @@ def config_workflow(
     """
     Config some workflow-level information.
     :param name: name of the workflow.
+    :param name_salter: function to salt workflow names.
     :param user_id: user information.
     :param timeout: maximum running time(seconds).
     :param time_to_clean: time to keep the workflow after completed(seconds).
@@ -37,8 +39,11 @@ def config_workflow(
         runs this workflow
     :return:
     """
+    if name_salter is not None:
+        states.workflow_name_salter = name_salter
+
     if name is not None:
-        states.workflow.name = name
+        states.workflow.name = states.workflow_name_salter(name)
 
     if user_id is not None:
         states.workflow.user_id = user_id
