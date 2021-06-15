@@ -74,7 +74,7 @@ class ArgoSubmitter(object):
                     "Initialized with kube_config."
                 )
                 if client_configuration is not None:
-                    logging.info("Setting default k8s to given client config.")
+                    logging.info("Setting default k8s client config as provided")
                     k8s_client.Configuration.set_default(client_configuration)
             except Exception:
                 logging.info(
