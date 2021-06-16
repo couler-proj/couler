@@ -35,6 +35,7 @@ def default_workflow_name_salter(name):
 
 
 workflow_name_salter = default_workflow_name_salter
+default_service_account = None
 
 _sub_steps = None
 # Argo DAG task

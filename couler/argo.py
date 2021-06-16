@@ -54,25 +54,29 @@ def workflow_yaml():
     return states.workflow.to_dict()
 
 
-def run(submitter=ArgoSubmitter):
+def run(submitter=None):
     """To submit the workflow using user-provided submitter implementation.
        Note that, the provided submitter must have a submit function which
        takes the workflow YAML as input.
     """
     states._enable_print_yaml = False
 
-    if submitter is None:
-        raise ValueError("The input submitter is None")
+    if submitter is None and ArgoSubmitter.default_submitter is None:
+        raise ValueError("The input submitter is None and default submitter was not set.")
     wf = workflow_yaml()
     secrets = states._secrets.values()
     validate_workflow_yaml(wf)
-    if isinstance(submitter, ArgoSubmitter):
-        res = submitter.submit(wf, secrets=secrets)
-    elif issubclass(submitter, ArgoSubmitter):
-        submitter = ArgoSubmitter()
-        res = submitter.submit(wf, secrets=secrets)
+
+    if submitter is not None:
+        if isinstance(submitter, ArgoSubmitter):
+            res = submitter.submit(wf, secrets=secrets)
+        elif issubclass(submitter, ArgoSubmitter):
+            submitter = ArgoSubmitter()
+            res = submitter.submit(wf, secrets=secrets)
+        else:
+            raise ValueError("Only ArgoSubmitter is supported currently.")
     else:
-        raise ValueError("Only ArgoSubmitter is supported currently.")
+        res = states.default_submitter.submit(wf, secrets=secrets)
 
     # Clean up the saved states of the workflow since we made a copy of
     # the workflow above and no longer need the original reference. This
@@ -82,14 +86,14 @@ def run(submitter=ArgoSubmitter):
 
 
 def delete(
-    name,
-    namespace="default",
-    config_file=None,
-    context=None,
-    client_configuration=None,
-    persist_config=True,
-    grace_period_seconds=5,
-    propagation_policy="Background",
+        name,
+        namespace="default",
+        config_file=None,
+        context=None,
+        client_configuration=None,
+        persist_config=True,
+        grace_period_seconds=5,
+        propagation_policy="Background",
 ):
     try:
         config.load_kube_config(
@@ -163,13 +167,13 @@ def create_local_artifact(path, is_global=False):
 
 
 def create_oss_artifact(
-    path,
-    bucket=None,
-    accesskey_id=None,
-    accesskey_secret=None,
-    key=None,
-    endpoint=None,
-    is_global=False,
+        path,
+        bucket=None,
+        accesskey_id=None,
+        accesskey_secret=None,
+        key=None,
+        endpoint=None,
+        is_global=False,
 ):
     """
     Configure the object as OssArtifact
@@ -195,13 +199,13 @@ def create_oss_artifact(
 
 
 def create_s3_artifact(
-    path,
-    bucket=None,
-    accesskey_id=None,
-    accesskey_secret=None,
-    key=None,
-    endpoint=None,
-    is_global=False,
+        path,
+        bucket=None,
+        accesskey_id=None,
+        accesskey_secret=None,
+        key=None,
+        endpoint=None,
+        is_global=False,
 ):
     """
     Configure the object as S3Artifact

@@ -16,20 +16,36 @@ from collections import OrderedDict
 from couler.core import states, utils
 
 
+def config_defaults(
+        name_salter=None,
+        service_account: str = None
+):
+    """
+    Config couler defaults.
+    :param name_salter: function to salt workflow names.
+    :param service_account: name of the default Kubernetes
+        ServiceAccount with which to run workflows
+    :return:
+    """
+    if name_salter is not None:
+        states.workflow_name_salter = name_salter
+
+    if service_account is not None:
+        states.default_service_account = service_account
+
+
 def config_workflow(
-    name=None,
-    name_salter=None,
-    user_id=None,
-    timeout=None,
-    time_to_clean=None,
-    cluster_config_file=None,
-    cron_config=None,
-    service_account=None,
+        name=None,
+        user_id=None,
+        timeout=None,
+        time_to_clean=None,
+        cluster_config_file=None,
+        cron_config=None,
+        service_account=None,
 ):
     """
     Config some workflow-level information.
     :param name: name of the workflow.
-    :param name_salter: function to salt workflow names.
     :param user_id: user information.
     :param timeout: maximum running time(seconds).
     :param time_to_clean: time to keep the workflow after completed(seconds).
@@ -39,9 +55,6 @@ def config_workflow(
         runs this workflow
     :return:
     """
-    if name_salter is not None:
-        states.workflow_name_salter = name_salter
-
     if name is not None:
         states.workflow.name = states.workflow_name_salter(name)
 
@@ -90,18 +103,18 @@ def config_workflow(
             timezone,
         )
 
-    if service_account is not None:
-        states.workflow.service_account = service_account
+    states.workflow.service_account = \
+        service_account if service_account is not None else states.default_service_account
 
 
 def _config_cron_workflow(
-    schedule,
-    concurrency_policy='"Allow"',  # Default to "Allow"
-    successful_jobs_history_limit=3,  # Default 3
-    failed_jobs_history_limit=1,  # Default 1
-    starting_deadline_seconds=10,
-    suspend="false",
-    timezone="Asia/Shanghai",  # Default to Beijing time
+        schedule,
+        concurrency_policy='"Allow"',  # Default to "Allow"
+        successful_jobs_history_limit=3,  # Default 3
+        failed_jobs_history_limit=1,  # Default 1
+        starting_deadline_seconds=10,
+        suspend="false",
+        timezone="Asia/Shanghai",  # Default to Beijing time
 ):
     """
     Config the CronWorkflow, see example
