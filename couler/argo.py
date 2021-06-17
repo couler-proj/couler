@@ -76,7 +76,7 @@ def run(submitter=None):
         else:
             raise ValueError("Only ArgoSubmitter is supported currently.")
     else:
-        res = states.default_submitter.submit(wf, secrets=secrets)
+        res = ArgoSubmitter.default_submitter.submit(wf, secrets=secrets)
 
     # Clean up the saved states of the workflow since we made a copy of
     # the workflow above and no longer need the original reference. This
