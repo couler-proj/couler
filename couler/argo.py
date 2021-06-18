@@ -21,7 +21,7 @@ from kubernetes import config
 
 from couler.argo_submitter import ArgoSubmitter
 from couler.core import states  # noqa: F401
-from couler.core.config import config_workflow  # noqa: F401
+from couler.core.config import config_defaults, config_workflow  # noqa: F401
 from couler.core.constants import *  # noqa: F401, F403
 from couler.core.constants import WorkflowCRD
 from couler.core.run_templates import (  # noqa: F401
