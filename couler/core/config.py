@@ -16,10 +16,7 @@ from collections import OrderedDict
 from couler.core import states, utils
 
 
-def config_defaults(
-        name_salter=None,
-        service_account: str = None
-):
+def config_defaults(name_salter=None, service_account: str = None):
     """
     Config couler defaults.
     :param name_salter: function to salt workflow names.
@@ -35,13 +32,13 @@ def config_defaults(
 
 
 def config_workflow(
-        name=None,
-        user_id=None,
-        timeout=None,
-        time_to_clean=None,
-        cluster_config_file=None,
-        cron_config=None,
-        service_account=None,
+    name=None,
+    user_id=None,
+    timeout=None,
+    time_to_clean=None,
+    cluster_config_file=None,
+    cron_config=None,
+    service_account=None,
 ):
     """
     Config some workflow-level information.
@@ -103,18 +100,21 @@ def config_workflow(
             timezone,
         )
 
-    states.workflow.service_account = \
-        service_account if service_account is not None else states.default_service_account
+    states.workflow.service_account = (
+        service_account
+        if service_account is not None
+        else states.default_service_account
+    )
 
 
 def _config_cron_workflow(
-        schedule,
-        concurrency_policy='"Allow"',  # Default to "Allow"
-        successful_jobs_history_limit=3,  # Default 3
-        failed_jobs_history_limit=1,  # Default 1
-        starting_deadline_seconds=10,
-        suspend="false",
-        timezone="Asia/Shanghai",  # Default to Beijing time
+    schedule,
+    concurrency_policy='"Allow"',
+    successful_jobs_history_limit=3,  # Default 3
+    failed_jobs_history_limit=1,  # Default 1
+    starting_deadline_seconds=10,
+    suspend="false",
+    timezone="Asia/Shanghai",
 ):
     """
     Config the CronWorkflow, see example

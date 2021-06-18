@@ -62,7 +62,9 @@ def run(submitter=None):
     states._enable_print_yaml = False
 
     if submitter is None and ArgoSubmitter.default_submitter is None:
-        raise ValueError("The input submitter is None and default submitter was not set.")
+        raise ValueError(
+            "The input submitter is None and default submitter was not set."
+        )
     wf = workflow_yaml()
     secrets = states._secrets.values()
     validate_workflow_yaml(wf)
@@ -86,14 +88,14 @@ def run(submitter=None):
 
 
 def delete(
-        name,
-        namespace="default",
-        config_file=None,
-        context=None,
-        client_configuration=None,
-        persist_config=True,
-        grace_period_seconds=5,
-        propagation_policy="Background",
+    name,
+    namespace="default",
+    config_file=None,
+    context=None,
+    client_configuration=None,
+    persist_config=True,
+    grace_period_seconds=5,
+    propagation_policy="Background",
 ):
     try:
         config.load_kube_config(
@@ -167,13 +169,13 @@ def create_local_artifact(path, is_global=False):
 
 
 def create_oss_artifact(
-        path,
-        bucket=None,
-        accesskey_id=None,
-        accesskey_secret=None,
-        key=None,
-        endpoint=None,
-        is_global=False,
+    path,
+    bucket=None,
+    accesskey_id=None,
+    accesskey_secret=None,
+    key=None,
+    endpoint=None,
+    is_global=False,
 ):
     """
     Configure the object as OssArtifact
@@ -199,13 +201,13 @@ def create_oss_artifact(
 
 
 def create_s3_artifact(
-        path,
-        bucket=None,
-        accesskey_id=None,
-        accesskey_secret=None,
-        key=None,
-        endpoint=None,
-        is_global=False,
+    path,
+    bucket=None,
+    accesskey_id=None,
+    accesskey_secret=None,
+    key=None,
+    endpoint=None,
+    is_global=False,
 ):
     """
     Configure the object as S3Artifact

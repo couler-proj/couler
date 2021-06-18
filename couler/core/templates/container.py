@@ -24,29 +24,29 @@ from couler.core.templates.template import Template
 
 class Container(Template):
     def __init__(
-            self,
-            name,
-            image,
-            command,
-            args=None,
-            env=None,
-            env_from=None,
-            secret=None,
-            resources=None,
-            image_pull_policy=None,
-            retry=None,
-            timeout=None,
-            pool=None,
-            output=None,
-            input=None,
-            enable_ulogfs=True,
-            daemon=False,
-            volume_mounts=None,
-            working_dir=None,
-            node_selector=None,
-            volumes=None,
-            cache=None,
-            parallelism=None
+        self,
+        name,
+        image,
+        command,
+        args=None,
+        env=None,
+        env_from=None,
+        secret=None,
+        resources=None,
+        image_pull_policy=None,
+        retry=None,
+        timeout=None,
+        pool=None,
+        output=None,
+        input=None,
+        enable_ulogfs=True,
+        daemon=False,
+        volume_mounts=None,
+        working_dir=None,
+        node_selector=None,
+        volumes=None,
+        cache=None,
+        parallelism=None,
     ):
         Template.__init__(
             self,
@@ -59,7 +59,7 @@ class Container(Template):
             enable_ulogfs=enable_ulogfs,
             daemon=daemon,
             cache=cache,
-            parallelism=parallelism
+            parallelism=parallelism,
         )
         self.image = image
         self.command = utils.make_list_if_not(command)
@@ -130,8 +130,8 @@ class Container(Template):
 
         # Container
         if (
-                not utils.gpu_requested(self.resources)
-                and states._overwrite_nvidia_gpu_envs
+            not utils.gpu_requested(self.resources)
+            and states._overwrite_nvidia_gpu_envs
         ):
             if self.env is None:
                 self.env = {}

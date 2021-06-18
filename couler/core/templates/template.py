@@ -18,17 +18,17 @@ from couler.core import utils
 
 class Template(object):
     def __init__(
-            self,
-            name,
-            output=None,
-            input=None,
-            timeout=None,
-            retry=None,
-            pool=None,
-            enable_ulogfs=True,
-            daemon=False,
-            cache=None,
-            parallelism=None
+        self,
+        name,
+        output=None,
+        input=None,
+        timeout=None,
+        retry=None,
+        pool=None,
+        enable_ulogfs=True,
+        daemon=False,
+        cache=None,
+        parallelism=None,
     ):
         self.name = name
         self.output = output

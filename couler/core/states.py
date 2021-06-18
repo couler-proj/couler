@@ -29,9 +29,7 @@ name_salt = StringGenerator(r"[\c\d]{8}")
 
 
 def default_workflow_name_salter(name):
-    return "{0}-{1}".format(
-        spinalcase(name),
-        name_salt.render())[:62]
+    return "{0}-{1}".format(spinalcase(name), name_salt.render())[:62]
 
 
 workflow_name_salter = default_workflow_name_salter

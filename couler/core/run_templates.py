@@ -215,7 +215,8 @@ def run_container(
     working_dir=None,
     node_selector=None,
     cache=None,
-    parallelism=None):
+    parallelism=None,
+):
     """
     Generate an Argo container template.  For example, the template whalesay
     in https://github.com/argoproj/argo/tree/master/examples#hello-world.
@@ -313,7 +314,7 @@ def run_container(
             working_dir=working_dir,
             node_selector=node_selector,
             cache=cache,
-            parallelism=parallelism
+            parallelism=parallelism,
         )
         states.workflow.add_template(template)
 
