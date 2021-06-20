@@ -1,6 +1,7 @@
 # Adopters of Couler
 
-This page contains a list of organizations who are using Couler. If you'd like to be included here, please send a pull request which modifies this file. Please keep the list in alphabetical order.
+This page contains a list of organizations who are using Couler. If you'd like to be included here, please send a pull request which modifies this file. 
+<!-- Please keep the list in alphabetical order. -->
 
 1. [Ant Group](https://www.antgroup.com/)
 1. [Bytedance](https://www.bytedance.com/)
