@@ -29,6 +29,8 @@ name_salt = StringGenerator(r"[\c\d]{8}")
 
 
 def default_workflow_name_salter(name):
+    # The maximum length of a workflow name derives from the 
+    # maximum k8s resource name length (workflows are custom resources).
     return "{0}-{1}".format(spinalcase(name), name_salt.render())[:62]
 
 
