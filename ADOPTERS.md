@@ -6,6 +6,7 @@ This page contains a list of organizations who are using Couler. If you'd like t
 1. [Bytedance](https://www.bytedance.com/)
 1. [Determined](https://determined.ai/)
 1. [FreeWheel](https://freewheel.com/)
+1. [Konnecto](https://www.konnecto.com/)
 1. [Onepanel](https://docs.onepanel.ai/)
 1. [Pipekit](https://pipekit.io/)
 1. [SQLFlow](https://github.com/sql-machine-learning/sqlflow)
