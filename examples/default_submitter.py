@@ -5,7 +5,7 @@ submitter = ArgoSubmitter(namespace="my_namespace")
 
 # Instead of setting up and passing a submitter each time,
 # you can just set it as default!
-ArgoSubmitter.set_default(submitter)
+couler.set_default_submitter(submitter)
 
 couler.run_container(
     image="docker/whalesay",

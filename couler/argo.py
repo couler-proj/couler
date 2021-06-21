@@ -86,6 +86,17 @@ def run(submitter=None):
     _cleanup()
     return res
 
+def set_default_submitter(submitter=None):
+    """
+    Config couler defaults.
+    :param submitter: default submitter to use when submitting workflows
+    :return:
+    """
+    if submitter is not None:
+        if not isinstance(submitter, ArgoSubmitter):
+            raise ValueError("Only ArgoSubmitter is supported currently.")
+        ArgoSubmitter._default_submitter = submitter
+
 
 def delete(
     name,

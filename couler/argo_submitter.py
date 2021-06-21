@@ -37,21 +37,21 @@ class ArgoSubmitter(object):
     _default_submitter = None
 
     def __init__(
-        self,
-        namespace="default",
-        config_file=None,
-        context=None,
-        client_configuration=None,
-        persist_config=True,
+            self,
+            namespace="default",
+            config_file=None,
+            context=None,
+            client_configuration=None,
+            persist_config=True,
     ):
         logging.basicConfig(level=logging.INFO)
         self.namespace = namespace
         logging.info("Argo submitter namespace: %s" % self.namespace)
         self.go_impl = (
-            os.environ.get(
-                _SUBMITTER_IMPL_ENV_VAR_KEY, _SubmitterImplTypes.PYTHON
-            )
-            == _SubmitterImplTypes.GO
+                os.environ.get(
+                    _SUBMITTER_IMPL_ENV_VAR_KEY, _SubmitterImplTypes.PYTHON
+                )
+                == _SubmitterImplTypes.GO
         )
         if self.go_impl:
             from ctypes import c_char_p, cdll
@@ -62,7 +62,7 @@ class ArgoSubmitter(object):
             self.go_submitter.Submit.restype = c_char_p
 
             with tempfile.NamedTemporaryFile(
-                dir="/tmp", delete=False, mode="wb"
+                    dir="/tmp", delete=False, mode="wb"
             ) as tmp_file:
                 self.proto_path = tmp_file.name
                 proto_wf = get_default_proto_workflow()
@@ -168,15 +168,3 @@ class ArgoSubmitter(object):
         return self._core_api_client.create_namespaced_secret(  # noqa: E501
             self.namespace, secret_yaml
         )
-
-    @classmethod
-    def set_default(cls, submitter=None):
-        """
-        Config couler defaults.
-        :param submitter: default submitter to use when submitting workflows
-        :return:
-        """
-        if submitter is not None:
-            if not isinstance(submitter, ArgoSubmitter):
-                raise ValueError("Only ArgoSubmitter is supported currently.")
-            cls._default_submitter = submitter
