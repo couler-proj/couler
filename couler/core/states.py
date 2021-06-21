@@ -25,16 +25,16 @@ except Exception:
     # set cleanup_proto_workflow to an empty function for compatibility
     cleanup_proto_workflow = lambda: None  # noqa: E731
 
-name_salt = StringGenerator(r"[\c\d]{8}")
+_name_salt = StringGenerator(r"[\c\d]{8}")
 
 
 def default_workflow_name_salter(name):
     # The maximum length of a workflow name derives from the 
     # maximum k8s resource name length (workflows are custom resources).
-    return "{0}-{1}".format(spinalcase(name), name_salt.render())[:62]
+    return "{0}-{1}".format(spinalcase(name), _name_salt.render())[:62]
 
 
-workflow_name_salter = default_workflow_name_salter
+_workflow_name_salter = default_workflow_name_salter
 default_service_account = None
 
 _sub_steps = None

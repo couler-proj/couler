@@ -34,7 +34,7 @@ class _SubmitterImplTypes(object):
 class ArgoSubmitter(object):
     """A submitter which submits a workflow to Argo"""
 
-    default_submitter = None
+    _default_submitter = None
 
     def __init__(
         self,
@@ -179,4 +179,4 @@ class ArgoSubmitter(object):
         if submitter is not None:
             if not isinstance(submitter, ArgoSubmitter):
                 raise ValueError("Only ArgoSubmitter is supported currently.")
-            cls.default_submitter = submitter
+            cls._default_submitter = submitter

@@ -61,7 +61,7 @@ def run(submitter=None):
     """
     states._enable_print_yaml = False
 
-    if submitter is None and ArgoSubmitter.default_submitter is None:
+    if submitter is None and ArgoSubmitter._default_submitter is None:
         raise ValueError(
             "The input submitter is None and default submitter was not set."
         )
@@ -78,7 +78,7 @@ def run(submitter=None):
         else:
             raise ValueError("Only ArgoSubmitter is supported currently.")
     else:
-        res = ArgoSubmitter.default_submitter.submit(wf, secrets=secrets)
+        res = ArgoSubmitter._default_submitter.submit(wf, secrets=secrets)
 
     # Clean up the saved states of the workflow since we made a copy of
     # the workflow above and no longer need the original reference. This

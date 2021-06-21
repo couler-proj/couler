@@ -25,7 +25,7 @@ def config_defaults(name_salter=None, service_account: str = None):
     :return:
     """
     if name_salter is not None:
-        states.workflow_name_salter = name_salter
+        states._workflow_name_salter = name_salter
 
     if service_account is not None:
         states.default_service_account = service_account
@@ -53,7 +53,7 @@ def config_workflow(
     :return:
     """
     if name is not None:
-        states.workflow.name = states.workflow_name_salter(name)
+        states.workflow.name = states._workflow_name_salter(name)
 
     if user_id is not None:
         states.workflow.user_id = user_id
