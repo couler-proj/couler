@@ -16,12 +16,8 @@ from typing import List
 
 
 class VolumeClaimTemplate(object):
-    def __init__(
-        self,
-        claim_name: str,
-        access_modes: List[str] = ["ReadWriteOnce"],
-        size: str = "1Gi",
-    ):
+    def __init__(self, claim_name: str, access_modes: List[str], size: str):
+
         self.claim_name = claim_name
         self.access_modes = access_modes
         self.size = size
