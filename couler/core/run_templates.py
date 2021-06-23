@@ -32,33 +32,36 @@ from couler.core.templates.output import (
 )
 from couler.core.templates.volume import VolumeMount
 
-try:
-    from couler.core import proto_repr
-except Exception:
+if os.environ.get("SUBMITTER_IMPLEMENTATION", None) == "Go":
+    try:
+        from couler.core import proto_repr
+    except Exception:
+        proto_repr = None
+else:
     proto_repr = None
 
 
 def run_script(
-    image,
-    command=None,
-    source=None,
-    args=None,
-    output=None,
-    input=None,
-    env=None,
-    secret=None,
-    resources=None,
-    timeout=None,
-    retry=None,
-    step_name=None,
-    image_pull_policy=None,
-    pool=None,
-    enable_ulogfs=True,
-    daemon=False,
-    volume_mounts=None,
-    working_dir=None,
-    node_selector=None,
-    cache=None,
+        image,
+        command=None,
+        source=None,
+        args=None,
+        output=None,
+        input=None,
+        env=None,
+        secret=None,
+        resources=None,
+        timeout=None,
+        retry=None,
+        step_name=None,
+        image_pull_policy=None,
+        pool=None,
+        enable_ulogfs=True,
+        daemon=False,
+        volume_mounts=None,
+        working_dir=None,
+        node_selector=None,
+        cache=None,
 ):
     """
     Generate an Argo script template.  For example,
@@ -103,11 +106,11 @@ def run_script(
             # Handle case where args is a list of list type
             # For example, [[Output, ]]
             if (
-                isinstance(args, list)
-                and len(args) > 0
-                and isinstance(args[0], list)
-                and len(args[0]) > 0
-                and isinstance(args[0][0], Output)
+                    isinstance(args, list)
+                    and len(args) > 0
+                    and isinstance(args[0], list)
+                    and len(args[0]) > 0
+                    and isinstance(args[0][0], Output)
             ):
                 args = args[0]
 
@@ -195,27 +198,29 @@ def run_script(
 
 
 def run_container(
-    image,
-    command=None,
-    args=None,
-    output=None,
-    input=None,
-    env=None,
-    env_from=None,
-    secret=None,
-    resources=None,
-    timeout=None,
-    retry=None,
-    step_name=None,
-    image_pull_policy=None,
-    pool=None,
-    enable_ulogfs=True,
-    daemon=False,
-    volume_mounts=None,
-    working_dir=None,
-    node_selector=None,
-    cache=None,
-    parallelism=None,
+        template_name=None,
+        image=None,
+        command=None,
+        args=None,
+        output=None,
+        input=None,
+        env=None,
+        env_from=None,
+        secret=None,
+        resources=None,
+        timeout=None,
+        retry=None,
+        step_name=None,
+        image_pull_policy=None,
+        pool=None,
+        enable_ulogfs=True,
+        daemon=False,
+        volume_mounts=None,
+        working_dir=None,
+        node_selector=None,
+        cache=None,
+        parallelism=None,
+        with_param=None
 ):
     """
     Generate an Argo container template.  For example, the template whalesay
@@ -242,7 +247,9 @@ def run_container(
         utils.argo_safe_name(step_name) if step_name is not None else func_name
     )
 
-    if states.workflow.get_template(func_name) is None:
+    template_object = states.workflow.get_template(
+        template_name) if template_name is not None else states.workflow.get_template(func_name)
+    if template_object is None:
         # Generate the inputs parameter for the template
         if input is None:
             input = []
@@ -257,11 +264,11 @@ def run_container(
             # Handle case where args is a list of list type
             # For example, [[Output, ]]
             if (
-                isinstance(args, list)
-                and len(args) > 0
-                and isinstance(args[0], list)
-                and len(args[0]) > 0
-                and isinstance(args[0][0], Output)
+                    isinstance(args, list)
+                    and len(args) > 0
+                    and isinstance(args[0], list)
+                    and len(args[0]) > 0
+                    and isinstance(args[0][0], Output)
             ):
                 args = args[0]
 
@@ -293,7 +300,7 @@ def run_container(
                     mounted_path.append(path_to_mount)
 
         # Generate container and template
-        template = Container(
+        template_object = Container(
             name=func_name,
             image=image,
             command=command,
@@ -316,16 +323,17 @@ def run_container(
             cache=cache,
             parallelism=parallelism,
         )
-        states.workflow.add_template(template)
+        states.workflow.add_template(template_object)
 
     step_name = step_update_utils.update_step(
-        func_name, args, step_name, caller_line
+        func_name, args, step_name, caller_line,with_param
     )
 
     # TODO: need to switch to use field `output` directly
-    step_templ = states.workflow.get_template(func_name)
-    _output = step_templ.to_dict().get("outputs", None)
-    _input = step_templ.to_dict().get("inputs", None)
+    step_templ = template_object
+    step_templ_dict = step_templ.to_dict()
+    _output = step_templ_dict.get("outputs", None)
+    _input = step_templ_dict.get("inputs", None)
 
     rets = _container_output(step_name, func_name, _output)
     states._steps_outputs[step_name] = rets
@@ -352,17 +360,17 @@ def run_container(
 
 
 def run_job(
-    manifest,
-    success_condition,
-    failure_condition,
-    timeout=None,
-    retry=None,
-    step_name=None,
-    pool=None,
-    env=None,
-    action="create",
-    set_owner_reference=True,
-    cache=None,
+        manifest,
+        success_condition,
+        failure_condition,
+        timeout=None,
+        retry=None,
+        step_name=None,
+        pool=None,
+        env=None,
+        action="create",
+        set_owner_reference=True,
+        cache=None,
 ):
     """
     Create a k8s job. For example, the pi-tmpl template in
@@ -402,8 +410,8 @@ def run_job(
             # TODO this is used to pass the test cases,
             # should be fixed in a better way
             if (
-                "labels" in manifest_dict["metadata"]
-                and "argo.step.owner" in manifest_dict["metadata"]["labels"]
+                    "labels" in manifest_dict["metadata"]
+                    and "argo.step.owner" in manifest_dict["metadata"]["labels"]
             ):
                 manifest_dict["metadata"]["labels"][
                     "argo.step.owner"
@@ -454,7 +462,7 @@ def run_job(
 
 
 def run_canned_step(
-    name, args, inputs=None, outputs=None, step_name=None, cache=None
+        name, args, inputs=None, outputs=None, step_name=None, cache=None
 ):
     func_name, caller_line = utils.invocation_location()
     func_name = (

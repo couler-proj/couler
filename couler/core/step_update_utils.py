@@ -15,10 +15,11 @@ from collections import OrderedDict
 
 import couler.core.templates.output
 from couler.core import states, utils
-from couler.core.templates import OutputArtifact, Step
+from couler.core.templates import Artifact, OutputArtifact, Step
+from couler.core.templates.input import InputParameter
 
 
-def update_step(func_name, args, step_name, caller_line):
+def update_step(func_name, args, step_name, caller_line, with_param=None):
     if states.workflow.dag_mode_enabled():
         step_name = _update_dag_tasks(
             func_name,
@@ -27,6 +28,7 @@ def update_step(func_name, args, step_name, caller_line):
             states._upstream_dag_depends_logic,
             args,
             step_name=step_name,
+            with_param=with_param,
         )
         states._upstream_dag_task = [step_name]
     else:
@@ -44,13 +46,14 @@ def update_step(func_name, args, step_name, caller_line):
 
 
 def _update_dag_tasks(
-    function_name,
-    caller_line,
-    dependencies,
-    depends_logic,
-    args=None,
-    template_name=None,
-    step_name=None,
+        function_name,
+        caller_line,
+        dependencies,
+        depends_logic,
+        args=None,
+        template_name=None,
+        step_name=None,
+        with_param=None
 ):
     """
     A task in DAG of Argo YAML contains name, related template and parameters.
@@ -95,6 +98,9 @@ def _update_dag_tasks(
 
                 task_template["arguments"]["artifacts"] = artifacts
 
+        if with_param:
+            task_template["withParam"] = with_param
+
     else:
         # step exist on the dag, thus, we update its dependency
         if dependencies is not None:
@@ -106,7 +112,7 @@ def _update_dag_tasks(
             task_template["depends"] = depends_logic
 
     t_name = function_name if template_name is None else template_name
-    step = Step(name=function_id, template=t_name)
+    step = Step(name=function_id, template=t_name, with_param=with_param)
     if states._exit_handler_enable:
         if states._when_prefix is not None:
             step.when = states._when_prefix
@@ -219,6 +225,10 @@ def _get_params_and_artifacts_from_args(args, input_param_name, prefix):
                     }
                 )
                 i += 1
+        elif isinstance(values, InputParameter):
+            parameters.append(values.to_dict())
+        elif isinstance(values, Artifact):
+            parameters.append(values.to_yaml())
         else:
             if isinstance(values, OutputArtifact):
                 tmp = values.value.split(".")

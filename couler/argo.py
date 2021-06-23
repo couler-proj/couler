@@ -43,7 +43,7 @@ from couler.core.templates import (  # noqa: F401
     LocalArtifact,
     OssArtifact,
     S3Artifact,
-    Secret,
+    Secret, Container,
 )
 from couler.core.workflow_validation_utils import (  # noqa: F401
     validate_workflow_yaml,
@@ -100,14 +100,14 @@ def set_default_submitter(submitter=None):
 
 
 def delete(
-    name,
-    namespace="default",
-    config_file=None,
-    context=None,
-    client_configuration=None,
-    persist_config=True,
-    grace_period_seconds=5,
-    propagation_policy="Background",
+        name,
+        namespace="default",
+        config_file=None,
+        context=None,
+        client_configuration=None,
+        persist_config=True,
+        grace_period_seconds=5,
+        propagation_policy="Background",
 ):
     try:
         config.load_kube_config(
@@ -181,13 +181,13 @@ def create_local_artifact(path, is_global=False):
 
 
 def create_oss_artifact(
-    path,
-    bucket=None,
-    accesskey_id=None,
-    accesskey_secret=None,
-    key=None,
-    endpoint=None,
-    is_global=False,
+        path,
+        bucket=None,
+        accesskey_id=None,
+        accesskey_secret=None,
+        key=None,
+        endpoint=None,
+        is_global=False,
 ):
     """
     Configure the object as OssArtifact
@@ -213,13 +213,14 @@ def create_oss_artifact(
 
 
 def create_s3_artifact(
-    path,
-    bucket=None,
-    accesskey_id=None,
-    accesskey_secret=None,
-    key=None,
-    endpoint=None,
-    is_global=False,
+        path,
+        bucket=None,
+        accesskey_id=None,
+        accesskey_secret=None,
+        key=None,
+        endpoint=None,
+        is_global=False,
+        name=None,
 ):
     """
     Configure the object as S3Artifact
@@ -239,6 +240,7 @@ def create_s3_artifact(
         key=key,
         endpoint=endpoint,
         is_global=is_global,
+        name=name
     )
 
 
@@ -253,6 +255,56 @@ def create_secret(secret_data, namespace="default", name=None, dry_run=False):
         states._secrets[secret.name] = secret
 
     return secret.name
+
+
+def create_container_template(
+        name,
+        image=None,
+        command=None,
+        args=None,
+        output=None,
+        input=None,
+        env=None,
+        env_from=None,
+        secret=None,
+        resources=None,
+        timeout=None,
+        retry=None,
+        image_pull_policy=None,
+        pool=None,
+        enable_ulogfs=True,
+        daemon=False,
+        volume_mounts=None,
+        working_dir=None,
+        node_selector=None,
+        cache=None,
+        parallelism=None,
+):
+    # Generate container and template
+    template = Container(
+        name=name,
+        image=image,
+        command=command,
+        args=args,
+        env=env,
+        env_from=env_from,
+        secret=states.get_secret(secret),
+        resources=resources,
+        image_pull_policy=image_pull_policy,
+        retry=retry,
+        timeout=timeout,
+        output=output,
+        input=input,
+        pool=pool,
+        enable_ulogfs=enable_ulogfs,
+        daemon=daemon,
+        volume_mounts=volume_mounts,
+        working_dir=working_dir,
+        node_selector=node_selector,
+        cache=cache,
+        parallelism=parallelism,
+    )
+    states.workflow.add_template(template)
 
 
 # Dump the YAML when exiting

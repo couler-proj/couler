@@ -17,6 +17,7 @@ from collections import OrderedDict
 from couler.core import states, utils
 from couler.core.constants import OVERWRITE_GPU_ENVS
 from couler.core.templates.artifact import TypedArtifact
+from couler.core.templates.input import InputParameter
 from couler.core.templates.output import OutputArtifact, OutputJob
 from couler.core.templates.secret import Secret
 from couler.core.templates.template import Template
@@ -24,29 +25,29 @@ from couler.core.templates.template import Template
 
 class Container(Template):
     def __init__(
-        self,
-        name,
-        image,
-        command,
-        args=None,
-        env=None,
-        env_from=None,
-        secret=None,
-        resources=None,
-        image_pull_policy=None,
-        retry=None,
-        timeout=None,
-        pool=None,
-        output=None,
-        input=None,
-        enable_ulogfs=True,
-        daemon=False,
-        volume_mounts=None,
-        working_dir=None,
-        node_selector=None,
-        volumes=None,
-        cache=None,
-        parallelism=None,
+            self,
+            name,
+            image,
+            command,
+            args=None,
+            env=None,
+            env_from=None,
+            secret=None,
+            resources=None,
+            image_pull_policy=None,
+            retry=None,
+            timeout=None,
+            pool=None,
+            output=None,
+            input=None,
+            enable_ulogfs=True,
+            daemon=False,
+            volume_mounts=None,
+            working_dir=None,
+            node_selector=None,
+            volumes=None,
+            cache=None,
+            parallelism=None,
     ):
         Template.__init__(
             self,
@@ -95,6 +96,8 @@ class Container(Template):
                                 }
                             )
                             i += 1
+                    elif isinstance(arg, InputParameter):
+                        parameters.append({"name": arg.name})
                     else:
                         para_name = utils.input_parameter_name(self.name, i)
                         parameters.append({"name": para_name})
@@ -130,8 +133,8 @@ class Container(Template):
 
         # Container
         if (
-            not utils.gpu_requested(self.resources)
-            and states._overwrite_nvidia_gpu_envs
+                not utils.gpu_requested(self.resources)
+                and states._overwrite_nvidia_gpu_envs
         ):
             if self.env is None:
                 self.env = {}
@@ -195,7 +198,9 @@ class Container(Template):
         if args is not None:
             for i in range(len(args)):
                 o = args[i]
-                if not isinstance(o, OutputArtifact):
+                if isinstance(o, InputParameter):
+                    pass
+                elif not isinstance(o, OutputArtifact):
                     para_name = utils.input_parameter_name(self.name, i)
                     param_full_name = '"{{inputs.parameters.%s}}"' % para_name
                     if param_full_name not in parameters:
