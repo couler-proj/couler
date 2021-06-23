@@ -30,6 +30,7 @@ class Container(Template):
         command,
         args=None,
         env=None,
+        env_from=None,
         secret=None,
         resources=None,
         image_pull_policy=None,
@@ -45,6 +46,7 @@ class Container(Template):
         node_selector=None,
         volumes=None,
         cache=None,
+        parallelism=None,
     ):
         Template.__init__(
             self,
@@ -57,11 +59,13 @@ class Container(Template):
             enable_ulogfs=enable_ulogfs,
             daemon=daemon,
             cache=cache,
+            parallelism=parallelism,
         )
         self.image = image
         self.command = utils.make_list_if_not(command)
         self.args = args
         self.env = env
+        self.env_from = env_from
         self.secret = secret
         self.resources = resources
         self.image_pull_policy = image_pull_policy
@@ -166,6 +170,8 @@ class Container(Template):
                 container["env"] = self.secret.to_env_list()
             else:
                 container["env"].extend(self.secret.to_env_list())
+        if self.env_from is not None:
+            container["envFrom"] = self.env_from
         if self.resources is not None:
             container["resources"] = {
                 "requests": self.resources,

@@ -13,6 +13,9 @@
 
 from collections import OrderedDict
 
+from strgen import StringGenerator
+from stringcase import spinalcase
+
 from couler.core import utils
 from couler.core.templates import Workflow
 
@@ -21,6 +24,18 @@ try:
 except Exception:
     # set cleanup_proto_workflow to an empty function for compatibility
     cleanup_proto_workflow = lambda: None  # noqa: E731
+
+_name_salt = StringGenerator(r"[\c\d]{8}")
+
+
+def default_workflow_name_salter(name):
+    # The maximum length of a workflow name derives from the
+    # maximum k8s resource name length (workflows are custom resources).
+    return "{0}-{1}".format(spinalcase(name), _name_salt.render())[:62]
+
+
+_workflow_name_salter = default_workflow_name_salter
+default_service_account = None
 
 _sub_steps = None
 # Argo DAG task

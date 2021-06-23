@@ -357,6 +357,14 @@ class WorkflowBasicTest(ArgoYamlTest):
         ret = couler.workflow_yaml()
         self.assertEqual(code, ret["spec"]["templates"][1]["script"]["source"])
 
+    def test_workflow_name_salt_applies(self):
+        couler.config_defaults(name_salter=lambda name: "%s-salted" % name)
+        couler.config_workflow(name="test_name_salter_applies")
+        ret = couler.workflow_yaml()
+        self.assertEqual(
+            ret["metadata"]["name"], "test_name_salter_applies-salted"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
