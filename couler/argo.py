@@ -86,6 +86,7 @@ def run(submitter=None):
     _cleanup()
     return res
 
+
 def set_default_submitter(submitter=None):
     """
     Config couler defaults.
