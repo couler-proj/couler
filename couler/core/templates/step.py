@@ -19,13 +19,15 @@ from couler.core.templates.template import Template
 
 class Step(object):
     def __init__(
-            self, name, template=None, arguments=None, when=None, with_itmes=None, with_param=None
+            self, name, template=None, arguments=None, when=None, with_itmes=None, with_param=None,
+            parallelism=None
     ):
         self.name = name
         self.template = template
         self.arguments = arguments
         self.with_items = with_itmes
         self.with_param = with_param
+        self.parallelism = parallelism
         self.when = when
 
     def to_dict(self):
@@ -38,8 +40,10 @@ class Step(object):
             d.update({"arguments": self.arguments})
         if utils.non_empty(self.with_items):
             d.update({"withItems": self.with_items})
-        if utils.non_empty(self.with_items):
+        if utils.non_empty(self.with_param):
             d.update({"withParam": self.with_param})
+        if utils.non_empty(self.parallelism):
+            d.update({"withParam": self.parallelism})
         return d
 
 

@@ -28,7 +28,6 @@ class Template(object):
         enable_ulogfs=True,
         daemon=False,
         cache=None,
-        parallelism=None,
     ):
         self.name = name
         self.output = output
@@ -39,7 +38,6 @@ class Template(object):
         self.enable_ulogfs = enable_ulogfs
         self.daemon = daemon
         self.cache = cache
-        self.parallelism: int = parallelism
 
     def to_dict(self):
         template = OrderedDict({"name": self.name})
@@ -51,6 +49,4 @@ class Template(object):
             template["retryStrategy"] = utils.config_retry_strategy(self.retry)
         if self.cache is not None:
             template["memoize"] = self.cache.to_dict()
-        if self.parallelism is not None:
-            template["parallelism"] = self.parallelism
         return template

@@ -321,12 +321,11 @@ def run_container(
             working_dir=working_dir,
             node_selector=node_selector,
             cache=cache,
-            parallelism=parallelism,
         )
         states.workflow.add_template(template_object)
 
     step_name = step_update_utils.update_step(
-        func_name, args, step_name, caller_line,with_param
+        func_name, args, step_name, caller_line,parallelism, with_param
     )
 
     # TODO: need to switch to use field `output` directly

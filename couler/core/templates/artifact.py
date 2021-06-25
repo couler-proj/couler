@@ -18,11 +18,11 @@ from couler.core import utils
 
 
 class Artifact(object):
-    def __init__(self, path, type=None, is_global=False):
+    def __init__(self, path, type=None, is_global=False, name=None):
         # TODO (terrytangyuan): This seems hacky.
         #   If line number changes, we need to update tests as well.
         _, caller_line = utils.invocation_location()
-        self.id = "output-id-%s" % caller_line
+        self.id = name if name else "output-id-%s" % caller_line
         self.path = path
         # TODO (terrytangyuan): this is not used for now and we currently
         #   only support "valueFrom".
@@ -108,9 +108,9 @@ class TypedArtifact(Artifact):
 
 
 class LocalArtifact(TypedArtifact):
-    def __init__(self, path, is_global=False):
+    def __init__(self, path, name=None, is_global=False):
         super().__init__(
-            couler.ArtifactType.LOCAL, path=path, is_global=is_global
+            couler.ArtifactType.LOCAL, path=path, name=name, is_global=is_global
         )
 
 

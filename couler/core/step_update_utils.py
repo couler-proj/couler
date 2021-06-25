@@ -19,7 +19,7 @@ from couler.core.templates import Artifact, OutputArtifact, Step
 from couler.core.templates.input import InputParameter
 
 
-def update_step(func_name, args, step_name, caller_line, with_param=None):
+def update_step(func_name, args, step_name, caller_line, parallelism=None, with_param=None):
     if states.workflow.dag_mode_enabled():
         step_name = _update_dag_tasks(
             func_name,
@@ -28,6 +28,7 @@ def update_step(func_name, args, step_name, caller_line, with_param=None):
             states._upstream_dag_depends_logic,
             args,
             step_name=step_name,
+            parallelism=parallelism,
             with_param=with_param,
         )
         states._upstream_dag_task = [step_name]
@@ -38,9 +39,14 @@ def update_step(func_name, args, step_name, caller_line, with_param=None):
                 states._concurrent_func_line,
                 args,
                 func_name,
+                parallelism=parallelism,
+                with_param=with_param,
             )
         else:
-            step_name = _update_steps(func_name, caller_line, args)
+            step_name = _update_steps(
+                func_name, caller_line, args,
+                parallelism=parallelism,
+                with_param=with_param)
 
     return step_name
 
@@ -53,6 +59,7 @@ def _update_dag_tasks(
         args=None,
         template_name=None,
         step_name=None,
+        parallelism=None,
         with_param=None
 ):
     """
@@ -98,6 +105,9 @@ def _update_dag_tasks(
 
                 task_template["arguments"]["artifacts"] = artifacts
 
+        if parallelism:
+            task_template["parallelism"] = parallelism
+
         if with_param:
             task_template["withParam"] = with_param
 
@@ -135,7 +145,8 @@ def _update_dag_tasks(
     return function_id
 
 
-def _update_steps(function_name, caller_line, args=None, template_name=None):
+def _update_steps(function_name, caller_line, args=None, template_name=None,
+                  parallelism=None, with_param=None):
     """
     A step in Argo YAML contains name, related template and parameters.
     Here we insert a single step into the global steps.
@@ -152,7 +163,7 @@ def _update_steps(function_name, caller_line, args=None, template_name=None):
                 states._concurrent_func_id = states._concurrent_func_id + 1
 
         t_name = function_name if template_name is None else template_name
-        step = Step(name=name, template=t_name)
+        step = Step(name=name, template=t_name, parallelism=parallelism, with_param=with_param)
 
         if states._when_prefix is not None:
             step.when = states._when_prefix
@@ -228,7 +239,7 @@ def _get_params_and_artifacts_from_args(args, input_param_name, prefix):
         elif isinstance(values, InputParameter):
             parameters.append(values.to_dict())
         elif isinstance(values, Artifact):
-            parameters.append(values.to_yaml())
+            artifacts.append(values.to_yaml())
         else:
             if isinstance(values, OutputArtifact):
                 tmp = values.value.split(".")
