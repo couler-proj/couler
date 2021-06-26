@@ -172,12 +172,12 @@ def _dump_yaml():
         print(yaml_str)
 
 
-def create_parameter_artifact(path, is_global=False):
-    return Artifact(path=path, type="parameters", is_global=is_global)
+def create_parameter_artifact(name, path, is_global=False):
+    return Artifact(name=name, path=path, type="parameters", is_global=is_global)
 
 
-def create_local_artifact(path, is_global=False):
-    return LocalArtifact(path=path, is_global=is_global)
+def create_local_artifact(path, name=None, is_global=False):
+    return LocalArtifact(path=path, name=name, is_global=is_global)
 
 
 def create_oss_artifact(
@@ -278,7 +278,6 @@ def create_container_template(
         working_dir=None,
         node_selector=None,
         cache=None,
-        parallelism=None,
 ):
     # Generate container and template
     template = Container(
@@ -302,7 +301,6 @@ def create_container_template(
         working_dir=working_dir,
         node_selector=node_selector,
         cache=cache,
-        parallelism=parallelism,
     )
     states.workflow.add_template(template)
 

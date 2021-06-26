@@ -17,8 +17,8 @@ from collections import OrderedDict
 from couler.core import states, utils
 from couler.core.constants import OVERWRITE_GPU_ENVS
 from couler.core.templates.artifact import TypedArtifact
-from couler.core.templates.input import InputParameter
 from couler.core.templates.output import OutputArtifact, OutputJob
+from couler.core.templates.parameter import ArgumentsParameter, InputParameter
 from couler.core.templates.secret import Secret
 from couler.core.templates.template import Template
 
@@ -94,8 +94,8 @@ class Container(Template):
                                 }
                             )
                             i += 1
-                    elif isinstance(arg, InputParameter):
-                        parameters.append({"name": arg.name})
+                    elif isinstance(arg, ArgumentsParameter) or isinstance(arg, InputParameter):
+                        parameters.append(arg.to_dict())
                     else:
                         para_name = utils.input_parameter_name(self.name, i)
                         parameters.append({"name": para_name})
@@ -196,7 +196,7 @@ class Container(Template):
         if args is not None:
             for i in range(len(args)):
                 o = args[i]
-                if isinstance(o, InputParameter):
+                if isinstance(o, ArgumentsParameter) or isinstance(o, InputParameter):
                     pass
                 elif not isinstance(o, OutputArtifact):
                     para_name = utils.input_parameter_name(self.name, i)

@@ -16,7 +16,7 @@ from collections import OrderedDict
 import couler.core.templates.output
 from couler.core import states, utils
 from couler.core.templates import Artifact, OutputArtifact, Step
-from couler.core.templates.input import InputParameter
+from couler.core.templates.parameter import ArgumentsParameter
 
 
 def update_step(func_name, args, step_name, caller_line, parallelism=None, with_param=None):
@@ -236,7 +236,7 @@ def _get_params_and_artifacts_from_args(args, input_param_name, prefix):
                     }
                 )
                 i += 1
-        elif isinstance(values, InputParameter):
+        elif isinstance(values, ArgumentsParameter):
             parameters.append(values.to_dict())
         elif isinstance(values, Artifact):
             artifacts.append(values.to_yaml())
