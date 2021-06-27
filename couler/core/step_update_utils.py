@@ -19,7 +19,9 @@ from couler.core.templates import Artifact, OutputArtifact, Step
 from couler.core.templates.parameter import ArgumentsParameter
 
 
-def update_step(func_name, args, step_name, caller_line, parallelism=None, with_param=None):
+def update_step(
+    func_name, args, step_name, caller_line, parallelism=None, with_param=None
+):
     if states.workflow.dag_mode_enabled():
         step_name = _update_dag_tasks(
             func_name,
@@ -44,23 +46,26 @@ def update_step(func_name, args, step_name, caller_line, parallelism=None, with_
             )
         else:
             step_name = _update_steps(
-                func_name, caller_line, args,
+                func_name,
+                caller_line,
+                args,
                 parallelism=parallelism,
-                with_param=with_param)
+                with_param=with_param,
+            )
 
     return step_name
 
 
 def _update_dag_tasks(
-        function_name,
-        caller_line,
-        dependencies,
-        depends_logic,
-        args=None,
-        template_name=None,
-        step_name=None,
-        parallelism=None,
-        with_param=None
+    function_name,
+    caller_line,
+    dependencies,
+    depends_logic,
+    args=None,
+    template_name=None,
+    step_name=None,
+    parallelism=None,
+    with_param=None,
 ):
     """
     A task in DAG of Argo YAML contains name, related template and parameters.
@@ -145,8 +150,14 @@ def _update_dag_tasks(
     return function_id
 
 
-def _update_steps(function_name, caller_line, args=None, template_name=None,
-                  parallelism=None, with_param=None):
+def _update_steps(
+    function_name,
+    caller_line,
+    args=None,
+    template_name=None,
+    parallelism=None,
+    with_param=None,
+):
     """
     A step in Argo YAML contains name, related template and parameters.
     Here we insert a single step into the global steps.
@@ -163,7 +174,12 @@ def _update_steps(function_name, caller_line, args=None, template_name=None,
                 states._concurrent_func_id = states._concurrent_func_id + 1
 
         t_name = function_name if template_name is None else template_name
-        step = Step(name=name, template=t_name, parallelism=parallelism, with_param=with_param)
+        step = Step(
+            name=name,
+            template=t_name,
+            parallelism=parallelism,
+            with_param=with_param,
+        )
 
         if states._when_prefix is not None:
             step.when = states._when_prefix

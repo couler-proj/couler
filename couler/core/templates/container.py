@@ -25,28 +25,28 @@ from couler.core.templates.template import Template
 
 class Container(Template):
     def __init__(
-            self,
-            name,
-            image,
-            command,
-            args=None,
-            env=None,
-            env_from=None,
-            secret=None,
-            resources=None,
-            image_pull_policy=None,
-            retry=None,
-            timeout=None,
-            pool=None,
-            output=None,
-            input=None,
-            enable_ulogfs=True,
-            daemon=False,
-            volume_mounts=None,
-            working_dir=None,
-            node_selector=None,
-            volumes=None,
-            cache=None,
+        self,
+        name,
+        image,
+        command,
+        args=None,
+        env=None,
+        env_from=None,
+        secret=None,
+        resources=None,
+        image_pull_policy=None,
+        retry=None,
+        timeout=None,
+        pool=None,
+        output=None,
+        input=None,
+        enable_ulogfs=True,
+        daemon=False,
+        volume_mounts=None,
+        working_dir=None,
+        node_selector=None,
+        volumes=None,
+        cache=None,
     ):
         Template.__init__(
             self,
@@ -94,7 +94,9 @@ class Container(Template):
                                 }
                             )
                             i += 1
-                    elif isinstance(arg, ArgumentsParameter) or isinstance(arg, InputParameter):
+                    elif isinstance(arg, ArgumentsParameter) or isinstance(
+                        arg, InputParameter
+                    ):
                         parameters.append(arg.to_dict())
                     else:
                         para_name = utils.input_parameter_name(self.name, i)
@@ -131,8 +133,8 @@ class Container(Template):
 
         # Container
         if (
-                not utils.gpu_requested(self.resources)
-                and states._overwrite_nvidia_gpu_envs
+            not utils.gpu_requested(self.resources)
+            and states._overwrite_nvidia_gpu_envs
         ):
             if self.env is None:
                 self.env = {}
@@ -196,7 +198,9 @@ class Container(Template):
         if args is not None:
             for i in range(len(args)):
                 o = args[i]
-                if isinstance(o, ArgumentsParameter) or isinstance(o, InputParameter):
+                if isinstance(o, ArgumentsParameter) or isinstance(
+                    o, InputParameter
+                ):
                     pass
                 elif not isinstance(o, OutputArtifact):
                     para_name = utils.input_parameter_name(self.name, i)

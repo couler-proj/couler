@@ -21,10 +21,7 @@ class Parameter(object):
     context: str = attr.ib(default=None)
 
     def to_dict(self):
-        return {
-            "name": self.name,
-            "value": self.value
-        }
+        return {"name": self.name, "value": self.value}
 
     @property
     def placeholder(self):
@@ -32,26 +29,23 @@ class Parameter(object):
 
     @property
     def escaped_placeholder(self):
-        return "\"{0}\"".format(self.placeholder)
+        return '"{0}"'.format(self.placeholder)
 
 
 @attr.s
 class InputParameter(Parameter):
-
     def __attrs_post_init__(self):
         self.context = "inputs"
 
     def to_dict(self):
-        return {
-            "name": self.name
-        }
+        return {"name": self.name}
 
 
 @attr.s
 class ArgumentsParameter(Parameter):
-
     def __attrs_post_init__(self):
         self.context = "arguments"
+
 
 # @attr.s
 # class ParameterArtifact(Parameter):

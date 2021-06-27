@@ -19,8 +19,14 @@ from couler.core.templates.template import Template
 
 class Step(object):
     def __init__(
-            self, name, template=None, arguments=None, when=None, with_itmes=None, with_param=None,
-            parallelism=None
+        self,
+        name,
+        template=None,
+        arguments=None,
+        when=None,
+        with_itmes=None,
+        with_param=None,
+        parallelism=None,
     ):
         self.name = name
         self.template = template
