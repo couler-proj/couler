@@ -19,19 +19,29 @@ from couler.core import states
 from couler.core.templates import Step, output
 
 
-def map(function, input_list):
+def map(function, *arguments):
     """
     map operation of Couler
     """
+
     # Enforce the function to run and lock to add into step
+    # Checks the correct syntax
     if callable(function):
         states._update_steps_lock = False
-        # TODO (terrytangyuan): Support functions with multiple arguments.
-        para = input_list[0]
-        inner = function(para)
+
+        para = []
+        x = 0
+
+        while x < len(arguments):
+            para.append(arguments[x][0])
+            x += 1
+
+        inner = function(*para)
+
         if inner is None:
             raise SyntaxError("require function return value")
         states._update_steps_lock = True
+
     else:
         raise TypeError("require loop over a function to run")
 
@@ -72,18 +82,43 @@ def map(function, input_list):
 
     inner_step.arguments = {"parameters": parameters}
 
+    # the following part of the code
+    # Adds values to parameters (with items) while it goes
+    # through the *arguments-variable with two loops.
+    # inner loop:
+    # arguments[ind_of_func_param][0], arguments[ind_of_func_param][0]...
+    # Outer loop:
+    # arguments[0][ind_of_func_call], arguments[0][ind_of_func_call]...
+    # With two lists in *arguments
+    # result would be:
+    #  1. pair of items for the function:
+    # arguments[0][0], arguments[1][0]
+    # 2. pair of items for the function:
+    #  arguments[0][1], arguments[1][1]
+    # and so on...
     with_items = []
-    for para_values in input_list:
+    ind_of_func_call = 0
+    # the number of calls to be made to function
+    while ind_of_func_call < len(arguments[0]):
+        ind_of_func_param = 0
         item = {}
-        if not isinstance(para_values, list):
-            para_values = [para_values]
+        # the number of parameters function takes.
+        while ind_of_func_param < len(arguments):
 
-        for j in range(len(input_parameters)):
-            para_name = input_parameters[j]["name"]
-            item[para_name] = para_values[j]
+            # checks if arguments[ind_of_func_param] is a list if not makes it
+            if not isinstance(arguments[ind_of_func_param], list):
+                arguments[ind_of_func_param] = [arguments[ind_of_func_param]]
 
+            # items are created for the with itmes part in .yaml
+            para_name = input_parameters[ind_of_func_param]["name"]
+            item[para_name] = arguments[ind_of_func_param][ind_of_func_call]
+
+            ind_of_func_param += 1
         with_items.append(item)
+        ind_of_func_call += 1
 
+    # all the created items are added to the step and
+    # then the step is added to  .yaml
     inner_step.with_items = with_items
     states.workflow.add_step(inner_dict["id"], inner_step)
 
