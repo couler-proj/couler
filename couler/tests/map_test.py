@@ -23,8 +23,17 @@ def consume(message):
     )
 
 
+def consume_m(*other):
+    return couler.run_container(
+        image="docker/whalesay:latest",
+        command=["cowsay"],
+        args=[other[0], other[1]],
+    )
+
+
 class MapTest(ArgoYamlTest):
     def test_map_function(self):
+
         test_paras = ["t1", "t2", "t3"]
         couler.map(lambda x: consume(x), test_paras)
         wf = couler.workflow_yaml()
@@ -93,6 +102,69 @@ class MapTest(ArgoYamlTest):
             map_step = steps_template["steps"][0][0]
             self.assertListEqual(map_step["withItems"], expected_with_items)
             couler._cleanup()
+
+    def test_map_function_multiple_arg(self):
+
+        test_paras_1 = ["t1", "t2", "t3"]
+        test_paras_2 = ["x1", "x2", "x3"]
+
+        couler.map(lambda x, y: consume_m(x, y), test_paras_1, test_paras_2)
+        wf = couler.workflow_yaml()
+
+        templates = wf["spec"]["templates"]
+        self.assertEqual(len(templates), 2)
+
+        # We should have a 'consume' template
+        consume_template = templates[1]
+        self.assertEqual(consume_template["name"], "consume-m")
+        # Check input parameters
+        expected_paras = [
+            {"name": "para-consume-m-0"},
+            {"name": "para-consume-m-1"},
+        ]
+        self.assertListEqual(
+            consume_template["inputs"]["parameters"], expected_paras
+        )
+        # Check container
+        expected_container = {
+            "image": "docker/whalesay:latest",
+            "command": ["cowsay"],
+            "args": [
+                '"{{inputs.parameters.para-consume-m-0}}"',
+                '"{{inputs.parameters.para-consume-m-1}}"',
+            ],
+        }
+        self.assertDictEqual(consume_template["container"], expected_container)
+        # Check the steps template
+        steps_template = templates[0]
+        self.assertTrue(steps_template["name"] in ["pytest", "runpy"])
+        self.assertEqual(len(steps_template["steps"]), 1)
+        self.assertEqual(len(steps_template["steps"][0]), 1)
+        map_step = steps_template["steps"][0][0]
+        self.assertIn("consume-m", map_step["name"])
+        self.assertEqual(map_step["template"], "consume-m")
+        # Check arguments
+        expected_paras = [
+            {
+                "name": "para-consume-m-0",
+                "value": '"{{item.para-consume-m-0}}"',
+            },
+            {
+                "name": "para-consume-m-1",
+                "value": '"{{item.para-consume-m-1}}"',
+            },
+        ]
+        self.assertListEqual(
+            map_step["arguments"]["parameters"], expected_paras
+        )
+        # Check withItems
+        expected_with_items = [
+            {"para-consume-m-0": "t1", "para-consume-m-1": "x1"},
+            {"para-consume-m-0": "t2", "para-consume-m-1": "x2"},
+            {"para-consume-m-0": "t3", "para-consume-m-1": "x3"},
+        ]
+        self.assertListEqual(map_step["withItems"], expected_with_items)
+        couler._cleanup()
 
     # TODO: Provide new test case without `tf.train`.
     # def test_map_function_with_run_job(self):

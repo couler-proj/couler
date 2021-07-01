@@ -149,7 +149,7 @@ class ArgoTest(ArgoBaseTestCase):
         couler._cleanup()
 
     def test_run_container_with_workflow_volume(self):
-        pvc = VolumeClaimTemplate("workdir")
+        pvc = VolumeClaimTemplate("workdir", ["ReadWriteOnce"], "1Gi")
         volume_mount = VolumeMount("workdir", "/mnt/vol")
         couler.create_workflow_volume(pvc)
         couler.run_container(

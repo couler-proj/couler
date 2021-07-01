@@ -324,6 +324,7 @@ def run_container(
             working_dir=working_dir,
             node_selector=node_selector,
             cache=cache,
+            parallelism=parallelism,
         )
         states.workflow.add_template(template_object)
 

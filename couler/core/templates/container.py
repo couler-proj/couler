@@ -47,6 +47,7 @@ class Container(Template):
         node_selector=None,
         volumes=None,
         cache=None,
+        parallelism=None,
     ):
         Template.__init__(
             self,
@@ -59,6 +60,7 @@ class Container(Template):
             enable_ulogfs=enable_ulogfs,
             daemon=daemon,
             cache=cache,
+            parallelism=parallelism,
         )
         self.image = image
         self.command = utils.make_list_if_not(command)
