@@ -13,28 +13,39 @@
 
 from collections import OrderedDict
 
+import attr
+
 from couler import argo as couler
 from couler.core import utils
 
 
+@attr.s
 class Artifact(object):
-    def __init__(self, path, type=None, is_global=False, name=None):
+    path: str = attr.ib()
+    # TODO (terrytangyuan): this is not used for now and we currently
+    #   only support "valueFrom".
+    type: str = attr.ib(default=None)
+    is_global: bool = attr.ib(default=False)
+    name: str = attr.ib(default=None)
+    archive = attr.ib(default=None)
+
+    def __attrs_post_init__(self):
         # TODO (terrytangyuan): This seems hacky.
         #   If line number changes, we need to update tests as well.
         _, caller_line = utils.invocation_location()
-        self.id = name if name else "output-id-%s" % caller_line
-        self.path = path
-        # TODO (terrytangyuan): this is not used for now and we currently
-        #   only support "valueFrom".
-        self.type = type
-        self.is_global = is_global
+        self.id = self.name if self.name else "output-id-%s" % caller_line
 
     def to_yaml(self):
         yaml_output = OrderedDict(
             {"name": self.id, "valueFrom": {"path": self.path}}
         )
+
         if self.is_global:
             yaml_output["globalName"] = "global-" + self.id
+
+        if self.archive:
+            yaml_output["archive"] = self.archive
+
         return yaml_output
 
 
@@ -47,16 +58,17 @@ class TypedArtifact(Artifact):
     """
 
     def __init__(
-        self,
-        artifact_type,
-        path,
-        accesskey_id=None,
-        accesskey_secret=None,
-        bucket=None,
-        key=None,
-        endpoint="",
-        is_global=False,
-        name=None,
+            self,
+            artifact_type,
+            path,
+            accesskey_id=None,
+            accesskey_secret=None,
+            bucket=None,
+            key=None,
+            endpoint="",
+            is_global=False,
+            name=None,
+            archive=None
     ):
         self.type = artifact_type
         self.id = name if name else f"output-{self.type}-{utils._get_uuid()}"
@@ -66,6 +78,7 @@ class TypedArtifact(Artifact):
         self.bucket = bucket
         self.key = key
         self.endpoint = endpoint
+        self.archive = archive
 
         if accesskey_id and accesskey_secret:
             secret = {"accessKey": accesskey_id, "secretKey": accesskey_secret}
@@ -104,30 +117,32 @@ class TypedArtifact(Artifact):
         )
         if self.is_global:
             yaml_output["globalName"] = "global-" + self.id
+        if self.archive:
+            if "none" in self.archive:
+                yaml_output["archive"] = {"none": {}}
+
         return yaml_output
 
 
 class LocalArtifact(TypedArtifact):
-    def __init__(self, path, name=None, is_global=False):
+    def __init__(self, **kwargs):
         super().__init__(
-            couler.ArtifactType.LOCAL,
-            path=path,
-            name=name,
-            is_global=is_global,
+            artifact_type=couler.ArtifactType.LOCAL,
+            **kwargs
         )
 
 
 class S3Artifact(TypedArtifact):
     def __init__(
-        self,
-        path,
-        accesskey_id,
-        accesskey_secret,
-        bucket,
-        key=None,
-        endpoint="s3.amazonaws.com",
-        is_global=False,
-        name=None,
+            self,
+            path,
+            accesskey_id,
+            accesskey_secret,
+            bucket,
+            key=None,
+            endpoint="s3.amazonaws.com",
+            is_global=False,
+            name=None,
     ):
         super().__init__(
             couler.ArtifactType.S3,
@@ -144,14 +159,14 @@ class S3Artifact(TypedArtifact):
 
 class OssArtifact(TypedArtifact):
     def __init__(
-        self,
-        path,
-        accesskey_id,
-        accesskey_secret,
-        bucket,
-        key=None,
-        endpoint="http://oss-cn-hangzhou-zmf.aliyuncs.com",
-        is_global=False,
+            self,
+            path,
+            accesskey_id,
+            accesskey_secret,
+            bucket,
+            key=None,
+            endpoint="http://oss-cn-hangzhou-zmf.aliyuncs.com",
+            is_global=False,
     ):
         super().__init__(
             couler.ArtifactType.OSS,

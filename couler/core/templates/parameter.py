@@ -25,11 +25,11 @@ class Parameter(object):
 
     @property
     def placeholder(self):
-        return "{{{0}.parameters.{1}}}".format(self.context, self.name)
+        return '{{' + self.context + '.parameters.' + self.name + '}}'
 
     @property
     def escaped_placeholder(self):
-        return '"{0}"'.format(self.placeholder)
+        return '"' + self.placeholder + '"'
 
 
 @attr.s
@@ -45,7 +45,6 @@ class InputParameter(Parameter):
 class ArgumentsParameter(Parameter):
     def __attrs_post_init__(self):
         self.context = "arguments"
-
 
 # @attr.s
 # class ParameterArtifact(Parameter):

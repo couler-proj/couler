@@ -179,8 +179,8 @@ def create_parameter_artifact(name, path, is_global=False):
     )
 
 
-def create_local_artifact(path, name=None, is_global=False):
-    return LocalArtifact(path=path, name=name, is_global=is_global)
+def create_local_artifact(**kwargs):
+    return LocalArtifact(**kwargs)
 
 
 def create_oss_artifact(
