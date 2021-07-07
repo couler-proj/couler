@@ -13,40 +13,35 @@
 
 from collections import OrderedDict
 
+import attr
+
 from couler.core import utils
 
 
+@attr.s
 class Template(object):
-    def __init__(
-        self,
-        name,
-        output=None,
-        input=None,
-        timeout=None,
-        retry=None,
-        pool=None,
-        enable_ulogfs=True,
-        daemon=False,
-        cache=None,
-    ):
-        self.name = name
-        self.output = output
-        self.input = input
-        self.timeout = timeout
-        self.retry = retry
-        self.pool = pool
-        self.enable_ulogfs = enable_ulogfs
-        self.daemon = daemon
-        self.cache = cache
+    name = attr.ib()
+    output = attr.ib(default=None)
+    input = attr.ib(default=None)
+    timeout = attr.ib(default=None)
+    retry = attr.ib(default=None)
+    pool = attr.ib(default=None)
+    enable_ulogfs = attr.ib(default=True)
+    daemon = attr.ib(default=False)
+    cache = attr.ib(default=None)
+    tolerations = attr.ib(default=None)
 
-    def to_dict(self):
-        template = OrderedDict({"name": self.name})
-        if self.daemon:
-            template["daemon"] = True
-        if self.timeout is not None:
-            template["activeDeadlineSeconds"] = self.timeout
-        if self.retry is not None:
-            template["retryStrategy"] = utils.config_retry_strategy(self.retry)
-        if self.cache is not None:
-            template["memoize"] = self.cache.to_dict()
-        return template
+
+def to_dict(self):
+    template = OrderedDict({"name": self.name})
+    if self.daemon:
+        template["daemon"] = True
+    if self.timeout is not None:
+        template["activeDeadlineSeconds"] = self.timeout
+    if self.retry is not None:
+        template["retryStrategy"] = utils.config_retry_strategy(self.retry)
+    if self.cache is not None:
+        template["memoize"] = self.cache.to_dict()
+    if self.tolerations is not None:
+        template["tolerations"] = self.tolerations.copy()
+    return template

@@ -13,28 +13,21 @@
 
 from collections import OrderedDict
 
+import attr
+
 from couler.core import utils
 from couler.core.templates.template import Template
 
 
+@attr.s
 class Step(object):
-    def __init__(
-        self,
-        name,
-        template=None,
-        arguments=None,
-        when=None,
-        with_itmes=None,
-        with_param=None,
-        parallelism=None,
-    ):
-        self.name = name
-        self.template = template
-        self.arguments = arguments
-        self.with_items = with_itmes
-        self.with_param = with_param
-        self.parallelism = parallelism
-        self.when = when
+    name = attr.ib()
+    template = attr.ib(default=None)
+    arguments = attr.ib(default=None)
+    with_items = attr.ib(default=None)
+    with_param = attr.ib(default=None)
+    parallelism = attr.ib(default=None)
+    when = attr.ib(default=None)
 
     def to_dict(self):
         d = OrderedDict({"name": self.name})
@@ -49,7 +42,7 @@ class Step(object):
         if utils.non_empty(self.with_param):
             d.update({"withParam": self.with_param})
         if utils.non_empty(self.parallelism):
-            d.update({"withParam": self.parallelism})
+            d.update({"parallelism": self.parallelism})
         return d
 
 

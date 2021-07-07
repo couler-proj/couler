@@ -25,28 +25,29 @@ from couler.core.templates.template import Template
 
 class Container(Template):
     def __init__(
-        self,
-        name,
-        image,
-        command,
-        args=None,
-        env=None,
-        env_from=None,
-        secret=None,
-        resources=None,
-        image_pull_policy=None,
-        retry=None,
-        timeout=None,
-        pool=None,
-        output=None,
-        input=None,
-        enable_ulogfs=True,
-        daemon=False,
-        volume_mounts=None,
-        working_dir=None,
-        node_selector=None,
-        volumes=None,
-        cache=None,
+            self,
+            name,
+            image,
+            command,
+            args=None,
+            env=None,
+            env_from=None,
+            secret=None,
+            resources=None,
+            image_pull_policy=None,
+            retry=None,
+            timeout=None,
+            pool=None,
+            output=None,
+            input=None,
+            enable_ulogfs=True,
+            daemon=False,
+            volume_mounts=None,
+            working_dir=None,
+            node_selector=None,
+            volumes=None,
+            cache=None,
+            tolerations=None
     ):
         Template.__init__(
             self,
@@ -59,6 +60,7 @@ class Container(Template):
             enable_ulogfs=enable_ulogfs,
             daemon=daemon,
             cache=cache,
+            tolerations=tolerations
         )
         self.image = image
         self.command = utils.make_list_if_not(command)
@@ -95,7 +97,7 @@ class Container(Template):
                             )
                             i += 1
                     elif isinstance(arg, ArgumentsParameter) or isinstance(
-                        arg, InputParameter
+                            arg, InputParameter
                     ):
                         parameters.append(arg.to_dict())
                     else:
@@ -133,8 +135,8 @@ class Container(Template):
 
         # Container
         if (
-            not utils.gpu_requested(self.resources)
-            and states._overwrite_nvidia_gpu_envs
+                not utils.gpu_requested(self.resources)
+                and states._overwrite_nvidia_gpu_envs
         ):
             if self.env is None:
                 self.env = {}
@@ -199,7 +201,7 @@ class Container(Template):
             for i in range(len(args)):
                 o = args[i]
                 if isinstance(o, ArgumentsParameter) or isinstance(
-                    o, InputParameter
+                        o, InputParameter
                 ):
                     pass
                 elif not isinstance(o, OutputArtifact):
