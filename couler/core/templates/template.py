@@ -31,17 +31,16 @@ class Template(object):
     cache = attr.ib(default=None)
     tolerations = attr.ib(default=None)
 
-
-def to_dict(self):
-    template = OrderedDict({"name": self.name})
-    if self.daemon:
-        template["daemon"] = True
-    if self.timeout is not None:
-        template["activeDeadlineSeconds"] = self.timeout
-    if self.retry is not None:
-        template["retryStrategy"] = utils.config_retry_strategy(self.retry)
-    if self.cache is not None:
-        template["memoize"] = self.cache.to_dict()
-    if self.tolerations is not None:
-        template["tolerations"] = self.tolerations.copy()
-    return template
+    def to_dict(self):
+        template = OrderedDict({"name": self.name})
+        if self.daemon:
+            template["daemon"] = True
+        if self.timeout is not None:
+            template["activeDeadlineSeconds"] = self.timeout
+        if self.retry is not None:
+            template["retryStrategy"] = utils.config_retry_strategy(self.retry)
+        if self.cache is not None:
+            template["memoize"] = self.cache.to_dict()
+        if self.tolerations is not None:
+            template["tolerations"] = self.tolerations.copy()
+        return template
