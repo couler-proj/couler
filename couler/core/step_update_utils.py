@@ -15,12 +15,12 @@ from collections import OrderedDict
 
 import couler.core.templates.output
 from couler.core import states, utils
-from couler.core.templates import Artifact, OutputArtifact, Step
+from couler.core.templates import Artifact, OutputArtifact, Step, OutputParameter
 from couler.core.templates.parameter import ArgumentsParameter
 
 
 def update_step(
-    func_name, args, step_name, caller_line, parallelism=None, with_param=None
+        func_name, args, step_name, caller_line, parallelism=None, with_param=None
 ):
     if states.workflow.dag_mode_enabled():
         step_name = _update_dag_tasks(
@@ -57,15 +57,15 @@ def update_step(
 
 
 def _update_dag_tasks(
-    function_name,
-    caller_line,
-    dependencies,
-    depends_logic,
-    args=None,
-    template_name=None,
-    step_name=None,
-    parallelism=None,
-    with_param=None,
+        function_name,
+        caller_line,
+        dependencies,
+        depends_logic,
+        args=None,
+        template_name=None,
+        step_name=None,
+        parallelism=None,
+        with_param=None,
 ):
     """
     A task in DAG of Argo YAML contains name, related template and parameters.
@@ -114,7 +114,10 @@ def _update_dag_tasks(
             task_template["parallelism"] = parallelism
 
         if with_param:
-            task_template["withParam"] = with_param
+            if isinstance(with_param, OutputParameter):
+                task_template["withParam"] = with_param.placeholder("tasks")
+            else:
+                raise ValueError("argument for withParam must be a parameter.")
 
     else:
         # step exist on the dag, thus, we update its dependency
@@ -151,12 +154,12 @@ def _update_dag_tasks(
 
 
 def _update_steps(
-    function_name,
-    caller_line,
-    args=None,
-    template_name=None,
-    parallelism=None,
-    with_param=None,
+        function_name,
+        caller_line,
+        args=None,
+        template_name=None,
+        parallelism=None,
+        with_param=None,
 ):
     """
     A step in Argo YAML contains name, related template and parameters.
@@ -258,19 +261,9 @@ def _get_params_and_artifacts_from_args(args, input_param_name, prefix):
             artifacts.append(values.to_yaml())
         else:
             if isinstance(values, OutputArtifact):
-                tmp = values.value.split(".")
-                if len(tmp) < 5:
-                    raise ValueError("Incorrect step return representation")
-                step_name = tmp[1]
-                output_id = tmp[3]
-                for item in tmp[4:]:
-                    output_id = output_id + "." + item
-                if values.is_global:
-                    value = '"{{workflow.outputs.%s}}"' % output_id
-                else:
-                    value = '"{{%s.%s.%s}}"' % (prefix, step_name, output_id)
-                artifact = {"name": ".".join(tmp[5:]), "from": value}
-                if not any([value == x["from"] for x in artifacts]):
+                from_value = values.placeholder(prefix)
+                artifact = {"name": values.name, "from": from_value}
+                if not any([from_value == x["from"] for x in artifacts]):
                     artifacts.append(artifact)
             else:
                 parameters.append(

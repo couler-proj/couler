@@ -49,10 +49,14 @@ class Container(Template):
             cache=None,
             tolerations=None
     ):
+        if output is not None:
+            output["parameters"] = utils.make_list_if_not(output.get("parameters", []))
+            output["artifacts"] = utils.make_list_if_not(output.get("artifacts", []))
+
         Template.__init__(
             self,
             name=name,
-            output=utils.make_list_if_not(output),
+            output=output,
             input=utils.make_list_if_not(input),
             timeout=timeout,
             retry=retry,
@@ -145,15 +149,10 @@ class Container(Template):
 
         # Output
         if self.output is not None:
-            _output_list = []
-            for o in self.output:
-                _output_list.append(o.to_yaml())
-
-            if isinstance(o, TypedArtifact):
-                # Require only one kind of output type
-                template["outputs"] = {"artifacts": _output_list}
-            else:
-                template["outputs"] = {"parameters": _output_list}
+            template["outputs"] = {
+                "artifacts": [o.to_yaml() for o in self.output["artifacts"]],
+                "parameters": [o.to_yaml() for o in self.output["parameters"]]
+            }
 
         return template
 

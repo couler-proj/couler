@@ -10,47 +10,95 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import attr
 
 
+@attr.s
 class Output(object):
-    def __init__(self, value, is_global=False):
-        self.value = value
-        self.is_global = is_global
+    # value = attr.ib(default=None)
+    name = attr.ib()
+    step_name: str = attr.ib()
+    template_name: str = attr.ib()
+    is_global: bool = attr.ib(default=False)
+
+    def value(self, type):
+        if self.is_global:
+            return "workflow.outputs.%s.%s" % (type, self.name)
+        else:
+            return "%s.%s.outputs.%s.%s" % (
+                self.step_name,
+                self.template_name,
+                type,
+                self.name,
+            )
+
+    def placeholder(self, prefix, type):
+        if self.is_global:
+            return '"{{workflow.outputs.%s.%s.%s}}"' % (
+                self.step_name,
+                type,
+                self.name)
+        else:
+            return '"{{%s.%s.outputs.%s.%s}}"' % (
+                prefix,
+                self.step_name,
+                type,
+                self.name,
+            )
 
 
+@attr.s
 class OutputEmpty(Output):
-    def __init__(self, value, is_global=False):
-        Output.__init__(self, value=value, is_global=is_global)
+    pass
 
 
+@attr.s
 class OutputParameter(Output):
-    def __init__(self, value, is_global=False):
-        Output.__init__(self, value=value, is_global=is_global)
+    path = attr.ib(default="")
+
+    def to_yaml(self):
+        return {
+            "name": self.name,
+            "valueFrom": {
+                "path": self.path
+            }
+        }
+
+    @property
+    def value(self):
+        return super().value("parameters")
+
+    def placeholder(self, prefix):
+        return super().placeholder(prefix, "parameters")
 
 
+@attr.s
 class OutputArtifact(Output):
-    def __init__(self, value, path, artifact, is_global=False, type=""):
-        Output.__init__(self, value=value, is_global=is_global)
-        self.path = path
-        self.artifact = artifact
-        self.type = type
+    path = attr.ib(default="")
+    artifact = attr.ib(default={})
+    type = attr.ib(default="")
+
+    @property
+    def value(self):
+        return super().value("artifacts")
+
+    def placeholder(self, prefix):
+        return super().placeholder(prefix, "artifacts")
 
 
+@attr.s
 class OutputScript(Output):
-    def __init__(self, value, is_global=False):
-        Output.__init__(self, value=value, is_global=is_global)
+    pass
 
 
+@attr.s
 class OutputJob(Output):
-    def __init__(self, value, job_name, job_id, job_obj=None, is_global=False):
-        Output.__init__(self, value=value, is_global=is_global)
-        self.job_name = job_name
-        self.job_id = job_id
-        self.job_obj = job_obj
+    job_name = attr.ib(default="job")
+    job_id = attr.ib(default="job_id")
+    job_obj = attr.ib(default=None)
 
 
 def _parse_single_argo_output(output, prefix):
-
     if isinstance(output, Output):
         tmp = output.value.split(".")
         if "artifacts" in tmp:
@@ -68,9 +116,9 @@ def _parse_single_argo_output(output, prefix):
     else:
         # enforce int, float and bool types to string
         if (
-            isinstance(output, int)
-            or isinstance(output, float)
-            or isinstance(output, bool)
+                isinstance(output, int)
+                or isinstance(output, float)
+                or isinstance(output, bool)
         ):
             output = "'%s'" % output
 
@@ -78,7 +126,6 @@ def _parse_single_argo_output(output, prefix):
 
 
 def parse_argo_output(output, prefix):
-
     if isinstance(output, OutputJob):
         return [
             _parse_single_argo_output(
@@ -97,6 +144,26 @@ def parse_argo_output(output, prefix):
         return _parse_single_argo_output(output, prefix)
 
 
+def _container_param_output(output_object, step_name, template_name):
+    is_global = "globalName" in output_object
+    return OutputParameter(name=output_object["name"],
+                           step_name=step_name,
+                           template_name=template_name,
+                           is_global=is_global)
+
+
+def _container_artifact_output(output_object, step_name, template_name):
+    is_global = "globalName" in output_object
+    return OutputArtifact(
+        name=output_object["name"],
+        step_name=step_name,
+        template_name=template_name,
+        path=output_object["path"],
+        artifact=output_object,
+        is_global=is_global,
+    )
+
+
 def _container_output(step_name, template_name, output):
     """Generate output name from an Argo container template.  For example,
     "{{steps.generate-parameter.outputs.parameters.hello-param}}" used in
@@ -105,62 +172,30 @@ def _container_output(step_name, template_name, output):
     couler.step_name.template_name.output.parameters.output_id
     """
 
-    rets = []
     if output is None:
-        ret = "couler.%s.%s.outputs.parameters.%s" % (
-            step_name,
-            template_name,
-            "1",
-        )
-        rets.append(OutputEmpty(value=ret))
-        return rets
+        return {
+            "parameters": [
+                OutputEmpty(
+                    name='%s-empty-output' % template_name,
+                    step_name=step_name,
+                    template_name=template_name,
+                )]
+        }
 
-    output_is_parameter = True
-    if "parameters" in output:
-        _outputs = output["parameters"]
-    elif "artifacts" in output:
-        _outputs = output["artifacts"]
-        output_is_parameter = False
-
-    if isinstance(_outputs, str):
-        _outputs = [_outputs]
-
-    if isinstance(_outputs, list):
-        for o in _outputs:
-            output_id = o["name"]
-            is_global = "globalName" in o
-            if output_is_parameter:
-                if is_global:
-                    ret = "couler.workflow.outputs.parameters.%s" % output_id
-                else:
-                    ret = "couler.%s.%s.outputs.parameters.%s" % (
-                        step_name,
-                        template_name,
-                        output_id,
-                    )
-                rets.append(OutputParameter(value=ret, is_global=is_global))
-            else:
-                if is_global:
-                    ret = "couler.workflow.outputs.artifacts.%s" % output_id
-                else:
-                    ret = "couler.%s.%s.outputs.artifacts.%s" % (
-                        step_name,
-                        template_name,
-                        output_id,
-                    )
-
-                rets.append(
-                    OutputArtifact(
-                        value=ret,
-                        path=o["path"],
-                        artifact=o,
-                        is_global=is_global,
-                    )
-                )
-    else:
-        raise SyntaxError("Container output must be a list")
-
-    return rets
+    return {
+        "parameters": [
+            _container_param_output(
+                output_object=o,
+                step_name=step_name,
+                template_name=template_name) for o in output["parameters"]
+        ],
+        "artifacts": [
+            _container_artifact_output(
+                output_object=o,
+                step_name=step_name,
+                template_name=template_name) for o in output["artifacts"]
+        ]
+    }
 
 
 def _script_output(step_name, template_name, output):
