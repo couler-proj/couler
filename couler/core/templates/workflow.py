@@ -150,9 +150,9 @@ class Workflow(object):
         for template in self.templates.values():
             template_dict = template.to_dict()
             if (
-                    isinstance(template, Container)
-                    or isinstance(template, Job)
-                    or isinstance(template, Script)
+                isinstance(template, Container)
+                or isinstance(template, Job)
+                or isinstance(template, Script)
             ) and self.cluster_config is not None:
                 sig = getfullargspec(self.cluster_config.config_pod)
                 num_args = len(sig.args)
@@ -188,8 +188,8 @@ class Workflow(object):
                 if volume_mounts is not None:
                     for volume_mount in volume_mounts:
                         if (
-                                self.has_pvc_template(volume_mount.name) is False
-                                and self.has_volume(volume_mount.name) is False
+                            self.has_pvc_template(volume_mount.name) is False
+                            and self.has_volume(volume_mount.name) is False
                         ):
                             # Auto-generate emptyDir volume
                             self.volumes.append(
@@ -224,7 +224,7 @@ class Workflow(object):
 
         # Spec part
         if self.cluster_config is not None and hasattr(
-                self.cluster_config, "config_workflow"
+            self.cluster_config, "config_workflow"
         ):
             sig = getfullargspec(self.cluster_config.config_workflow)
             # This is to support cluster configuration to modify the

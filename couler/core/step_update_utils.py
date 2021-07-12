@@ -15,12 +15,17 @@ from collections import OrderedDict
 
 import couler.core.templates.output
 from couler.core import states, utils
-from couler.core.templates import Artifact, OutputArtifact, Step, OutputParameter
+from couler.core.templates import (
+    Artifact,
+    OutputArtifact,
+    OutputParameter,
+    Step,
+)
 from couler.core.templates.parameter import ArgumentsParameter
 
 
 def update_step(
-        func_name, args, step_name, caller_line, parallelism=None, with_param=None
+    func_name, args, step_name, caller_line, parallelism=None, with_param=None
 ):
     if states.workflow.dag_mode_enabled():
         step_name = _update_dag_tasks(
@@ -57,15 +62,15 @@ def update_step(
 
 
 def _update_dag_tasks(
-        function_name,
-        caller_line,
-        dependencies,
-        depends_logic,
-        args=None,
-        template_name=None,
-        step_name=None,
-        parallelism=None,
-        with_param=None,
+    function_name,
+    caller_line,
+    dependencies,
+    depends_logic,
+    args=None,
+    template_name=None,
+    step_name=None,
+    parallelism=None,
+    with_param=None,
 ):
     """
     A task in DAG of Argo YAML contains name, related template and parameters.
@@ -154,12 +159,12 @@ def _update_dag_tasks(
 
 
 def _update_steps(
-        function_name,
-        caller_line,
-        args=None,
-        template_name=None,
-        parallelism=None,
-        with_param=None,
+    function_name,
+    caller_line,
+    args=None,
+    template_name=None,
+    parallelism=None,
+    with_param=None,
 ):
     """
     A step in Argo YAML contains name, related template and parameters.

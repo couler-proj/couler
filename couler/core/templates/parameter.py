@@ -25,7 +25,7 @@ class Parameter(object):
 
     @property
     def placeholder(self):
-        return '{{' + self.context + '.parameters.' + self.name + '}}'
+        return "{{" + self.context + ".parameters." + self.name + "}}"
 
     @property
     def escaped_placeholder(self):
@@ -45,16 +45,3 @@ class InputParameter(Parameter):
 class ArgumentsParameter(Parameter):
     def __attrs_post_init__(self):
         self.context = "arguments"
-
-# @attr.s
-# class ParameterArtifact(Parameter):
-#     path: str = attr.ib()
-#     artifact: str = attr.ib()
-#     type: str = attr.ib()
-#
-#     def to_dict(self):
-#         return super().to_dict().update({
-#             "path": self.path,
-#             "artifact": self.artifact,
-#             "type": self.type,
-#         })

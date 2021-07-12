@@ -58,17 +58,17 @@ class TypedArtifact(Artifact):
     """
 
     def __init__(
-            self,
-            artifact_type,
-            path,
-            accesskey_id=None,
-            accesskey_secret=None,
-            bucket=None,
-            key=None,
-            endpoint="",
-            is_global=False,
-            name=None,
-            archive=None
+        self,
+        artifact_type,
+        path,
+        accesskey_id=None,
+        accesskey_secret=None,
+        bucket=None,
+        key=None,
+        endpoint="",
+        is_global=False,
+        name=None,
+        archive=None,
     ):
         self.type = artifact_type
         self.id = name if name else f"output-{self.type}-{utils._get_uuid()}"
@@ -126,23 +126,20 @@ class TypedArtifact(Artifact):
 
 class LocalArtifact(TypedArtifact):
     def __init__(self, **kwargs):
-        super().__init__(
-            artifact_type=couler.ArtifactType.LOCAL,
-            **kwargs
-        )
+        super().__init__(artifact_type=couler.ArtifactType.LOCAL, **kwargs)
 
 
 class S3Artifact(TypedArtifact):
     def __init__(
-            self,
-            path,
-            accesskey_id,
-            accesskey_secret,
-            bucket,
-            key=None,
-            endpoint="s3.amazonaws.com",
-            is_global=False,
-            name=None,
+        self,
+        path,
+        accesskey_id,
+        accesskey_secret,
+        bucket,
+        key=None,
+        endpoint="s3.amazonaws.com",
+        is_global=False,
+        name=None,
     ):
         super().__init__(
             couler.ArtifactType.S3,
@@ -159,14 +156,14 @@ class S3Artifact(TypedArtifact):
 
 class OssArtifact(TypedArtifact):
     def __init__(
-            self,
-            path,
-            accesskey_id,
-            accesskey_secret,
-            bucket,
-            key=None,
-            endpoint="http://oss-cn-hangzhou-zmf.aliyuncs.com",
-            is_global=False,
+        self,
+        path,
+        accesskey_id,
+        accesskey_secret,
+        bucket,
+        key=None,
+        endpoint="http://oss-cn-hangzhou-zmf.aliyuncs.com",
+        is_global=False,
     ):
         super().__init__(
             couler.ArtifactType.OSS,
