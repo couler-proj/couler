@@ -206,7 +206,11 @@ def _script_output(step_name, template_name, output):
     couler.step_name.template_name.outputs.result
     """
     value = "couler.%s.%s.outputs.result" % (step_name, template_name)
-    output_script = OutputScript(value=value)
+    output_script = OutputScript(
+        name="script-output",
+        step_name=step_name,
+        template_name=template_name
+    )
 
     if output is None:
         return [output_script]
