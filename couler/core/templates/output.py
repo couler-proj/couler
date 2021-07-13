@@ -37,7 +37,8 @@ class Output(object):
             return '"{{workflow.outputs.%s.%s.%s}}"' % (
                 self.step_name,
                 type,
-                self.name)
+                self.name,
+            )
         else:
             return '"{{%s.%s.outputs.%s.%s}}"' % (
                 prefix,
@@ -57,12 +58,7 @@ class OutputParameter(Output):
     path = attr.ib(default="")
 
     def to_yaml(self):
-        return {
-            "name": self.name,
-            "valueFrom": {
-                "path": self.path
-            }
-        }
+        return {"name": self.name, "valueFrom": {"path": self.path}}
 
     @property
     def value(self):
@@ -88,7 +84,12 @@ class OutputArtifact(Output):
 
 @attr.s
 class OutputScript(Output):
-    pass
+    @property
+    def value(self):
+        return "%s.%s.outputs.result" % (self.step_name, self.template_name)
+
+    def placeholder(self, prefix, type):
+        return '"{{%s.%s.outputs.result}}"' % (prefix, self.step_name)
 
 
 @attr.s
@@ -116,9 +117,9 @@ def _parse_single_argo_output(output, prefix):
     else:
         # enforce int, float and bool types to string
         if (
-                isinstance(output, int)
-                or isinstance(output, float)
-                or isinstance(output, bool)
+            isinstance(output, int)
+            or isinstance(output, float)
+            or isinstance(output, bool)
         ):
             output = "'%s'" % output
 
@@ -146,10 +147,12 @@ def parse_argo_output(output, prefix):
 
 def _container_param_output(output_object, step_name, template_name):
     is_global = "globalName" in output_object
-    return OutputParameter(name=output_object["name"],
-                           step_name=step_name,
-                           template_name=template_name,
-                           is_global=is_global)
+    return OutputParameter(
+        name=output_object["name"],
+        step_name=step_name,
+        template_name=template_name,
+        is_global=is_global,
+    )
 
 
 def _container_artifact_output(output_object, step_name, template_name):
@@ -176,10 +179,11 @@ def _container_output(step_name, template_name, output):
         return {
             "parameters": [
                 OutputEmpty(
-                    name='%s-empty-output' % template_name,
+                    name="%s-empty-output" % template_name,
                     step_name=step_name,
                     template_name=template_name,
-                )]
+                )
+            ]
         }
 
     return {
@@ -187,14 +191,18 @@ def _container_output(step_name, template_name, output):
             _container_param_output(
                 output_object=o,
                 step_name=step_name,
-                template_name=template_name) for o in output["parameters"]
+                template_name=template_name,
+            )
+            for o in output["parameters"]
         ],
         "artifacts": [
             _container_artifact_output(
                 output_object=o,
                 step_name=step_name,
-                template_name=template_name) for o in output["artifacts"]
-        ]
+                template_name=template_name,
+            )
+            for o in output["artifacts"]
+        ],
     }
 
 
@@ -205,11 +213,8 @@ def _script_output(step_name, template_name, output):
     Return of run_script is contacted by:
     couler.step_name.template_name.outputs.result
     """
-    value = "couler.%s.%s.outputs.result" % (step_name, template_name)
     output_script = OutputScript(
-        name="script-output",
-        step_name=step_name,
-        template_name=template_name
+        name="script-output", step_name=step_name, template_name=template_name
     )
 
     if output is None:
@@ -258,21 +263,24 @@ def extract_step_return(step_output):
         # The first element of outputs is used for control flow operation
         step_output = step_output[0]
         # In case user input a normal variable
-        if not isinstance(step_output, Output):
-            ret["value"] = step_output
-            return ret
-        else:
+        if isinstance(step_output, Output):
             tmp = step_output.value.split(".")
             if len(tmp) < 4:
                 raise ValueError("Incorrect step return representation")
-            step_name = tmp[1]
-            template_name = tmp[2]
             # To avoid duplicate map function
-            output = tmp[3]
-            for item in tmp[4:]:
+            output = tmp[2]
+            for item in tmp[3:]:
                 output = output + "." + item
 
-            ret = {"name": template_name, "id": step_name, "output": output}
+            ret = {
+                "name": step_output.template_name,
+                "id": step_output.step_name,
+                "output": output,
+            }
+
+            return ret
+        else:
+            ret["value"] = step_output
             return ret
     else:
         ret["value"] = step_output
