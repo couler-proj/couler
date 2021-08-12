@@ -22,6 +22,7 @@ def linear():
     couler.set_dependencies(lambda: job(name="C"), dependencies=["A"])
     couler.set_dependencies(lambda: job(name="D"), dependencies=["B"])
 
+    
 #   A
 #  / \
 # B   C
