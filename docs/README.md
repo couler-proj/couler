@@ -1,7 +1,6 @@
 <img width="300px" src="./assets/logo.svg" alt="Couler Logo">
 
 [![CI](https://github.com/couler-proj/couler/workflows/CI/badge.svg)](https://github.com/couler-proj/couler/actions?query=event%3Apush+branch%3Amaster)
-[![Slack](https://img.shields.io/badge/Slack-Couler-brightgreen.svg?logo=slack)](https://join.slack.com/t/couler/shared_invite/zt-i0m7ziol-1gz4_p_aXmWM7KVpxJ4k9Q)
 [![Twitter](https://img.shields.io/badge/@CoulerProject--_.svg?style=social&logo=twitter)](https://twitter.com/CoulerProject)
 
 ## What is Couler?

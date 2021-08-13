@@ -16,6 +16,21 @@ from collections import OrderedDict
 from couler.core import states, utils
 
 
+def config_defaults(name_salter=None, service_account: str = None):
+    """
+    Config couler defaults.
+    :param name_salter: function to salt workflow names.
+    :param service_account: name of the default Kubernetes
+        ServiceAccount with which to run workflows
+    :return:
+    """
+    if name_salter is not None:
+        states._workflow_name_salter = name_salter
+
+    if service_account is not None:
+        states.default_service_account = service_account
+
+
 def config_workflow(
     name=None,
     user_id=None,
@@ -38,7 +53,7 @@ def config_workflow(
     :return:
     """
     if name is not None:
-        states.workflow.name = name
+        states.workflow.name = states._workflow_name_salter(name)
 
     if user_id is not None:
         states.workflow.user_id = user_id
@@ -85,18 +100,21 @@ def config_workflow(
             timezone,
         )
 
-    if service_account is not None:
-        states.workflow.service_account = service_account
+    states.workflow.service_account = (
+        service_account
+        if service_account is not None
+        else states.default_service_account
+    )
 
 
 def _config_cron_workflow(
     schedule,
-    concurrency_policy='"Allow"',  # Default to "Allow"
+    concurrency_policy='"Allow"',
     successful_jobs_history_limit=3,  # Default 3
     failed_jobs_history_limit=1,  # Default 1
     starting_deadline_seconds=10,
     suspend="false",
-    timezone="Asia/Shanghai",  # Default to Beijing time
+    timezone="Asia/Shanghai",
 ):
     """
     Config the CronWorkflow, see example

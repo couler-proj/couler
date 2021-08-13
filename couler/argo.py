@@ -21,7 +21,7 @@ from kubernetes import config
 
 from couler.argo_submitter import ArgoSubmitter
 from couler.core import states  # noqa: F401
-from couler.core.config import config_workflow  # noqa: F401
+from couler.core.config import config_defaults, config_workflow  # noqa: F401
 from couler.core.constants import *  # noqa: F401, F403
 from couler.core.constants import WorkflowCRD
 from couler.core.run_templates import (  # noqa: F401
@@ -54,31 +54,49 @@ def workflow_yaml():
     return states.workflow.to_dict()
 
 
-def run(submitter=ArgoSubmitter):
+def run(submitter=None):
     """To submit the workflow using user-provided submitter implementation.
        Note that, the provided submitter must have a submit function which
        takes the workflow YAML as input.
     """
     states._enable_print_yaml = False
 
-    if submitter is None:
-        raise ValueError("The input submitter is None")
+    if submitter is None and ArgoSubmitter._default_submitter is None:
+        raise ValueError(
+            "The input submitter is None and default submitter was not set."
+        )
     wf = workflow_yaml()
     secrets = states._secrets.values()
     validate_workflow_yaml(wf)
-    if isinstance(submitter, ArgoSubmitter):
-        res = submitter.submit(wf, secrets=secrets)
-    elif issubclass(submitter, ArgoSubmitter):
-        submitter = ArgoSubmitter()
-        res = submitter.submit(wf, secrets=secrets)
+
+    if submitter is not None:
+        if isinstance(submitter, ArgoSubmitter):
+            res = submitter.submit(wf, secrets=secrets)
+        elif issubclass(submitter, ArgoSubmitter):
+            submitter = ArgoSubmitter()
+            res = submitter.submit(wf, secrets=secrets)
+        else:
+            raise ValueError("Only ArgoSubmitter is supported currently.")
     else:
-        raise ValueError("Only ArgoSubmitter is supported currently.")
+        res = ArgoSubmitter._default_submitter.submit(wf, secrets=secrets)
 
     # Clean up the saved states of the workflow since we made a copy of
     # the workflow above and no longer need the original reference. This
     # would also allow users to define a new workflow after submission.
     _cleanup()
     return res
+
+
+def set_default_submitter(submitter=None):
+    """
+    Config couler defaults.
+    :param submitter: default submitter to use when submitting workflows
+    :return:
+    """
+    if submitter is not None:
+        if not isinstance(submitter, ArgoSubmitter):
+            raise ValueError("Only ArgoSubmitter is supported currently.")
+        ArgoSubmitter._default_submitter = submitter
 
 
 def delete(

@@ -34,6 +34,8 @@ class _SubmitterImplTypes(object):
 class ArgoSubmitter(object):
     """A submitter which submits a workflow to Argo"""
 
+    _default_submitter = None
+
     def __init__(
         self,
         namespace="default",
@@ -44,6 +46,7 @@ class ArgoSubmitter(object):
     ):
         logging.basicConfig(level=logging.INFO)
         self.namespace = namespace
+        logging.info("Argo submitter namespace: %s" % self.namespace)
         self.go_impl = (
             os.environ.get(
                 _SUBMITTER_IMPL_ENV_VAR_KEY, _SubmitterImplTypes.PYTHON
@@ -73,6 +76,11 @@ class ArgoSubmitter(object):
                     "Found local kubernetes config. "
                     "Initialized with kube_config."
                 )
+                if client_configuration is not None:
+                    logging.info(
+                        "Setting default k8s client config as provided"
+                    )
+                    k8s_client.Configuration.set_default(client_configuration)
             except Exception:
                 logging.info(
                     "Cannot find local k8s config. "
