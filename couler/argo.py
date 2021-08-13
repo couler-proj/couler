@@ -36,7 +36,7 @@ from couler.core.states import (  # noqa: F401
     get_step_output,
     workflow,
 )
-from couler.core.syntax import *  # noqa: F401, F403
+from couler.core.syntax import *   # noqa: F401, F403
 from couler.core.templates import (  # noqa: F401
     Artifact,
     Cache,
@@ -242,10 +242,10 @@ def create_s3_artifact(
     )
 
 
-def create_secret(secret_data, namespace="default", name=None, dry_run=False):
+def create_secret(secret_data, namespace="default", name=None, dry_run=False, exists=False):
     """Store the input dict as a secret in k8s, and return the secret name."""
     secret = Secret(
-        namespace=namespace, data=secret_data, name=name, dry_run=dry_run
+        namespace=namespace, data=secret_data, name=name, dry_run=dry_run, exists=exists
     )
 
     # avoid create the secret for same input dict

@@ -134,7 +134,8 @@ class ArgoSubmitter(object):
         else:
             if secrets:
                 for secret in secrets:
-                    self._create_secret(secret.to_yaml())
+                    if secret.exists == False:
+                        self._create_secret(secret.to_yaml())
             logging.info("Checking workflow name/generatedName %s" % wf_name)
             self.check_name(wf_name)
             return self._create_workflow(workflow_yaml)
