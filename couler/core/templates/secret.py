@@ -19,7 +19,9 @@ from couler.core import utils
 
 
 class Secret(object):
-    def __init__(self, namespace, data, name=None, dry_run=False, exists=False):
+    def __init__(
+        self, namespace, data, name=None, dry_run=False, exists=False
+    ):
 
         if not isinstance(data, dict):
             raise TypeError("The secret data is required to be a dict")

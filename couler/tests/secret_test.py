@@ -23,7 +23,9 @@ class SecretTest(ArgoYamlTest):
     def test_create_secret(self):
         # First job with secret1
         user_info = {"uname": "abc", "passwd": "def"}
-        secret1 = couler.create_secret(secret_data=user_info, name="dummy1", exists=False)
+        secret1 = couler.create_secret(
+            secret_data=user_info, name="dummy1", exists=False
+        )
         couler.run_container(
             image="python:3.6", secret=secret1, command="echo $uname"
         )
@@ -31,7 +33,10 @@ class SecretTest(ArgoYamlTest):
         # Second job with secret2
         access_key = {"access_key": "key1234", "access_value": "value5678"}
         secret2 = couler.create_secret(
-            secret_data=access_key, namespace="test", name="dummy2", exists=True
+            secret_data=access_key,
+            namespace="test",
+            name="dummy2",
+            exists=True,
         )
         couler.run_container(
             image="python:3.6", secret=secret2, command="echo $access_value"
@@ -90,14 +95,18 @@ class SecretTest(ArgoYamlTest):
     def test_create_secrete_duplicate(self):
         def job_1():
             user_info = {"uname": "abc", "passwd": "def"}
-            secret1 = couler.create_secret(secret_data=user_info, dry_run=True, exists=False)
+            secret1 = couler.create_secret(
+                secret_data=user_info, dry_run=True, exists=False
+            )
             couler.run_container(
                 image="python:3.6", secret=secret1, command="echo $uname"
             )
 
         def job_2():
             user_info = {"uname": "abc", "passwd": "def"}
-            secret1 = couler.create_secret(secret_data=user_info, dry_run=True, exists=False)
+            secret1 = couler.create_secret(
+                secret_data=user_info, dry_run=True, exists=False
+            )
             couler.run_container(
                 image="python:3.6", secret=secret1, command="echo $uname"
             )
