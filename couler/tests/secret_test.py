@@ -23,20 +23,15 @@ class SecretTest(ArgoYamlTest):
     def test_create_secret(self):
         # First job with secret1
         user_info = {"uname": "abc", "passwd": "def"}
-        secret1 = couler.create_secret(
-            secret_data=user_info, name="dummy1", exists=False
-        )
+        secret1 = couler.create_secret(secret_data=user_info, name="dummy1")
         couler.run_container(
             image="python:3.6", secret=secret1, command="echo $uname"
         )
 
-        # Second job with secret2
-        access_key = {"access_key": "key1234", "access_value": "value5678"}
-        secret2 = couler.create_secret(
-            secret_data=access_key,
-            namespace="test",
-            name="dummy2",
-            exists=True,
+        # Second job with secret2 that exists
+        access_key = ["access_key", "access_value"]
+        secret2 = couler.get_existing_secret(
+            secret_keys=access_key, namespace="test", name="dummy2"
         )
         couler.run_container(
             image="python:3.6", secret=secret2, command="echo $access_value"
@@ -60,13 +55,6 @@ class SecretTest(ArgoYamlTest):
         self.assertEqual(secret2_yaml["metadata"]["namespace"], "test")
         self.assertEqual(secret2_yaml["metadata"]["name"], "dummy2")
         self.assertEqual(len(secret2_yaml["data"]), 2)
-        self.assertEqual(
-            secret2_yaml["data"]["access_key"], utils.encode_base64("key1234")
-        )
-        self.assertEqual(
-            secret2_yaml["data"]["access_value"],
-            utils.encode_base64("value5678"),
-        )
 
     def _verify_script_body(
         self, script_to_check, image, command, source, env
@@ -95,18 +83,14 @@ class SecretTest(ArgoYamlTest):
     def test_create_secrete_duplicate(self):
         def job_1():
             user_info = {"uname": "abc", "passwd": "def"}
-            secret1 = couler.create_secret(
-                secret_data=user_info, dry_run=True, exists=False
-            )
+            secret1 = couler.create_secret(secret_data=user_info, dry_run=True)
             couler.run_container(
                 image="python:3.6", secret=secret1, command="echo $uname"
             )
 
         def job_2():
             user_info = {"uname": "abc", "passwd": "def"}
-            secret1 = couler.create_secret(
-                secret_data=user_info, dry_run=True, exists=False
-            )
+            secret1 = couler.create_secret(secret_data=user_info, dry_run=True)
             couler.run_container(
                 image="python:3.6", secret=secret1, command="echo $uname"
             )

@@ -242,16 +242,37 @@ def create_s3_artifact(
     )
 
 
-def create_secret(
-    secret_data, namespace="default", name=None, dry_run=False, exists=False
+def get_existing_secret(
+    secret_keys, namespace="default", name=None, dry_run=False
 ):
+    """Get the key from secret in k8s, and return the secret name."""
+    secret_data = {}
+    for x in secret_keys:
+        secret_data[x] = ""
+
+    secret = Secret(
+        namespace=namespace,
+        data=secret_data,
+        name=name,
+        dry_run=dry_run,
+        exists=True,
+    )
+
+    # avoid create the secret for same input dict
+    if secret.name not in states._secrets:
+        states._secrets[secret.name] = secret
+
+    return secret.name
+
+
+def create_secret(secret_data, namespace="default", name=None, dry_run=False):
     """Store the input dict as a secret in k8s, and return the secret name."""
     secret = Secret(
         namespace=namespace,
         data=secret_data,
         name=name,
         dry_run=dry_run,
-        exists=exists,
+        exists=False,
     )
 
     # avoid create the secret for same input dict
