@@ -30,7 +30,7 @@ class SecretTest(ArgoYamlTest):
 
         # Second job with secret2 that exists
         access_key = ["access_key", "access_value"]
-        secret2 = couler.get_existing_secret(
+        secret2 = couler.obtain_secret(
             secret_keys=access_key, namespace="test", name="dummy2"
         )
         couler.run_container(
