@@ -53,7 +53,7 @@ jobs:
         bash ./scripts/test_go.sh
     - uses: opsgang/ga-setup-minikube@v0.1.1
       with:
-          minikube-version: 1.11.0
+          minikube-version: 1.22.0
           k8s-version: 1.18.3
     - name: Integration tests
       run: |
@@ -69,6 +69,6 @@ jobs:
         kubectl apply -n argo -f manifests/mpi-operator.yaml
 
         go build -buildmode=c-shared -o submit.so go/couler/commands/submit.go
-        # scripts/integration_tests.sh
-        # export E2E_TEST=true
-        # go test -timeout 3m ./go/couler/submitter/... -v
+        scripts/integration_tests.sh
+        export E2E_TEST=true
+        go test -timeout 3m ./go/couler/submitter/... -v
