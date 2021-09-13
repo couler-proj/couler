@@ -18,6 +18,8 @@ from couler.core import utils
 from couler.core.templates import Container, Job, Script, Step, Template
 from couler.core.templates.volume import Volume
 from couler.core.templates.volume_claim import VolumeClaimTemplate
+from couler.core.templates.image_pull_secret import ImagePullSecret
+
 
 
 class Workflow(object):
@@ -37,6 +39,7 @@ class Workflow(object):
         self.cluster_config = utils.load_cluster_config()
         self.cron_config = None
         self.volumes = []
+        self.image_pull_secrets = []
         self.pvcs = []
         self.service_account = None
         self.security_context = None
@@ -69,6 +72,9 @@ class Workflow(object):
             if volume["name"] == name:
                 return True
         return False
+
+    def add_image_pull_secret(self, image_pull_secret: ImagePullSecret):
+        self.image_pull_secrets.append(image_pull_secret.to_dict())
 
     def get_step(self, name):
         return self.steps.get(name, None)
@@ -136,6 +142,8 @@ class Workflow(object):
 
         if self.volumes:
             workflow_spec.update({"volumes": self.volumes})
+        if self.image_pull_secrets:
+            workflow_spec.update({"imagePullSecrets": self.image_pull_secrets})
         if self.pvcs:
             workflow_spec.update({"volumeClaimTemplates": self.pvcs})
         if self.dag_mode_enabled():

@@ -20,6 +20,7 @@ import couler.argo as couler
 from couler.core import states
 from couler.core.templates.volume import Volume, VolumeMount
 from couler.core.templates.volume_claim import VolumeClaimTemplate
+from couler.core.templates import ImagePullSecret
 
 
 class ArgoBaseTestCase(unittest.TestCase):
@@ -175,6 +176,25 @@ class ArgoTest(ArgoBaseTestCase):
             wf["spec"]["templates"][1]["container"]["volumeMounts"][0],
             volume_mount.to_dict(),
         )
+        couler._cleanup()
+
+    def test_run_container_with_image_pull_secret(self):
+        secret = ImagePullSecret("test-secret")
+        couler.add_image_pull_secret(secret)
+
+        secret1 = ImagePullSecret("test-secret1")
+        couler.add_image_pull_secret(secret1)
+        couler.run_container(
+            image="docker/whalesay:latest",
+            args=["echo -n hello world"],
+            command=["bash", "-c"],
+            step_name="A",
+            working_dir="/mnt/src",
+        )
+
+        wf = couler.workflow_yaml()
+        self.assertEqual(wf["spec"]["imagePullSecrets"][0], secret.to_dict())
+        self.assertEqual(wf["spec"]["imagePullSecrets"][1], secret1.to_dict())
         couler._cleanup()
 
     def test_artifact_passing_script(self):
