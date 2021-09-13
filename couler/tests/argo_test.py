@@ -19,6 +19,7 @@ import yaml
 import couler.argo as couler
 from couler.core import states
 from couler.core.templates.volume import Volume, VolumeMount
+from couler.core.templates.image_pull_secret import ImagePullSecret
 from couler.core.templates.volume_claim import VolumeClaimTemplate
 
 
@@ -130,6 +131,25 @@ class ArgoTest(ArgoBaseTestCase):
         self.assertEqual(
             wf["spec"]["templates"][1]["container"]["workingDir"], "/mnt/src"
         )
+        couler._cleanup()
+
+    def test_run_container_with_image_pull_secret(self):
+        secret = ImagePullSecret("test-secret")
+        couler.add_image_pull_secret(secret)
+
+        secret1 = ImagePullSecret("test-secret1")
+        couler.add_image_pull_secret(secret1)
+        couler.run_container(
+            image="docker/whalesay:latest",
+            args=["echo -n hello world"],
+            command=["bash", "-c"],
+            step_name="A",
+            working_dir="/mnt/src",
+        )
+
+        wf = couler.workflow_yaml()
+        self.assertEqual(wf["spec"]["imagePullSecrets"][0], secret.to_dict())
+        self.assertEqual(wf["spec"]["imagePullSecrets"][1], secret1.to_dict())
         couler._cleanup()
 
     def test_run_container_with_node_selector(self):
@@ -420,7 +440,7 @@ class ArgoTest(ArgoBaseTestCase):
             couler._cleanup()
 
     def test_run_job_with_dependency_implicit_params_passing_from_container(
-        self
+            self
     ):
         success_condition = "status.succeeded > 0"
         failure_condition = "status.failed > 3"
@@ -576,7 +596,7 @@ class ArgoTest(ArgoBaseTestCase):
         )
 
     def _verify_script_body(
-        self, script_to_check, image, command, source, env
+            self, script_to_check, image, command, source, env
     ):
         self.assertEqual(script_to_check.get("image", None), image)
         self.assertEqual(script_to_check.get("command", None), command)

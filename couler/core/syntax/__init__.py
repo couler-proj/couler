@@ -22,3 +22,6 @@ from couler.core.syntax.volume import (  # noqa: F401
     add_volume,
     create_workflow_volume,
 )
+from couler.core.syntax.image_pull_secret import (  # noqa: F401
+    add_image_pull_secret,
+)

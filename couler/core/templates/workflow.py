@@ -16,6 +16,7 @@ from inspect import getfullargspec
 
 from couler.core import utils
 from couler.core.templates import Container, Job, Script, Step, Template
+from couler.core.templates.image_pull_secret import ImagePullSecret
 from couler.core.templates.volume import Volume
 from couler.core.templates.volume_claim import VolumeClaimTemplate
 
@@ -40,6 +41,7 @@ class Workflow(object):
         self.pvcs = []
         self.service_account = None
         self.security_context = None
+        self.image_pull_secrets = []
 
     def add_template(self, template: Template):
         self.templates.update({template.name: template})
@@ -63,6 +65,9 @@ class Workflow(object):
 
     def add_volume(self, volume: Volume):
         self.volumes.append(volume.to_dict())
+
+    def add_image_pull_secret(self, image_pull_secret: ImagePullSecret):
+        self.image_pull_secrets.append(image_pull_secret.to_dict())
 
     def has_volume(self, name):
         for volume in self.volumes:
@@ -128,6 +133,9 @@ class Workflow(object):
         #     d["metadata"]["labels"] = {"couler_job_user": self.user_id}
 
         workflow_spec = {"entrypoint": entrypoint}
+
+        if self.image_pull_secrets:
+            workflow_spec.update({"imagePullSecrets": self.image_pull_secrets})
 
         if self.security_context:
             workflow_spec["securityContext"] = dict()
