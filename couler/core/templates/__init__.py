@@ -34,3 +34,5 @@ from couler.core.templates.secret import Secret  # noqa: F401
 from couler.core.templates.step import Step, Steps  # noqa: F401
 from couler.core.templates.template import Template  # noqa: F401
 from couler.core.templates.workflow import Workflow  # noqa: F401
+from couler.core.templates.image_pull_secret import ImagePullSecret  # noqa: F401
+
