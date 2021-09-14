@@ -44,6 +44,7 @@ from couler.core.templates import (  # noqa: F401
     OssArtifact,
     S3Artifact,
     Secret,
+    ImagePullSecret
 )
 from couler.core.workflow_validation_utils import (  # noqa: F401
     validate_workflow_yaml,

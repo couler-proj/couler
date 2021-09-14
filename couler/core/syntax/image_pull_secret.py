@@ -12,8 +12,11 @@
 # limitations under the License.
 
 from couler.core import states
-from couler.core.templates.image_pull_secret import ImagePullSecret
+from couler.core.templates import ImagePullSecret
 
 
 def add_image_pull_secret(image_pull_secret: ImagePullSecret):
+    """
+     Add image pull secret to the workflow.
+    """
     states.workflow.add_image_pull_secret(image_pull_secret)
