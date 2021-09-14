@@ -16,10 +16,9 @@ from inspect import getfullargspec
 
 from couler.core import utils
 from couler.core.templates import Container, Job, Script, Step, Template
+from couler.core.templates.image_pull_secret import ImagePullSecret
 from couler.core.templates.volume import Volume
 from couler.core.templates.volume_claim import VolumeClaimTemplate
-from couler.core.templates.image_pull_secret import ImagePullSecret
-
 
 
 class Workflow(object):
