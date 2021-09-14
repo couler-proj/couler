@@ -272,6 +272,7 @@ class Workflow(object):
         self.cluster_config = None
         self.cron_config = None
         self.volumes = []
+        self.image_pull_secrets = []
         self.pvcs = []
         self.service_account = None
         self.security_context = None
