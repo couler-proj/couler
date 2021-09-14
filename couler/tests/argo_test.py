@@ -20,7 +20,7 @@ import couler.argo as couler
 from couler.core import states
 from couler.core.templates.volume import Volume, VolumeMount
 from couler.core.templates.volume_claim import VolumeClaimTemplate
-from couler.core.templates import ImagePullSecret
+from couler.core.templates.image_pull_secret import ImagePullSecret
 
 
 class ArgoBaseTestCase(unittest.TestCase):
