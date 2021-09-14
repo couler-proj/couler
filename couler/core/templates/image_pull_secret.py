@@ -19,8 +19,4 @@ class ImagePullSecret(object):
         self.name = name
 
     def to_dict(self):
-        return OrderedDict(
-            {
-                "name": self.name,
-            }
-        )
+        return OrderedDict({"name": self.name})
