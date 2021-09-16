@@ -35,6 +35,8 @@ class Workflow(object):
         self.clean_ttl = None
         self.dag_mode = False
         self.user_id = None
+        self.dns_policy = None
+        self.dns_config = None
         self.cluster_config = utils.load_cluster_config()
         self.cron_config = None
         self.volumes = []
@@ -108,6 +110,10 @@ class Workflow(object):
             else self.cluster_config._cluster
         )
 
+    def set_dns(self, dns_policy, dns_config):
+        self.dns_policy = dns_policy
+        self.dns_config = dns_config
+
     def to_dict(self):
         d = OrderedDict(
             {
@@ -133,6 +139,12 @@ class Workflow(object):
         #     d["metadata"]["labels"] = {"couler_job_user": self.user_id}
 
         workflow_spec = {"entrypoint": entrypoint}
+
+        if self.dns_policy is not None:
+            workflow_spec["dnsPolicy"] = self.dns_policy
+
+        if self.dns_config is not None:
+            workflow_spec["dnsConfig"] = self.dns_config.to_dict()
 
         if self.security_context:
             workflow_spec["securityContext"] = dict()
@@ -276,3 +288,5 @@ class Workflow(object):
         self.pvcs = []
         self.service_account = None
         self.security_context = None
+        self.dns_config = None
+        self.dns_policy = None

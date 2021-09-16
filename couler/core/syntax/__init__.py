@@ -14,6 +14,7 @@
 from couler.core.syntax.concurrent import concurrent  # noqa: F401
 from couler.core.syntax.conditional import when  # noqa: F401
 from couler.core.syntax.dag import dag, set_dependencies  # noqa: F401
+from couler.core.syntax.dns import set_dns  # noqa: F401
 from couler.core.syntax.exit_handler import set_exit_handler  # noqa: F401
 from couler.core.syntax.image_pull_secret import (  # noqa: F401
     add_image_pull_secret,

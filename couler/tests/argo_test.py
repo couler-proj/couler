@@ -18,6 +18,7 @@ import yaml
 
 import couler.argo as couler
 from couler.core import states
+from couler.core.templates.dns import DnsConfig, DnsConfigOption
 from couler.core.templates.image_pull_secret import ImagePullSecret
 from couler.core.templates.volume import Volume, VolumeMount
 from couler.core.templates.volume_claim import VolumeClaimTemplate
@@ -195,6 +196,29 @@ class ArgoTest(ArgoBaseTestCase):
         wf = couler.workflow_yaml()
         self.assertEqual(wf["spec"]["imagePullSecrets"][0], secret.to_dict())
         self.assertEqual(wf["spec"]["imagePullSecrets"][1], secret1.to_dict())
+        couler._cleanup()
+
+    def test_run_container_with_dns(self):
+        dns_config = DnsConfig(
+            ["10.1.0.1", "0.0.0.0"],
+            [DnsConfigOption("timeout", "1")],
+            ["domain.google.com"],
+        )
+        couler.set_dns("None", dns_config)
+        wf = couler.workflow_yaml()
+        self.assertEqual(wf["spec"]["dnsPolicy"], "None")
+        self.assertEqual(len(wf["spec"]["dnsConfig"]["nameservers"]), 2)
+        self.assertEqual(wf["spec"]["dnsConfig"]["nameservers"][0], "10.1.0.1")
+        self.assertEqual(wf["spec"]["dnsConfig"]["nameservers"][1], "0.0.0.0")
+        self.assertEqual(len(wf["spec"]["dnsConfig"]["options"]), 1)
+        self.assertEqual(
+            wf["spec"]["dnsConfig"]["options"][0]["name"], "timeout"
+        )
+        self.assertEqual(wf["spec"]["dnsConfig"]["options"][0]["value"], "1")
+        self.assertEqual(len(wf["spec"]["dnsConfig"]["searches"]), 1)
+        self.assertEqual(
+            wf["spec"]["dnsConfig"]["searches"][0], "domain.google.com"
+        )
         couler._cleanup()
 
     def test_artifact_passing_script(self):
