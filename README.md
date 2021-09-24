@@ -117,10 +117,10 @@ Please see the following sections for installation guide and examples.
 * Couler currently only supports Argo Workflows. Please see instructions [here](https://argoproj.github.io/argo-workflows/quick-start/#install-argo-workflows)
 to install Argo Workflows on your Kubernetes cluster.
 * Install Python 3.6+
-* Install Couler Python SDK via the following `pip` command:
+* Install Couler Python SDK via the following command:
 
 ```bash
-pip install git+https://github.com/couler-proj/couler
+python3 -m pip install git+https://github.com/couler-proj/couler --ignore-installed
 ```
 Alternatively, you can clone this repository and then run the following to install:
 
