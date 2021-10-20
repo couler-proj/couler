@@ -19,12 +19,12 @@ from couler.core.templates.template import Template
 
 class Step(object):
     def __init__(
-        self, name, template=None, arguments=None, when=None, with_itmes=None
+        self, name, template=None, arguments=None, when=None, with_items=None
     ):
         self.name = name
         self.template = template
         self.arguments = arguments
-        self.with_items = with_itmes
+        self.with_items = with_items
         self.when = when
 
     def to_dict(self):
