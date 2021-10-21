@@ -1,6 +1,6 @@
 pyaml
 kubernetes>=11.0.0
-docker==4.1.0
+docker>=4.1.0
 Deprecated
-stringcase==1.2.0
-StringGenerator==0.4.4
+stringcase>=1.2.0
+StringGenerator>=0.4.4
