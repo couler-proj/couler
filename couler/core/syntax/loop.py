@@ -109,7 +109,7 @@ def map(function, *arguments):
             if not isinstance(arguments[ind_of_func_param], list):
                 arguments[ind_of_func_param] = [arguments[ind_of_func_param]]
 
-            # items are created for the with itmes part in .yaml
+            # items are created for the with items part in .yaml
             para_name = input_parameters[ind_of_func_param]["name"]
             item[para_name] = arguments[ind_of_func_param][ind_of_func_call]
 
