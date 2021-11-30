@@ -15,12 +15,12 @@ from collections import OrderedDict
 
 
 class Toleration(object):
-    def __init__(self, effect, key, operator):
-        self.effect = effect
+    def __init__(self, key, effect, operator):
         self.key = key
+        self.effect = effect
         self.operator = operator
 
     def to_dict(self):
         return OrderedDict(
-            {"effect": self.effect, "key": self.key, "operator": self.operator}
+            {"key": self.key, "effect": self.effect, "operator": self.operator}
         )
