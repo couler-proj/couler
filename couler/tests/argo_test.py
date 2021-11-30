@@ -22,6 +22,7 @@ from couler.core.templates.dns import DnsConfig, DnsConfigOption
 from couler.core.templates.image_pull_secret import ImagePullSecret
 from couler.core.templates.volume import Volume, VolumeMount
 from couler.core.templates.volume_claim import VolumeClaimTemplate
+from couler.core.templates.toleration import Toleration
 
 
 class ArgoBaseTestCase(unittest.TestCase):
