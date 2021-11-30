@@ -179,6 +179,21 @@ class ArgoTest(ArgoBaseTestCase):
         )
         couler._cleanup()
 
+    def test_run_container_with_toleration(self):
+        toleration = Toleration("example", "Exists", "NoSchedule")
+        # couler.add_toleration(toleration)
+        couler.run_container(
+            image="docker/whalesay:latest",
+            args=["echo -n hello world"],
+            command=["bash", "-c"],
+            step_name="A",
+            tolerations=[toleration],
+        )
+
+        wf = couler.workflow_yaml()
+        self.assertEqual(wf["spec"]["tolerations"][0], toleration.to_dict())
+        couler._cleanup()
+
     def test_run_container_with_image_pull_secret(self):
         secret = ImagePullSecret("test-secret")
         couler.add_image_pull_secret(secret)
