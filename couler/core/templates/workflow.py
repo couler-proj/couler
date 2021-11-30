@@ -293,6 +293,7 @@ class Workflow(object):
         self.volumes = []
         self.image_pull_secrets = []
         self.pvcs = []
+        self.tolerations = []
         self.service_account = None
         self.security_context = None
         self.dns_config = None
