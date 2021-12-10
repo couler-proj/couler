@@ -11,7 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import atexit
 import logging
 
 import pyaml
@@ -278,8 +277,3 @@ def create_secret(
         states._secrets[secret.name] = secret
 
     return secret.name
-
-
-# Dump the YAML when exiting
-init_yaml_dump()
-atexit.register(_dump_yaml)
