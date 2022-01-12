@@ -138,7 +138,7 @@ class Container(Template):
 
         # Labels
         if self.labels is not None:
-            if "metadata" is not in template:
+            if "metadata" not in template:
                 template["metadata"] = {}
             manifest["metadata"].update({"labels": labels})
 
