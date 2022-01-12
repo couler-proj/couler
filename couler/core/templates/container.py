@@ -158,6 +158,8 @@ class Container(Template):
             else:
                 template["outputs"] = {"parameters": _output_list}
 
+        # TODO: remove this
+        print(template)
         return template
 
     def container_dict(self):
