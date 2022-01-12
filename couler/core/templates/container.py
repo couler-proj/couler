@@ -90,7 +90,11 @@ class Container(Template):
                     if isinstance(arg, OutputJob):
                         for _ in range(3):
                             parameters.append(
-                                {"name": utils.input_parameter_name(self.name, i)}
+                                {
+                                    "name": utils.input_parameter_name(
+                                        self.name, i
+                                    )
+                                }
                             )
                             i += 1
                     else:
@@ -140,7 +144,7 @@ class Container(Template):
         if self.labels is not None:
             if "metadata" not in template:
                 template["metadata"] = {}
-            manifest["metadata"].update({"labels": labels})
+            template["metadata"].update({"labels": self.labels})
 
         # Output
         if self.output is not None:
@@ -160,12 +164,16 @@ class Container(Template):
         # Container part
         container = OrderedDict({"image": self.image, "command": self.command})
         if utils.non_empty(self.args):
-            container["args"] = self._convert_args_to_input_parameters(self.args)
+            container["args"] = self._convert_args_to_input_parameters(
+                self.args
+            )
         if utils.non_empty(self.env):
             container["env"] = utils.convert_dict_to_env_list(self.env)
         if self.secret is not None:
             if not isinstance(self.secret, Secret):
-                raise ValueError("Parameter secret should be an instance of Secret")
+                raise ValueError(
+                    "Parameter secret should be an instance of Secret"
+                )
             if self.env is None:
                 container["env"] = self.secret.to_env_list()
             else:
@@ -183,7 +191,9 @@ class Container(Template):
                 self.image_pull_policy
             )
         if self.volume_mounts is not None:
-            container["volumeMounts"] = [vm.to_dict() for vm in self.volume_mounts]
+            container["volumeMounts"] = [
+                vm.to_dict() for vm in self.volume_mounts
+            ]
         if self.working_dir is not None:
             container["workingDir"] = self.working_dir
         return container
