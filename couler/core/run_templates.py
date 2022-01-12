@@ -84,9 +84,7 @@ def run_script(
     if source is None:
         raise ValueError("Source must be provided")
     func_name, caller_line = utils.invocation_location()
-    func_name = (
-        utils.argo_safe_name(step_name) if step_name is not None else func_name
-    )
+    func_name = utils.argo_safe_name(step_name) if step_name is not None else func_name
 
     if states.workflow.get_template(func_name) is None:
         # Generate the inputs parameter for the template
@@ -163,9 +161,7 @@ def run_script(
         )
         states.workflow.add_template(template)
 
-    step_name = step_update_utils.update_step(
-        func_name, args, step_name, caller_line
-    )
+    step_name = step_update_utils.update_step(func_name, args, step_name, caller_line)
 
     # TODO: need to switch to use field `output` directly
     step_templ = states.workflow.get_template(func_name)
@@ -216,6 +212,7 @@ def run_container(
     node_selector=None,
     cache=None,
     parallelism=None,
+    labels=None,
 ):
     """
     Generate an Argo container template.  For example, the template whalesay
@@ -238,9 +235,7 @@ def run_container(
     :return:
     """
     func_name, caller_line = utils.invocation_location()
-    func_name = (
-        utils.argo_safe_name(step_name) if step_name is not None else func_name
-    )
+    func_name = utils.argo_safe_name(step_name) if step_name is not None else func_name
 
     if states.workflow.get_template(func_name) is None:
         # Generate the inputs parameter for the template
@@ -315,12 +310,11 @@ def run_container(
             node_selector=node_selector,
             cache=cache,
             parallelism=parallelism,
+            labels=labels,
         )
         states.workflow.add_template(template)
 
-    step_name = step_update_utils.update_step(
-        func_name, args, step_name, caller_line
-    )
+    step_name = step_update_utils.update_step(func_name, args, step_name, caller_line)
 
     # TODO: need to switch to use field `output` directly
     step_templ = states.workflow.get_template(func_name)
@@ -382,9 +376,7 @@ def run_job(
         raise ValueError("Input manifest can not be null")
 
     func_name, caller_line = utils.invocation_location()
-    func_name = (
-        utils.argo_safe_name(step_name) if step_name is not None else func_name
-    )
+    func_name = utils.argo_safe_name(step_name) if step_name is not None else func_name
 
     args = []
     if states.workflow.get_template(func_name) is None:
@@ -426,9 +418,7 @@ def run_job(
         )
         states.workflow.add_template(template)
 
-    step_name = step_update_utils.update_step(
-        func_name, args, step_name, caller_line
-    )
+    step_name = step_update_utils.update_step(func_name, args, step_name, caller_line)
 
     # return job name and job uid for reference
     rets = _job_output(step_name, func_name)
@@ -453,16 +443,10 @@ def run_job(
     return rets
 
 
-def run_canned_step(
-    name, args, inputs=None, outputs=None, step_name=None, cache=None
-):
+def run_canned_step(name, args, inputs=None, outputs=None, step_name=None, cache=None):
     func_name, caller_line = utils.invocation_location()
-    func_name = (
-        utils.argo_safe_name(step_name) if step_name is not None else func_name
-    )
-    step_name = step_update_utils.update_step(
-        func_name, args, step_name, caller_line
-    )
+    func_name = utils.argo_safe_name(step_name) if step_name is not None else func_name
+    step_name = step_update_utils.update_step(func_name, args, step_name, caller_line)
     tmpl_args = []
     if states._outputs_tmp is not None:
         tmpl_args.extend(states._outputs_tmp)
