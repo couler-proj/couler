@@ -20,6 +20,7 @@ import couler.argo as couler
 from couler.core import states
 from couler.core.templates.dns import DnsConfig, DnsConfigOption
 from couler.core.templates.image_pull_secret import ImagePullSecret
+from couler.core.templates.toleration import Toleration
 from couler.core.templates.volume import Volume, VolumeMount
 from couler.core.templates.volume_claim import VolumeClaimTemplate
 
@@ -177,6 +178,20 @@ class ArgoTest(ArgoBaseTestCase):
             wf["spec"]["templates"][1]["container"]["volumeMounts"][0],
             volume_mount.to_dict(),
         )
+        couler._cleanup()
+
+    def test_run_container_with_toleration(self):
+        toleration = Toleration("example-toleration", "Exists", "NoSchedule")
+        couler.add_toleration(toleration)
+        couler.run_container(
+            image="docker/whalesay:latest",
+            args=["echo -n hello world"],
+            command=["bash", "-c"],
+            step_name="A",
+        )
+
+        wf = couler.workflow_yaml()
+        self.assertEqual(wf["spec"]["tolerations"][0], toleration.to_dict())
         couler._cleanup()
 
     def test_run_container_with_image_pull_secret(self):

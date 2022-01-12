@@ -17,6 +17,7 @@ from inspect import getfullargspec
 from couler.core import utils
 from couler.core.templates import Container, Job, Script, Step, Template
 from couler.core.templates.image_pull_secret import ImagePullSecret
+from couler.core.templates.toleration import Toleration
 from couler.core.templates.volume import Volume
 from couler.core.templates.volume_claim import VolumeClaimTemplate
 
@@ -42,6 +43,7 @@ class Workflow(object):
         self.volumes = []
         self.image_pull_secrets = []
         self.pvcs = []
+        self.tolerations = []
         self.service_account = None
         self.security_context = None
 
@@ -76,6 +78,9 @@ class Workflow(object):
 
     def add_image_pull_secret(self, image_pull_secret: ImagePullSecret):
         self.image_pull_secrets.append(image_pull_secret.to_dict())
+
+    def add_toleration(self, toleration: Toleration):
+        self.tolerations.append(toleration.to_dict())
 
     def get_step(self, name):
         return self.steps.get(name, None)
@@ -157,6 +162,8 @@ class Workflow(object):
             workflow_spec.update({"imagePullSecrets": self.image_pull_secrets})
         if self.pvcs:
             workflow_spec.update({"volumeClaimTemplates": self.pvcs})
+        if self.tolerations:
+            workflow_spec.update({"tolerations": self.tolerations})
         if self.dag_mode_enabled():
             dag = {"tasks": list(self.dag_tasks.values())}
             ts = [OrderedDict({"name": entrypoint, "dag": dag})]
@@ -286,6 +293,7 @@ class Workflow(object):
         self.volumes = []
         self.image_pull_secrets = []
         self.pvcs = []
+        self.tolerations = []
         self.service_account = None
         self.security_context = None
         self.dns_config = None
