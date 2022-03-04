@@ -48,7 +48,7 @@ class Secret(object):
             {
                 "apiVersion": "v1",
                 "kind": "Secret",
-                "metadata": {"name": self.name, "namespace": self.namespace},
+                "metadata": {"name": self.name, "namespace": self.namespace} if self.namespace != "default" else {"name": self.name},
                 "type": "Opaque",
                 "data": {},
             }

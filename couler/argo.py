@@ -219,6 +219,7 @@ def create_s3_artifact(
     key=None,
     endpoint=None,
     is_global=False,
+    insecure=False,
 ):
     """
     Configure the object as S3Artifact
@@ -228,6 +229,7 @@ def create_s3_artifact(
     :param accesskey_secret: s3 user key
     :param key: key of s3 object
     :param endpoint: end point of s3
+    :param insecure: use HTTP instead of HTTPS when True
     :return:
     """
     return S3Artifact(
@@ -238,6 +240,7 @@ def create_s3_artifact(
         key=key,
         endpoint=endpoint,
         is_global=is_global,
+        insecure=insecure,
     )
 
 
