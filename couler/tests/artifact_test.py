@@ -93,6 +93,7 @@ class ArtifactTest(ArgoYamlTest):
         self.assertEqual(s3_config["key"], "s3path/t1")
         self.assertEqual(s3_config["accessKeySecret"]["key"], "accessKey")
         self.assertEqual(s3_config["secretKeySecret"]["key"], "secretKey")
+        self.assertEqual(s3_config["insecure"], True)
 
     def test_output_s3_artifact(self):
         # the content of local file would be uploaded to OSS
@@ -103,6 +104,7 @@ class ArtifactTest(ArgoYamlTest):
             accesskey_secret="abc12345",
             key="s3path/t1",
             endpoint="xyz.com",
+            insecure=True,
         )
         couler.run_container(
             image="docker/whalesay:latest",
@@ -125,6 +127,7 @@ class ArtifactTest(ArgoYamlTest):
             accesskey_secret="abc12345",
             key="s3path/t1",
             endpoint="xyz.com",
+            insecure=True,
         )
 
         # read the content from an S3 bucket

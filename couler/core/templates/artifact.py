@@ -56,6 +56,7 @@ class TypedArtifact(Artifact):
         key=None,
         endpoint="",
         is_global=False,
+        insecure=False,
     ):
         self.type = artifact_type
         self.id = f"output-{self.type}-{utils._get_uuid()}"
@@ -65,6 +66,7 @@ class TypedArtifact(Artifact):
         self.bucket = bucket
         self.key = key
         self.endpoint = endpoint
+        self.insecure = insecure
 
         if accesskey_id and accesskey_secret:
             secret = {"accessKey": accesskey_id, "secretKey": accesskey_secret}
@@ -94,6 +96,8 @@ class TypedArtifact(Artifact):
             config.update({"bucket": self.bucket})
         if self.endpoint:
             config.update({"endpoint": self.endpoint})
+        if self.insecure:
+            config.update({"insecure": self.insecure})
         yaml_output = (
             OrderedDict(
                 {"name": self.id, "path": self.path, self.type: config}
@@ -123,6 +127,7 @@ class S3Artifact(TypedArtifact):
         key=None,
         endpoint="s3.amazonaws.com",
         is_global=False,
+        insecure=False,
     ):
         super().__init__(
             couler.ArtifactType.S3,
@@ -133,6 +138,7 @@ class S3Artifact(TypedArtifact):
             key,
             endpoint,
             is_global,
+            insecure,
         )
 
 

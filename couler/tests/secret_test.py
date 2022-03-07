@@ -42,7 +42,6 @@ class SecretTest(ArgoYamlTest):
         secret1_yaml = couler.states._secrets[secret1].to_yaml()
         secret2_yaml = couler.states._secrets[secret2].to_yaml()
 
-        self.assertEqual(secret1_yaml["metadata"]["namespace"], "default")
         self.assertEqual(secret1_yaml["metadata"]["name"], "dummy1")
         self.assertEqual(len(secret1_yaml["data"]), 2)
         self.assertEqual(
