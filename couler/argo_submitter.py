@@ -135,7 +135,16 @@ class ArgoSubmitter(object):
             if secrets:
                 for secret in secrets:
                     if secret.use_existing is False:
-                        self._create_secret(secret.to_yaml())
+                        if secret.artifact_secret is True:
+                            #For artifact secrets, check if the secret already exists
+                            if secret.name in [ x.metadata.name for x in self.get_core_api_client().list_namespaced_secret(namespace=self.namespace).items ]:
+                                logging.info("Secret {} already exists in the {} namespace. Skipping creation.".format(secret.name, self.namespace))
+                            else:
+                                #Otherwise create the secret
+                                self._create_secret(secret.to_yaml())
+                        else:
+                            #For all other secrets
+                            self._create_secret(secret.to_yaml())
 
             logging.info("Checking workflow name/generatedName %s" % wf_name)
             self.check_name(wf_name)

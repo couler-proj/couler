@@ -265,6 +265,7 @@ def create_secret(
     name=None,
     dry_run=False,
     use_existing=False,
+    artifact_secret=False,
 ):
     """Store the input dict as a secret in k8s, and return the secret name."""
     secret = Secret(
@@ -273,6 +274,7 @@ def create_secret(
         name=name,
         dry_run=dry_run,
         use_existing=use_existing,
+        artifact_secret=artifact_secret,
     )
 
     # avoid create the secret for same input dict

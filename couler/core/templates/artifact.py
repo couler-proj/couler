@@ -70,8 +70,8 @@ class TypedArtifact(Artifact):
 
         if accesskey_id and accesskey_secret:
             secret = {"accessKey": accesskey_id, "secretKey": accesskey_secret}
-            # TODO: check this secret exist or not
-            self.secret = couler.create_secret(secret)
+            # artifact_secret flag causes the secret to be created only when a secret with the same name doesn't exist in the namespace
+            self.secret = couler.create_secret(secret, artifact_secret=True)
         else:
             self.secret = None
 
