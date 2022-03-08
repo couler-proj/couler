@@ -20,7 +20,7 @@ from couler.core import utils
 
 class Secret(object):
     def __init__(
-        self, namespace, data, name=None, dry_run=False, use_existing=False
+        self, namespace, data, name=None, dry_run=False, use_existing=False, artifact_secret=False
     ):
 
         if not isinstance(data, dict):
@@ -41,6 +41,7 @@ class Secret(object):
         self.data = {k: utils.encode_base64(v) for k, v in data.items()}
         self.dry_run = dry_run
         self.use_existing = use_existing
+        self.artifact_secret = artifact_secret
 
     def to_yaml(self):
         """Covert the secret to a secret CRD specification."""
