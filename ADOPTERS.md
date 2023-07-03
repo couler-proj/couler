@@ -10,4 +10,5 @@ This page contains a list of organizations who are using Couler. If you'd like t
 1. [Konnecto](https://www.konnecto.com/)
 1. [Onepanel](https://docs.onepanel.ai/)
 1. [Pipekit](https://pipekit.io/)
+1. [PITS Globale Datenrettungsdienste](https://www.pitsdatenrettung.de/)
 1. [SQLFlow](https://github.com/sql-machine-learning/sqlflow)
