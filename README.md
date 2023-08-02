@@ -1,5 +1,4 @@
-[![CI](https://github.com/couler-proj/couler/workflows/CI/badge.svg)](https://github.com/couler-proj/couler/actions?query=event%3Apush+branch%3Amaster)
-[![Twitter](https://img.shields.io/badge/@CoulerProject--_.svg?style=social&logo=twitter)](https://twitter.com/CoulerProject)
+**This project is no longer actively maintained by the core team. Please reach out to [@terrytangyuan](https://github.com/terrytangyuan) for any questions or potential collaborations.**
 
 # Couler
 
@@ -10,7 +9,7 @@ different workflow engines, such as [Argo Workflows](https://github.com/argoproj
 
 Couler is included in [CNCF Cloud Native Landscape](https://landscape.cncf.io/) and [LF AI Landscape](https://landscape.lfai.foundation).
 
-> Note that while one of ambitious goals of Couler is to support multiple workflow engines, Couler currently only supports Argo Workflows as the workflow orchestration backend. In addition, if you are looking for a Python SDK that provides access to all the available features from Argo Workflows, you might want to check out [the low-level Python SDK maintained by the Argo Workflows team](https://github.com/argoproj/argo-workflows/tree/master/sdks/python).
+> Note that while one of ambitious goals of Couler is to support multiple workflow engines, Couler currently only supports Argo Workflows as the workflow orchestration backend. In addition, if you are looking for a Python SDK that provides access to all the available features from Argo Workflows, you might want to check out [the low-level Python SDK maintained by the Argo Workflows team](https://argoproj.github.io/argo-workflows/client-libraries/).
 
 ## Who uses Couler?
 
