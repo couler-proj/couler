@@ -2,12 +2,9 @@
 
 ## What is Couler?
 
-Couler is a system designed for unified machine learning workflow optimization in the cloud. It endeavors to provide a unified interface for constructing and optimizing workflows across
-various workflow engines, such as [Argo Workflows](https://github.com/argoproj/argo-workflows), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/). Couler enhances workflow efficiency through features like Autonomous Workflow Construction, Automatic Artifact Caching Mechanisms, Big Workflow Auto Parallelism Optimization, and Automatic Hyperparameters Tuning.
-
-Couler is included in [CNCF Cloud Native Landscape](https://landscape.cncf.io/) and [LF AI Landscape](https://landscape.lfai.foundation).
-
-The technical report for Couler can be found at the following link: [Techinal-Report](https://github.com/ignite-abd/Technical-Report-of-Couler)
+* Couler is a system designed for unified machine learning workflow optimization in the cloud. Couler endeavors to provide a unified interface for constructing and optimizing workflows across various workflow engines, such as [Argo Workflows](https://github.com/argoproj/argo-workflows), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/). Couler enhances workflow efficiency through features like Autonomous Workflow Construction, Automatic Artifact Caching Mechanisms, Big Workflow Auto Parallelism Optimization, and Automatic Hyperparameters Tuning.
+* Couler is included in [CNCF Cloud Native Landscape](https://landscape.cncf.io/) and [LF AI Landscape](https://landscape.lfai.foundation).
+* The technical report for Couler can be found at the following link: [Techinal-Report](https://github.com/ignite-abd/Technical-Report-of-Couler)
 
 > Note that while one of ambitious goals of Couler is to support multiple workflow engines, Couler currently only supports Argo Workflows as the workflow orchestration backend. An ambitious goal of Couler is to provide support for multiple workflow engines. While it initially supported only Argo Workflows for workflow orchestration, efforts are now underway to extend support to other workflow engines such as Tekton Pipelines and Apache Airflow.
 > In addition, if you are looking for a Python SDK that provides access to all the available features from Argo Workflows, you might want to check out [the low-level Python SDK maintained by the Argo Workflows team](https://argoproj.github.io/argo-workflows/client-libraries/).
@@ -109,13 +106,8 @@ def recursive():
 Couler is a system for unified Mechine Learning (ML) workflow optimization in cloud and the contributions are outlined below::
 
 * Simplicity and Extensibility: Couler provides a unified programming interface for workflow definition, ensuring independence from the workflow engine and compatibility with various workflow engines such as Argo Workflows, Airflow, and Tekton. 
-
-
 * Automation: Couler integrates LLMs in unified programming code generation. By leveraging LLMs, Couler facilitates the generation of unified programming code using NL descriptions. Additionally, we automate hyperparameters tuning through the integration of Dataset Card and Model Card, enhancing the effectiveness of the autoML process.
-
 * Efficiency: Couler introduces the Intermediate Representative (IR) to depict the workflow Directed Acyclic Graph (DAG), optimizing extensive workflow computations by dividing a large workflow into smaller ones for auto-parallelism optimization. Couler also implements dynamic caching of artifacts, which are the outputs of jobs in the workflow, to minimize redundant computations and ensure fault tolerance.
-
-
 * Open Source Community: The released open-source version of Couler has garnered adoption from multiple companies and end-users. For instance, over 3000 end users are utilizing Couler within Ant Group, and more than 20 companies have adopted Couler as their default workflow engine interface.
 
 Please see the following sections for installation guide and examples.
