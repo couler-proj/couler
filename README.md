@@ -2,7 +2,7 @@
 
 ## What is Couler?
 
-Couler is a system designed for unified Mechine Learning workflow optimization in the cloud. It endeavors to provide a unified interface for constructing and optimizing workflows across
+Couler is a system designed for unified machine learning workflow optimization in the cloud. It endeavors to provide a unified interface for constructing and optimizing workflows across
 various workflow engines, such as [Argo Workflows](https://github.com/argoproj/argo-workflows), [Tekton Pipelines](https://tekton.dev/), and [Apache Airflow](https://airflow.apache.org/). Couler enhances workflow efficiency through features like Autonomous Workflow Construction, Automatic Artifact Caching Mechanisms, Big Workflow Auto Parallelism Optimization, and Automatic Hyperparameters Tuning.
 
 Couler is included in [CNCF Cloud Native Landscape](https://landscape.cncf.io/) and [LF AI Landscape](https://landscape.lfai.foundation).
