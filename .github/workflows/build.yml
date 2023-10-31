@@ -14,7 +14,7 @@ jobs:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
     strategy:
       matrix:
-        python-version: [3.6.7, 3.6.7, 3.6.7]
+        python-version: [3.6.7]
 
     steps:
     - uses: actions/checkout@v2
