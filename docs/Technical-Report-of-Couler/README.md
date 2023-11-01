@@ -3,6 +3,6 @@ Expanding an ML workflow to encompass a wider range of data infrastructure and d
 Currently, numerous workflow engines are available (with over ten being widely recognized). This variety poses a challenge for end-users in terms of mastering different engine APIs. While efforts have primarily focused on optimizing ML Operations (MLOps) for a specific workflow engine, current methods largely overlook workflow optimization across different engines. 
 
 In this work, we design and implement Couler, a system designed for unified ML workflow optimization in the cloud. 
-Our main insight lies in the ability to generate an ML workflow using natural language~(NL) descriptions. 
+Our main insight lies in the ability to generate an ML workflow using natural language (NL) descriptions. 
 We integrate Large Language Models (LLMs) into workflow generation, and provide a unified programming interface for various workflow engines. This approach alleviates the need to understand various workflow engines' APIs. Moreover, Couler enhances workflow computation efficiency by introducing automated caching at multiple stages, enabling large workflow auto-parallelization and automatic hyperparameters tuning. These enhancements minimize redundant computational costs and improve fault tolerance during deep learning workflow training.
 Couler is extensively deployed in real-world production scenarios at Ant Group, handling approximately 22k workflows daily, and has successfully improved the CPU/Memory utilization by more than 15\% and the workflow completion rate by around 17\%.
