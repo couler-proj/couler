@@ -253,6 +253,6 @@ Please cite the repo if you use the code in this repo.
   title = {Couler: Unified Machine Learning Workflow Optimization in Cloud},
   year = {2023},
   publisher = {GitHub},
-  howpublished = {\url{https://github.com/couler-proj/couler}}.
+  howpublished = {\url{https://github.com/couler-proj/couler/tree/master/docs/Technical-Report-of-Couler}}.
 }
 ```
