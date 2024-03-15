@@ -251,8 +251,8 @@ Please cite the repo if you use the code in this repo.
 @misc{Couler,
   author = {Xiaoda Wang, Yuan Tang, Tengda Guo, Bo Sang, Jingji Wu, Jian Sha, Ke Zhang, Jiang Qian, Mingjie Tang},
   title = {Couler: Unified Machine Learning Workflow Optimization in Cloud},
-  year = {2023},
-  publisher = {GitHub},
-  howpublished = {\url{https://github.com/couler-proj/couler/tree/master/docs/Technical-Report-of-Couler}}.
+  year = {2024},
+  publisher = {40th IEEE International Conference on Data Engineering},
+  howpublished = {\url{https://arxiv.org/abs/2403.07608}}.
 }
 ```
