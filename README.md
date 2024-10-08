@@ -6,7 +6,7 @@
 * Couler is included in [CNCF Cloud Native Landscape](https://landscape.cncf.io/) and [LF AI Landscape](https://landscape.lfai.foundation).
 * Check out our technical report published on ICDE 2024 [here](https://arxiv.org/abs/2403.07608).
 
-> Note that while one of ambitious goals of Couler is to support multiple workflow engines, Couler currently only supports Argo Workflows as the workflow orchestration backend. An ambitious goal of Couler is to provide support for multiple workflow engines. While it initially supported only Argo Workflows for workflow orchestration, efforts are now underway to extend support to other workflow engines such as Tekton Pipelines and Apache Airflow.
+> Note that while one of ambitious goals of Couler is to support multiple workflow engines, Couler currently only supports Argo Workflows as the workflow orchestration backend. An ambitious goal of Couler is to provide support for multiple workflow engines. While it initially supported only Argo Workflows for workflow orchestration, we are actively working on enhancing our support for Airflow and the current system supports about 40-50% of the Airflow API.
 > In addition, if you are looking for a Python SDK that provides access to all the available features from Argo Workflows, you might want to check out [the low-level Python SDK maintained by the Argo Workflows team](https://argoproj.github.io/argo-workflows/client-libraries/).
 
 
